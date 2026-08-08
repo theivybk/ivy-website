@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu | The Ivy Bar and Kitchen — Lakeview, Chicago</title>
+<meta name="description" content="Full food, pizza, beer, cocktail, wine &amp; spirits menu for The Ivy Bar and Kitchen in Lakeview, Chicago — Chicago Tavern &amp; Detroit Pan pizza, smash burgers, and craft cocktails.">
+<link rel="canonical" href="https://www.theivybk.com/menu">
+<meta property="og:type" content="restaurant.menu">
+<meta property="og:title" content="Menu | The Ivy Bar and Kitchen">
+<meta property="og:description" content="Chicago Tavern &amp; Detroit Pan pizza, smash burgers, craft cocktails and a deep spirits list — the full menu for The Ivy in Lakeview, Chicago.">
+<meta property="og:image" content="https://www.theivybk.com/assets/img/gallery/DSC_0928.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<style>
+  .page-hero {
+    padding: var(--sp-9) 0 var(--sp-7); text-align: center;
+    background: var(--bg-alt); border-bottom: 1px solid var(--border-hair);
+  }
+  .page-hero h1 { font-size: var(--fs-6xl); font-style: italic; margin-bottom: var(--sp-2); }
+  .page-hero p { color: var(--fg-2); font-family: var(--font-ui); font-size: var(--fs-sm); }
+
+  /* Tabs */
+  .tabs {
+    position: sticky; top: var(--nav-h-desktop); z-index: 40;
+    background: var(--cream); border-bottom: 1px solid var(--border-hair);
+    display: flex; justify-content: center; gap: var(--sp-8);
+    overflow-x: auto;
+  }
+  .tabs button {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--font-ui); font-size: var(--fs-xs); font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--fg-3);
+    padding: var(--sp-5) var(--sp-2); border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out);
+  }
+  .tabs button:hover { color: var(--ivy); }
+  .tabs button.active { color: var(--ivy); border-bottom-color: var(--brass); }
+
+  .panel { display: none; padding: var(--sp-9) 0 var(--sp-11); }
+  .panel.active { display: block; }
+
+  .menu-sections { columns: 2; column-gap: var(--sp-9); }
+  .menu-section { break-inside: avoid; margin-bottom: var(--sp-8); }
+  .menu-section h2 {
+    font-style: italic; font-size: var(--fs-3xl); text-align: center; margin-bottom: 2px;
+  }
+  .menu-section .seclabel {
+    display: block; text-align: center; font-family: var(--font-ui); font-size: var(--fs-2xs);
+    font-weight: 600; letter-spacing: .3em; text-transform: uppercase; color: var(--brass);
+    margin-bottom: var(--sp-5);
+  }
+  .subhead {
+    font-family: var(--font-ui); font-size: var(--fs-2xs); font-weight: 600;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--ivy);
+    margin: var(--sp-5) 0 var(--sp-3); padding-bottom: 4px; border-bottom: 1px solid var(--border-hair);
+  }
+  .item { margin: 0 0 var(--sp-4); }
+  .item .row { display: flex; align-items: baseline; gap: 8px; }
+  .item .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); white-space: nowrap; }
+  .item .leader { flex: 1; height: 1px; border-bottom: 1px dotted var(--border-strong); transform: translateY(-4px); min-width: 12px; }
+  .item .price { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); color: var(--brass-deep); }
+  .item .desc { font-style: italic; color: var(--fg-2); font-size: var(--fs-sm); margin-top: 2px; }
+  .item .opts { font-family: var(--font-ui); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--brass-deep); margin-top: 2px; }
+
+  .beer-row { display: flex; align-items: baseline; gap: 6px; margin: 3px 0; }
+  .beer-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
+  .beer-row .name em { font-style: normal; font-family: var(--font-ui); font-size: 10px; color: var(--fg-3); margin-left: 6px; text-transform: uppercase; }
+  .beer-row .leader { flex: 1; height: 1px; border-bottom: 1px dotted var(--border-strong); transform: translateY(-3px); min-width: 10px; }
+  .beer-row .price { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); color: var(--brass-deep); }
+
+  .wine-head { display: grid; grid-template-columns: 1fr 40px 40px; font-family: var(--font-ui); font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-3); border-bottom: 1px solid var(--border-hair); padding-bottom: 4px; margin-bottom: 4px; }
+  .wine-head span:not(:first-child) { text-align: right; }
+  .wine-row { display: grid; grid-template-columns: 1fr 40px 40px; align-items: start; margin-bottom: 6px; }
+  .wine-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); }
+  .wine-row .meta { font-style: italic; color: var(--fg-3); font-size: 11px; }
+  .wine-row .price { font-family: var(--font-display); font-weight: 600; color: var(--brass-deep); text-align: right; font-size: var(--fs-sm); }
+
+  .pour-row { display: flex; align-items: baseline; gap: 6px; margin: 1px 0; }
+  .pour-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
+  .pour-row .name em { font-style: italic; color: var(--fg-3); font-size: 11px; margin-left: 3px; }
+  .pour-row .leader { flex: 1; border-bottom: 1px dotted var(--border-strong); margin: 0 4px 3px; min-width: 8px; }
+  .pour-row .price { font-family: var(--font-display); font-weight: 600; color: var(--brass-deep); font-size: var(--fs-sm); white-space: nowrap; }
+
+  .pour-note { font-style: italic; color: var(--fg-3); font-size: 12px; text-align: center; margin: 0 0 var(--sp-3); }
+
+  .byo-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0 var(--sp-6); margin-top: var(--sp-5); }
+  .byo-grid h3 { font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--ivy); text-align:center; border-bottom: 1px solid var(--border-hair); padding-bottom: 6px; margin-bottom: 8px;}
+  .byo-grid ul { list-style: none; padding: 0; margin: 0; text-align: center; }
+  .byo-grid li { font-family: var(--font-display); font-size: var(--fs-sm); margin-bottom: 4px; }
+  .byo-grid li span { font-family: var(--font-ui); font-size: 11px; color: var(--brass-deep); margin-left: 4px; }
+  .toppings-list { columns: 3; margin-top: var(--sp-5); }
+  .toppings-list li { font-family: var(--font-display); font-size: var(--fs-sm); margin-bottom: 4px; break-inside: avoid; }
+  .toppings-list li::before { content: "· "; color: var(--brass); }
+
+  .menu-footnote { text-align: center; font-family: var(--font-ui); font-size: 11px; color: var(--fg-3); letter-spacing: .06em; margin-top: var(--sp-7); }
+
+  @media (max-width: 860px) { .menu-sections { columns: 1; } .byo-grid { grid-template-columns: 1fr; gap: var(--sp-5); } .toppings-list { columns: 2; } }
+</style>
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="wrap">
+    <a href="index.html" class="brand"><img src="assets/img/logo/logo-green.png" alt="The Ivy Bar and Kitchen" class="brand-logo"></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="menu.html" class="active">Menu</a>
+      <a href="private-events.html">Private Events</a>
+      <a href="careers.html">Careers</a>
+      <a href="index.html#hours">Hours &amp; Location</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <a href="tel:+17737998160" class="nav-phone">(773) 799-8160</a>
+    <a href="index.html#reserve" class="btn btn--primary">Reserve a Table</a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="menu.html" class="active">Menu</a>
+    <a href="private-events.html">Private Events</a>
+    <a href="careers.html">Careers</a>
+    <a href="index.html#hours">Hours &amp; Location</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="tel:+17737998160" class="mobile-phone">(773) 799-8160</a>
+    <a href="index.html#reserve" class="btn btn--primary mobile-cta">Reserve a Table</a>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">The Full Spread</span>
+    <h1>Menu</h1>
+    <p>1625 W Irving Park Rd · Please notify your server of any allergies · 3% credit card processing fee applied to all card transactions</p>
+  </div>
+</section>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="food" class="active">Food</button>
+  <button data-tab="pizza">Pizza</button>
+  <button data-tab="beer">Beer</button>
+  <button data-tab="cocktails">Cocktails &amp; Wine</button>
+  <button data-tab="spirits">Spirits</button>
+  <button data-tab="kids">Kids</button>
+</nav>
+
+<!-- ══════════════════ FOOD ══════════════════ -->
+<section class="panel active" id="food" data-panel>
+  <div class="wrap">
+    <div class="menu-sections">
+
+      <div class="menu-section">
+        <h2>Small Plates</h2><span class="seclabel">to share, or not</span>
+        <div class="item"><div class="row"><div class="name">Hummus</div><span class="leader"></span><div class="price">16</div></div>
+          <div class="desc">Whipped silky, drizzled with EVOO, sumac &amp; parsley. Served with cucumbers, red bell peppers, Greek &amp; Kalamata marinated olives, roasted chickpeas &amp; warm pita</div></div>
+        <div class="item"><div class="row"><div class="name">Pretzel Twist</div><span class="leader"></span><div class="price">14</div></div>
+          <div class="desc">Served with whole grain mustard &amp; cheese sauce</div></div>
+        <div class="item"><div class="row"><div class="name">Cheese Curds</div><span class="leader"></span><div class="price">12</div></div>
+          <div class="desc">Served with spicy ranch</div></div>
+        <div class="item"><div class="row"><div class="name">Fries</div><span class="leader"></span><div class="price">9</div></div>
+          <div class="desc">Go truffle, topped with parmesan &amp; parsley — +1</div></div>
+        <div class="item"><div class="row"><div class="name">Green Beans</div><span class="leader"></span><div class="price">11</div></div>
+          <div class="desc">Blistered in lemon butter, finished with grated parmesan &amp; crispy fried onions</div></div>
+        <div class="item"><div class="row"><div class="name">Brussel Sprouts</div><span class="leader"></span><div class="price">11</div></div>
+          <div class="desc">Crisped in a honey-sriracha glaze, dusted with tuxedo sesame seeds</div></div>
+        <div class="item"><div class="row"><div class="name">Crispy Wings</div><span class="leader"></span><div class="price">16</div></div>
+          <div class="opts">BBQ · Buffalo · Butter Chicken · Giardiniera Hot Honey</div>
+          <div class="desc">Served with ranch or bleu cheese</div></div>
+        <div class="item"><div class="row"><div class="name">Chicken Tenders</div><span class="leader"></span><div class="price">14</div></div>
+          <div class="opts">Ranch · Bleu Cheese · BBQ · Buffalo · Dijon Honey Mustard</div></div>
+        <div class="item"><div class="row"><div class="name">Grilled Shrimp</div><span class="leader"></span><div class="price">16</div></div>
+          <div class="desc">Cajun-garlic butter, jalapeño coleslaw tossed in agave lime vinaigrette &amp; a side of honey sriracha, garnished with parsley</div></div>
+        <div class="item"><div class="row"><div class="name">Crispy Pork Belly Bites</div><span class="leader"></span><div class="price">16</div></div>
+          <div class="desc">Honey sriracha glaze, agave lime vinaigrette jalapeño cole slaw</div></div>
+        <div class="item"><div class="row"><div class="name">Nachos</div><span class="leader"></span><div class="price">17</div></div>
+          <div class="desc">Hatch chili cheese, red onions, tomatoes, lettuce, jalapeños, black beans, guacamole, sour cream &amp; chihuahua cheese</div>
+          <div class="opts">Add — Ground Beef +6 · Grilled Shrimp +8 · Steak +12 · Grilled Chicken +6 · Fried Chicken +6 · Bacon +4</div></div>
+        <div class="item"><div class="row"><div class="name">Quesadilla</div><span class="leader"></span><div class="price">15</div></div>
+          <div class="desc">Pico de gallo, sour cream, guacamole &amp; chihuahua cheese</div>
+          <div class="opts">Add — Ground Beef +6 · Grilled Shrimp +8 · Steak +12 · Grilled Chicken +6 · Fried Chicken +6 · Bacon +4 · Black Beans +4</div></div>
+        <div class="item"><div class="row"><div class="name">Mac n' Cheese</div><span class="leader"></span><div class="price">12</div></div>
+          <div class="desc">Cavatappi swirls in a velvety cheese</div>
+          <div class="opts">Add — Ground Beef +6 · Grilled Shrimp +8 · Steak +12 · Grilled Chicken +6 · Fried Chicken +6 · Bacon +4</div></div>
+      </div>
+
+      <div class="menu-section">
+        <h2>Entrées</h2><span class="seclabel">from the kitchen</span>
+        <div class="item"><div class="row"><div class="name">Pan-Seared Walleye</div><span class="leader"></span><div class="price">28</div></div>
+          <div class="desc">Lemon butter, capers &amp; parsley. Served with green beans</div></div>
+        <div class="item"><div class="row"><div class="name">Grilled Steak</div><span class="leader"></span><div class="price">30</div></div>
+          <div class="desc">Marinated hanger steak, chimichurri. Served with brussels sprouts</div></div>
+      </div>
+
+      <div class="menu-section">
+        <h2>Salads</h2><span class="seclabel">crisp, simple, generous</span>
+        <p class="item desc" style="font-size:12px;">Add a protein — Grilled Shrimp +8 · Steak +12 · Grilled Chicken +6 · Fried Chicken +6 · Bacon +4</p>
+        <div class="item"><div class="row"><div class="name">Caesar</div><span class="leader"></span><div class="price">18</div></div>
+          <div class="desc">Crisp romaine, house croutons &amp; parmesan · grilled or fried chicken — buffalo on either</div></div>
+        <div class="item"><div class="row"><div class="name">House Salad</div><span class="leader"></span><div class="price">17</div></div>
+          <div class="desc">Mixed greens, onions, grape tomatoes, shredded carrots, agave lime vinaigrette</div></div>
+        <div class="item"><div class="row"><div class="name">Crispy Chicken Chopped</div><span class="leader"></span><div class="price">21</div></div>
+          <div class="desc">Crisp romaine, avocado, bacon, tomatoes, red onions &amp; bleu cheese dressing</div></div>
+        <div class="item"><div class="row"><div class="name">Summer Salad</div><span class="leader"></span><div class="price">20</div></div>
+          <div class="desc">Mixed greens tossed with sweet strawberries, grape tomatoes &amp; red onion, crumbled feta &amp; toasted almonds in a honey-lemon vinaigrette</div></div>
+      </div>
+
+      <div class="menu-section">
+        <h2>Handhelds</h2><span class="seclabel">served with fries</span>
+        <p class="item desc" style="font-size:12px;">Go truffle +1 · Gluten-free bun available · Sub a vegetarian Beyond patty</p>
+        <div class="item"><div class="row"><div class="name">The Original</div><span class="leader"></span><div class="price">20</div></div>
+          <div class="desc">Two smash patties, house sauce, pickles, caramelized onions &amp; white American cheese, potato bun</div></div>
+        <div class="item"><div class="row"><div class="name">Five Alarm</div><span class="leader"></span><div class="price">20</div></div>
+          <div class="desc">Two smash patties, house sauce, pickles, caramelized onions, jalapeños &amp; pepper jack, potato bun</div></div>
+        <div class="item"><div class="row"><div class="name">The Works</div><span class="leader"></span><div class="price">20</div></div>
+          <div class="desc">Two smash patties, house sauce, pickles, onions, tomatoes, lettuce &amp; white American cheese, potato bun</div></div>
+        <div class="item"><div class="row"><div class="name">Southwest Grilled Chicken</div><span class="leader"></span><div class="price">20</div></div>
+          <div class="desc">Guacamole, lettuce, tomatoes, red onions &amp; chipotle mayo, brioche bun</div></div>
+        <div class="item"><div class="row"><div class="name">Steak Sandwich</div><span class="leader"></span><div class="price">25</div></div>
+          <div class="desc">Hanger steak, chimichurri, provolone, caramelized onions, ciabatta</div></div>
+        <div class="item"><div class="row"><div class="name">Caesar Wrap</div><span class="leader"></span><div class="price">20</div></div>
+          <div class="desc">Crisp romaine, house caesar, croutons &amp; parmesan · grilled or fried chicken</div></div>
+      </div>
+
+      <div class="menu-section">
+        <h2>Dessert</h2><span class="seclabel">a sweet finish</span>
+        <div class="item"><div class="row"><div class="name">Cheesecake</div><span class="leader"></span><div class="price">12</div></div>
+          <div class="desc">Raspberry &amp; blackberry compote</div></div>
+        <div class="item"><div class="row"><div class="name">Gelato</div><span class="leader"></span><div class="price">7</div></div>
+          <div class="desc">Vanilla bean, strawberry cheesecake, double dark chocolate or mango sorbet</div></div>
+        <div class="item"><div class="row"><div class="name">Gelato Trio</div><span class="leader"></span><div class="price">15</div></div>
+          <div class="desc">Choose three</div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ PIZZA ══════════════════ -->
+<section class="panel" id="pizza" data-panel>
+  <div class="wrap">
+    <div class="menu-sections">
+      <div class="menu-section">
+        <h2>From the Oven</h2><span class="seclabel">to start</span>
+        <div class="item"><div class="row"><div class="name">Garlic Bread</div><span class="leader"></span><div class="price">14</div></div></div>
+        <div class="item"><div class="row"><div class="name">Cheesy Garlic Bread</div><span class="leader"></span><div class="price">16</div></div></div>
+      </div>
+      <div class="menu-section">
+        <h2>Chicago Tavern</h2><span class="seclabel">thin, crisp · 12" × 12"</span>
+        <div class="item"><div class="row"><div class="name">Chi-City GOAT</div><span class="leader"></span><div class="price">28</div></div><div class="desc">Italian sausage, giardiniera</div></div>
+        <div class="item"><div class="row"><div class="name">Red Ivy</div><span class="leader"></span><div class="price">27</div></div><div class="desc">Pepperoni, hot honey</div></div>
+        <div class="item"><div class="row"><div class="name">Fowl Play</div><span class="leader"></span><div class="price">28</div></div><div class="desc">Chicken sausage, BBQ sauce, green pepper, caramelized onions</div></div>
+        <div class="item"><div class="row"><div class="name">White Out</div><span class="leader"></span><div class="price">28</div></div><div class="desc">Olive oil, ricotta, spinach, mushrooms, green olives, garlic</div></div>
+      </div>
+      <div class="menu-section">
+        <h2>Detroit Pan</h2><span class="seclabel">golden crust, crisp corners · 8" × 10"</span>
+        <div class="item"><div class="row"><div class="name">The Standard 313</div><span class="leader"></span><div class="price">19</div></div><div class="desc">Cheese, tomato sauce</div></div>
+        <div class="item"><div class="row"><div class="name">Pep In Your Step</div><span class="leader"></span><div class="price">25</div></div><div class="desc">Pepperoni and pepperoni — with some pepperoni on top</div></div>
+        <div class="item"><div class="row"><div class="name">The Bad Boys 5</div><span class="leader"></span><div class="price">25</div></div><div class="desc">Italian sausage, jalapeños, mushrooms, caramelized onions, basil</div></div>
+        <div class="item"><div class="row"><div class="name">Green Assembly Line</div><span class="leader"></span><div class="price">23</div></div><div class="desc">Green peppers, mushrooms, red onions, black olives</div></div>
+      </div>
+      <div class="menu-section" style="grid-column: 1 / -1;">
+        <h2>Build Your Own</h2><span class="seclabel">draft your line-up</span>
+        <p style="text-align:center; font-style:italic; color:var(--fg-2); font-size: var(--fs-sm);">Pick a crust, choose a sauce, then add up to five toppings</p>
+        <div class="byo-grid">
+          <div><h3>I. Crust</h3><ul><li>Tavern 12"×12" <span>22</span></li><li>Detroit 8"×10" <span>19</span></li></ul></div>
+          <div><h3>II. Sauce</h3><ul><li>Tomato</li><li>BBQ</li><li>Olive Oil</li></ul></div>
+          <div><h3>III. Meats +5</h3><ul><li>Italian Sausage</li><li>Pepperoni</li><li>Chicken Sausage</li><li>Bacon</li></ul></div>
+        </div>
+        <h3 style="text-align:center; font-family:var(--font-ui); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ivy); border-bottom:1px solid var(--border-hair); padding-bottom:6px; margin-top:var(--sp-6);">IV. Toppings +3</h3>
+        <ul class="toppings-list">
+          <li>Green Peppers</li><li>Mushrooms</li><li>Red Onions</li><li>Caramelized Onions</li>
+          <li>Black Olives</li><li>Green Olives</li><li>Fresh Jalapeños</li><li>Giardiniera</li>
+          <li>Spinach</li><li>Garlic</li><li>Basil</li><li>Ricotta Dollops</li><li>Butter Chicken</li>
+        </ul>
+      </div>
+    </div>
+    <p class="menu-footnote">Specialty pizzas are served as listed — no additions, though feel free to leave anything off · 20% gratuity on parties of six or more</p>
+  </div>
+</section>
+
+<!-- ══════════════════ BEER ══════════════════ -->
+<section class="panel" id="beer" data-panel>
+  <div class="wrap">
+    <div class="menu-sections">
+      <div class="menu-section">
+        <h2>Draft</h2><span class="seclabel">16 oz pour</span>
+        <div class="subhead">Lager &amp; Pilsner</div>
+        <div class="beer-row"><span class="name">Krombacher Pils</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Central Waters Honey Blonde</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Miller Lite</span><span class="leader"></span><span class="price">6</span></div>
+        <div class="beer-row"><span class="name">Modelo Especial</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="subhead">Kölsch</div>
+        <div class="beer-row"><span class="name">Goose Island Summertime</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="subhead">Wheat Ale</div>
+        <div class="beer-row"><span class="name">Bells Oberon Ale</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Cali Squeeze Blood Orange</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">93 Octane Hefeweizen</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="subhead">West Coast IPA</div>
+        <div class="beer-row"><span class="name">3 Floyds Zombie Dust</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Firestone Union Jack</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Goose Island River Bird</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Lagunitas A Little Sumpin' Sumpin'</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Lagunitas Trooper IPA</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="subhead">Hazy IPA</div>
+        <div class="beer-row"><span class="name">Half Acre Waybird</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Phase Three Rotating Hazy IPA</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Weldwerks Juicy Bits</span><span class="leader"></span><span class="price">8</span></div>
+        <div class="subhead">Amber</div>
+        <div class="beer-row"><span class="name">Phase Three P3 Amber</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="subhead">Sour</div>
+        <div class="beer-row"><span class="name">Rev Brew Freedom Lemonade</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="subhead">Cider</div>
+        <div class="beer-row"><span class="name">Vander Mill Honeycrisp Cider</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="subhead">Stout</div>
+        <div class="beer-row"><span class="name">Guinness Draught <em>20 oz</em></span><span class="leader"></span><span class="price">8</span></div>
+        <div class="subhead">Seltzer</div>
+        <div class="beer-row"><span class="name">Florida Seltzer Blood Orange Pomegranate</span><span class="leader"></span><span class="price">8</span></div>
+      </div>
+
+      <div class="menu-section">
+        <h2>Cans &amp; Bottles</h2><span class="seclabel">domestic · import · craft</span>
+        <div class="beer-row"><span class="name">Bud Light <em>Bottle</em></span><span class="leader"></span><span class="price">5</span></div>
+        <div class="beer-row"><span class="name">Coors Banquet <em>Bottle</em></span><span class="leader"></span><span class="price">5</span></div>
+        <div class="beer-row"><span class="name">Coors Light <em>Bottle</em></span><span class="leader"></span><span class="price">5</span></div>
+        <div class="beer-row"><span class="name">Goose Island 312 <em>Can</em></span><span class="leader"></span><span class="price">5</span></div>
+        <div class="beer-row"><span class="name">Michelob Ultra <em>Bottle</em></span><span class="leader"></span><span class="price">5</span></div>
+        <div class="beer-row"><span class="name">Miller High Life <em>Bottle</em></span><span class="leader"></span><span class="price">5</span></div>
+        <div class="beer-row"><span class="name">Pacifico <em>Bottle</em></span><span class="leader"></span><span class="price">6</span></div>
+
+        <h2 style="margin-top:var(--sp-7);">Seltzers</h2><span class="seclabel">hard seltzer · vodka soda · spiked tea</span>
+        <div class="beer-row"><span class="name">CarBliss Black Raspberry</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">CarBliss Lemon Lime</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">CarBliss Pineapple</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Florida Seltzer Blackberry Agave</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Florida Seltzer Orange Yuzu</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">High Noon Black Cherry</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">High Noon Grapefruit</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">High Noon Peach</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Lucky One Vodka Lemonade</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Sun Cruiser Classic Iced Tea + Vodka</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Sun Cruiser Lemonade + Iced Tea + Vodka</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Sun Cruiser Vodka Lemonade</span><span class="leader"></span><span class="price">7</span></div>
+        <div class="beer-row"><span class="name">Sun Cruiser Vodka Pink Lemonade</span><span class="leader"></span><span class="price">7</span></div>
+
+        <h2 style="margin-top:var(--sp-7);">Ciders</h2><span class="seclabel">dry · fruited · sessionable</span>
+        <div class="beer-row"><span class="name">Right Bee Cider Semi-Dry <em>Can</em></span><span class="leader"></span><span class="price">6</span></div>
+        <div class="beer-row"><span class="name">Schilling Cider Moon Berries <em>Can</em></span><span class="leader"></span><span class="price">6</span></div>
+        <div class="beer-row"><span class="name">Wölffer Estate Dry Cider Rosé <em>Bottle</em></span><span class="leader"></span><span class="price">8</span></div>
+        <div class="beer-row"><span class="name">Wölffer Estate Watermelon Sea Salt <em>Bottle</em></span><span class="leader"></span><span class="price">8</span></div>
+
+        <h2 style="margin-top:var(--sp-7);">Non-Alcoholic</h2><span class="seclabel">craft NA beer &amp; draught</span>
+        <div class="beer-row"><span class="name">Athletic Free Wave Hazy IPA</span><span class="leader"></span><span class="price">6</span></div>
+        <div class="beer-row"><span class="name">Athletic Run Wild IPA</span><span class="leader"></span><span class="price">6</span></div>
+        <div class="beer-row"><span class="name">Guinness Zero Draught</span><span class="leader"></span><span class="price">8</span></div>
+        <div class="beer-row"><span class="name">Krombacher Pilsner NA</span><span class="leader"></span><span class="price">8</span></div>
+
+        <h2 style="margin-top:var(--sp-7);">CBD/THC</h2><span class="seclabel">hemp-infused sparkling</span>
+        <div class="beer-row"><span class="name">Goodwell CBD Sparkling Water Blackberry</span><span class="leader"></span><span class="price">6</span></div>
+        <div class="beer-row"><span class="name">Toke Cosmic Berry <em>THC 2mg</em></span><span class="leader"></span><span class="price">9</span></div>
+        <div class="beer-row"><span class="name">Toke Star Crusher <em>THC 2mg</em></span><span class="leader"></span><span class="price">9</span></div>
+
+        <h2 style="margin-top:var(--sp-7);">Gluten Free</h2><span class="seclabel">dedicated gluten-free brewery</span>
+        <div class="beer-row"><span class="name">Ghostfish Meteor Shower <em>Can</em></span><span class="leader"></span><span class="price">8</span></div>
+        <div class="beer-row"><span class="name">Ghostfish Peak Buster <em>Can</em></span><span class="leader"></span><span class="price">10</span></div>
+        <div class="beer-row"><span class="name">Ghostfish Shrouded Summit <em>Can</em></span><span class="leader"></span><span class="price">8</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ COCKTAILS & WINE ══════════════════ -->
+<section class="panel" id="cocktails" data-panel>
+  <div class="wrap">
+    <div class="menu-sections">
+      <div class="menu-section">
+        <h2>Cocktails</h2><span class="seclabel">classics · spritz · signatures</span>
+        <div class="subhead">Classics</div>
+        <div class="item"><div class="row"><div class="name">Old Fashioned</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Bourbon, demerara, Angostura aromatic &amp; orange bitters, expressed orange peel, bada bing cherry</div></div>
+        <div class="item"><div class="row"><div class="name">Manhattan</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Rye whiskey, sweet vermouth, Angostura aromatic bitters, bada bing cherry</div></div>
+        <div class="item"><div class="row"><div class="name">The Margarita</div><span class="leader"></span><div class="price">14</div></div><div class="opts">classic · mango · spicy</div><div class="desc">Tequila, Gran Gala orange liqueur, fresh lime juice, agave nectar</div></div>
+        <div class="item"><div class="row"><div class="name">Moscow Mule</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Vodka, fresh lime, ginger beer</div></div>
+        <div class="item"><div class="row"><div class="name">Gin Martini</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Gin, dry vermouth rinse, shaken — pimento or bleu cheese stuffed olive</div></div>
+        <div class="item"><div class="row"><div class="name">Vodka Martini</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Vodka, dry vermouth rinse, shaken — pimento or bleu cheese stuffed olive</div></div>
+        <div class="item"><div class="row"><div class="name">Whiskey Sour</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Bourbon, lemon juice, simple syrup</div></div>
+        <div class="subhead">Spritz</div>
+        <div class="item"><div class="row"><div class="name">Sarti Spritz</div><span class="leader"></span><div class="price">14</div></div><div class="desc">Sarti Rosa (blood orange, mango, passion fruit), prosecco, club soda</div></div>
+        <div class="item"><div class="row"><div class="name">Aperol Spritz</div><span class="leader"></span><div class="price">14</div></div><div class="desc">Aperol, prosecco, club soda</div></div>
+        <div class="item"><div class="row"><div class="name">Limoncello Spritz</div><span class="leader"></span><div class="price">14</div></div><div class="desc">Limoncello, prosecco, club soda</div></div>
+        <div class="item"><div class="row"><div class="name">Hugo Spritz</div><span class="leader"></span><div class="price">14</div></div><div class="desc">Elderflower liqueur, prosecco, club soda</div></div>
+        <div class="item"><div class="row"><div class="name">Cubby Blue Spritz</div><span class="leader"></span><div class="price">14</div></div><div class="desc">Orange liqueur, prosecco, club soda</div></div>
+        <div class="subhead">Signatures</div>
+        <div class="item"><div class="row"><div class="name">Mezcalita Mango</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Mezcal, mango puree, lime, Angostura aromatic bitters</div></div>
+        <div class="item"><div class="row"><div class="name">Passion Fruit Paper Plane</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Bourbon, Aperol, Amaro Montenegro, lemon juice, passion fruit syrup</div></div>
+        <div class="item"><div class="row"><div class="name">Blueberry Pineapple Sour</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Vodka, pineapple juice, lemon juice, blueberry syrup</div></div>
+        <div class="item"><div class="row"><div class="name">Toasted Coconut Jungle Bird</div><span class="leader"></span><div class="price">15</div></div><div class="desc">White rum, toasted coconut syrup, Campari, pineapple juice, lime juice</div></div>
+        <div class="item"><div class="row"><div class="name">Espresso Martini</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Vodka, cold brew, coffee liqueur, demerara</div></div>
+        <div class="item"><div class="row"><div class="name">Lychee Mojito</div><span class="leader"></span><div class="price">15</div></div><div class="desc">White rum, lychee syrup, fresh lime, muddled mint, club soda</div></div>
+        <div class="item"><div class="row"><div class="name">Lychee Martini</div><span class="leader"></span><div class="price">15</div></div><div class="desc">Vodka, lychee syrup, lemon juice</div></div>
+      </div>
+
+      <div class="menu-section">
+        <h2>Sparkling</h2><span class="seclabel">prosecco &amp; bubbles</span>
+        <div class="wine-head" style="grid-template-columns:1fr 40px;"><span>Selection</span><span>Btl</span></div>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">La Marca Prosecco</div><div class="meta">Veneto, Italy · 187ml split</div></div><div class="price">11</div></div>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">Zardetto Prosecco Brut</div><div class="meta">Veneto, Italy · 187ml split</div></div><div class="price">11</div></div>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">Zardetto Prosecco Rosé</div><div class="meta">Veneto, Italy · 187ml split</div></div><div class="price">11</div></div>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">Zardetto Brut</div><div class="meta">Veneto, Italy</div></div><div class="price">30</div></div>
+
+        <h2 style="margin-top:var(--sp-6);">White</h2><span class="seclabel">crisp · aromatic · round</span>
+        <div class="wine-head"><span>Selection</span><span>Gl</span><span>Btl</span></div>
+        <div class="wine-row"><div><div class="name">Barnard Griffin Chardonnay</div><div class="meta">Columbia Valley, WA</div></div><div class="price">10</div><div class="price">30</div></div>
+        <div class="wine-row"><div><div class="name">Flora Lisa Pinot Grigio</div><div class="meta">Friuli, Italy</div></div><div class="price">10</div><div class="price">30</div></div>
+        <div class="wine-row"><div><div class="name">Villa Maria Sauvignon Blanc</div><div class="meta">Private Bin · Marlborough, NZ</div></div><div class="price">10</div><div class="price">30</div></div>
+        <div class="wine-row"><div><div class="name">Rombauer Sauvignon Blanc</div><div class="meta">Sonoma County, CA</div></div><div class="price">15</div><div class="price">45</div></div>
+
+        <h2 style="margin-top:var(--sp-6);">Rosé</h2><span class="seclabel">bright · floral · refreshing</span>
+        <div class="wine-head"><span>Selection</span><span>Gl</span><span>Btl</span></div>
+        <div class="wine-row"><div><div class="name">Forever Summer by Mirabeau</div><div class="meta">Provence, France</div></div><div class="price">10</div><div class="price">30</div></div>
+        <div class="wine-row"><div><div class="name">Maison Saint AIX Rosé</div><div class="meta">Provence, France</div></div><div class="price">15</div><div class="price">45</div></div>
+
+        <h2 style="margin-top:var(--sp-6);">Red</h2><span class="seclabel">velvet · oak · ember</span>
+        <div class="wine-head"><span>Selection</span><span>Gl</span><span>Btl</span></div>
+        <div class="wine-row"><div><div class="name">Liberty School Cabernet Sauvignon</div><div class="meta">Paso Robles, CA</div></div><div class="price">10</div><div class="price">30</div></div>
+        <div class="wine-row"><div><div class="name">Troublemaker Red Blend</div><div class="meta">Central Coast, CA</div></div><div class="price">10</div><div class="price">30</div></div>
+        <div class="wine-row"><div><div class="name">Raeburn Pinot Noir</div><div class="meta">Sonoma County, CA</div></div><div class="price">12</div><div class="price">35</div></div>
+        <div class="wine-row"><div><div class="name">Austin Hope Cabernet Sauvignon</div><div class="meta">Paso Robles, CA</div></div><div class="price">30</div><div class="price">120</div></div>
+
+        <h2 style="margin-top:var(--sp-6);">Zero Proof</h2><span class="seclabel">alcohol-free</span>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">Wölffer Non-Alc Sparkling Blanc</div><div class="meta">Long Island, NY · 200ml split</div></div><div class="price">11</div></div>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">Aplos Chili Margarita</div><div class="meta">Tequila-style · agave, lime, chili heat</div></div><div class="price">9</div></div>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">Aplos Dragon Fruit Martini</div><div class="meta">Vodka-style · dragon fruit, citrus</div></div><div class="price">9</div></div>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">Aplos Kola Fashioned</div><div class="meta">Whiskey-style · kola, bitters, citrus oil</div></div><div class="price">9</div></div>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">Aplos Mandora Negroni</div><div class="meta">Bitter aperitif · mandarin, herbs</div></div><div class="price">9</div></div>
+        <div class="wine-row" style="grid-template-columns:1fr 40px;"><div><div class="name">Aplos Ume Spritz</div><div class="meta">Sparkling · ume plum, yuzu</div></div><div class="price">9</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ SPIRITS ══════════════════ -->
+<section class="panel" id="spirits" data-panel>
+  <div class="wrap">
+    <p class="pour-note">Prices listed by pour — 1.5 oz / 2 oz</p>
+    <div class="menu-sections">
+      <div class="menu-section">
+        <h2>Whiskey</h2><span class="seclabel">bourbon · rye · scotch · more</span>
+        <p class="pour-note">2 oz cocktail pour available as Old Fashioned, Manhattan or Whiskey Sour — add 4</p>
+        <div class="subhead">Bourbon &amp; American</div>
+        <div class="pour-row"><span class="name">Old Forester 86 Proof</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Blanton's Single Barrel</span><span class="leader"></span><span class="price">15/20</span></div>
+        <div class="pour-row"><span class="name">Buffalo Trace</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Eagle Rare 10 Year</span><span class="leader"></span><span class="price">12/18</span></div>
+        <div class="pour-row"><span class="name">E.H. Taylor Small Batch</span><span class="leader"></span><span class="price">15/20</span></div>
+        <div class="pour-row"><span class="name">Heaven Hill 7 Year</span><span class="leader"></span><span class="price">12/17</span></div>
+        <div class="pour-row"><span class="name">Jack Daniel's</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Jack Daniel's Tennessee Honey</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Jim Beam</span><span class="leader"></span><span class="price">7/12</span></div>
+        <div class="pour-row"><span class="name">Knob Creek</span><span class="leader"></span><span class="price">10/15</span></div>
+        <div class="pour-row"><span class="name">Maker's Mark</span><span class="leader"></span><span class="price">9/14</span></div>
+        <div class="pour-row"><span class="name">Old Forester 1897</span><span class="leader"></span><span class="price">14/19</span></div>
+        <div class="pour-row"><span class="name">Old Forester 1910</span><span class="leader"></span><span class="price">14/19</span></div>
+        <div class="pour-row"><span class="name">Old Forester 1920</span><span class="leader"></span><span class="price">16/22</span></div>
+        <div class="pour-row"><span class="name">Weller Antique 107</span><span class="leader"></span><span class="price">15/19</span></div>
+        <div class="pour-row"><span class="name">Weller Special Reserve</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Wild Turkey 101</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Wild Turkey Rare Breed Bourbon</span><span class="leader"></span><span class="price">14/19</span></div>
+        <div class="pour-row"><span class="name">Woodford Reserve</span><span class="leader"></span><span class="price">10/15</span></div>
+        <div class="subhead">Reserve — 1.5 oz Pour Only</div>
+        <div class="pour-row"><span class="name">Weller 12 Year</span><span class="leader"></span><span class="price">20</span></div>
+        <div class="pour-row"><span class="name">Weller C.Y.P.B.</span><span class="leader"></span><span class="price">30</span></div>
+        <div class="pour-row"><span class="name">Weller Full Proof</span><span class="leader"></span><span class="price">20</span></div>
+        <div class="subhead">Rye</div>
+        <div class="pour-row"><span class="name">Old Forester Rye</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Sazerac Rye</span><span class="leader"></span><span class="price">7/12</span></div>
+        <div class="pour-row"><span class="name">Sazerac Rye 100 Proof</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Sazerac Rye 125 Proof</span><span class="leader"></span><span class="price">10/15</span></div>
+        <div class="pour-row"><span class="name">Wild Turkey Rare Breed Rye</span><span class="leader"></span><span class="price">16/21</span></div>
+        <div class="subhead">Canadian</div>
+        <div class="pour-row"><span class="name">Crown Royal</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Crown Royal Apple</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="subhead">Irish</div>
+        <div class="pour-row"><span class="name">Paddy Old Irish</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Jameson</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Tullamore Dew</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="subhead">Scotch</div>
+        <div class="pour-row"><span class="name">Ardbeg 10 Year <em>Islay</em></span><span class="leader"></span><span class="price">17/23</span></div>
+        <div class="pour-row"><span class="name">Balvenie 12 Year Doublewood <em>Speyside</em></span><span class="leader"></span><span class="price">20/25</span></div>
+        <div class="pour-row"><span class="name">Dewar's White Label <em>blended</em></span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Glendronach 12 Year <em>Highland</em></span><span class="leader"></span><span class="price">20/25</span></div>
+        <div class="pour-row"><span class="name">Glenfiddich 12 Year <em>Speyside</em></span><span class="leader"></span><span class="price">11/16</span></div>
+        <div class="pour-row"><span class="name">Lagavulin 16 Year <em>Islay</em></span><span class="leader"></span><span class="price">34/44</span></div>
+        <div class="pour-row"><span class="name">Monkey Shoulder <em>blended</em></span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Oban 14 Year <em>Highland</em></span><span class="leader"></span><span class="price">27/35</span></div>
+
+        <h2 style="margin-top:var(--sp-6);">Vodka</h2><span class="seclabel">2 oz cocktail pour +4</span>
+        <div class="pour-row"><span class="name">Wheatley</span><span class="leader"></span><span class="price">7/12</span></div>
+        <div class="pour-row"><span class="name">Grey Goose</span><span class="leader"></span><span class="price">9/15</span></div>
+        <div class="pour-row"><span class="name">Helix 7</span><span class="leader"></span><span class="price">7/12</span></div>
+        <div class="pour-row"><span class="name">Ketel One</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Ketel One Botanical Cucumber &amp; Mint</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Ketel One Botanical Grapefruit &amp; Rose</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Ketel One Botanical Peach &amp; Orange</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Ketel One Citroen</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Ketel One Oranje</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Tito's</span><span class="leader"></span><span class="price">7/12</span></div>
+      </div>
+
+      <div class="menu-section">
+        <h2>Gin</h2><span class="seclabel">2 oz Gin Martini pour +4</span>
+        <div class="pour-row"><span class="name">Watershed Four Peel</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Bombay Sapphire</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Hendrick's</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Tanqueray London Dry</span><span class="leader"></span><span class="price">8/13</span></div>
+
+        <h2 style="margin-top:var(--sp-6);">Tequila</h2><span class="seclabel">2 oz Margarita/Paloma pour +4</span>
+        <div class="pour-row"><span class="name">Corazón <em>blanco</em></span><span class="leader"></span><span class="price">7/9</span></div>
+        <div class="pour-row"><span class="name">Corazón <em>reposado</em></span><span class="leader"></span><span class="price">8/10</span></div>
+        <div class="pour-row"><span class="name">Corazón <em>añejo</em></span><span class="leader"></span><span class="price">9/11</span></div>
+        <div class="pour-row"><span class="name">Alma del Jaguar <em>blanco</em></span><span class="leader"></span><span class="price">11/14</span></div>
+        <div class="pour-row"><span class="name">Alma del Jaguar <em>reposado</em></span><span class="leader"></span><span class="price">13/17</span></div>
+        <div class="pour-row"><span class="name">Alma del Jaguar <em>añejo</em></span><span class="leader"></span><span class="price">17/23</span></div>
+        <div class="pour-row"><span class="name">Cazcanes No. 7 <em>blanco</em></span><span class="leader"></span><span class="price">13/18</span></div>
+        <div class="pour-row"><span class="name">Cazcanes No. 7 <em>reposado</em></span><span class="leader"></span><span class="price">15/25</span></div>
+        <div class="pour-row"><span class="name">Cazcanes No. 7 <em>añejo</em></span><span class="leader"></span><span class="price">25/35</span></div>
+        <div class="pour-row"><span class="name">Don Fulano <em>blanco</em></span><span class="leader"></span><span class="price">13/18</span></div>
+        <div class="pour-row"><span class="name">Don Fulano <em>reposado</em></span><span class="leader"></span><span class="price">15/19</span></div>
+        <div class="pour-row"><span class="name">Don Fulano <em>añejo</em></span><span class="leader"></span><span class="price">20/25</span></div>
+        <div class="pour-row"><span class="name">Don Julio <em>blanco</em></span><span class="leader"></span><span class="price">14/18</span></div>
+        <div class="pour-row"><span class="name">Don Julio <em>reposado</em></span><span class="leader"></span><span class="price">15/20</span></div>
+        <div class="pour-row"><span class="name">Don Julio <em>añejo</em></span><span class="leader"></span><span class="price">17/22</span></div>
+        <div class="pour-row"><span class="name">G4 <em>blanco</em></span><span class="leader"></span><span class="price">10/15</span></div>
+        <div class="pour-row"><span class="name">G4 <em>reposado</em></span><span class="leader"></span><span class="price">14/19</span></div>
+        <div class="pour-row"><span class="name">Lalo <em>blanco</em></span><span class="leader"></span><span class="price">10/15</span></div>
+        <div class="pour-row"><span class="name">Lost Lore <em>blanco</em></span><span class="leader"></span><span class="price">14/19</span></div>
+        <div class="pour-row"><span class="name">Lost Lore <em>reposado</em></span><span class="leader"></span><span class="price">16/21</span></div>
+        <div class="pour-row"><span class="name">Lost Lore <em>añejo</em></span><span class="leader"></span><span class="price">22/28</span></div>
+        <div class="pour-row"><span class="name">Mijenta <em>blanco</em></span><span class="leader"></span><span class="price">10/15</span></div>
+        <div class="pour-row"><span class="name">Mijenta <em>reposado</em></span><span class="leader"></span><span class="price">17/22</span></div>
+        <div class="pour-row"><span class="name">Mijenta <em>añejo</em></span><span class="leader"></span><span class="price">42/48</span></div>
+        <div class="pour-row"><span class="name">Patrón <em>blanco</em></span><span class="leader"></span><span class="price">14/19</span></div>
+        <div class="pour-row"><span class="name">Patrón <em>reposado</em></span><span class="leader"></span><span class="price">16/21</span></div>
+        <div class="pour-row"><span class="name">Patrón <em>silver 100 proof</em></span><span class="leader"></span><span class="price">16/21</span></div>
+        <div class="pour-row"><span class="name">Siete Leguas <em>blanco</em></span><span class="leader"></span><span class="price">11/16</span></div>
+        <div class="pour-row"><span class="name">Siete Leguas <em>reposado</em></span><span class="leader"></span><span class="price">12/18</span></div>
+        <div class="pour-row"><span class="name">Siete Leguas <em>añejo</em></span><span class="leader"></span><span class="price">14/19</span></div>
+
+        <h2 style="margin-top:var(--sp-6);">Mezcal</h2><span class="seclabel">2 oz Margarita/Paloma pour +4</span>
+        <div class="pour-row"><span class="name">Los Vecinos</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Banhez Joven</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Ilegal <em>joven</em></span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Ilegal <em>reposado</em></span><span class="leader"></span><span class="price">10/15</span></div>
+        <div class="pour-row"><span class="name">Del Maguey Vida</span><span class="leader"></span><span class="price">13/18</span></div>
+
+        <h2 style="margin-top:var(--sp-6);">Rum</h2>
+        <div class="pour-row"><span class="name">Cane Run Estate</span><span class="leader"></span><span class="price">7/12</span></div>
+        <div class="pour-row"><span class="name">Bacardi Superior</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Captain Morgan</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Diplomático Mantuano</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Diplomático Planas</span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Diplomático Reserva Exclusiva</span><span class="leader"></span><span class="price">9/14</span></div>
+
+        <h2 style="margin-top:var(--sp-6);">Liqueurs &amp; Cordials</h2>
+        <div class="pour-row"><span class="name">Costa del Sole Limoncello</span><span class="leader"></span><span class="price">7/12</span></div>
+        <div class="pour-row"><span class="name">Fernet-Branca</span><span class="leader"></span><span class="price">9/14</span></div>
+        <div class="pour-row"><span class="name">Fireball</span><span class="leader"></span><span class="price">7/12</span></div>
+        <div class="pour-row"><span class="name">Jägermeister</span><span class="leader"></span><span class="price">7/12</span></div>
+        <div class="pour-row"><span class="name">Jeppson's Malört</span><span class="leader"></span><span class="price">5/10</span></div>
+        <div class="pour-row"><span class="name">Rumple Minze <em>peppermint schnapps</em></span><span class="leader"></span><span class="price">8/13</span></div>
+        <div class="pour-row"><span class="name">Screwball <em>peanut butter whiskey</em></span><span class="leader"></span><span class="price">8/13</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ KIDS ══════════════════ -->
+<section class="panel" id="kids" data-panel>
+  <div class="wrap" style="max-width:640px;">
+    <div class="menu-section">
+      <h2>For the Little Ones</h2><span class="seclabel">guests twelve &amp; under</span>
+      <div class="item"><div class="row"><div class="name">The Little OG</div><span class="leader"></span><div class="price">12</div></div><div class="desc">One smash patty, white American cheese · served with fries</div></div>
+      <div class="item"><div class="row"><div class="name">Chicken Tenders</div><span class="leader"></span><div class="price">12</div></div><div class="desc">Hand-breaded · served with fries</div></div>
+      <div class="item"><div class="row"><div class="name">Cheese Pizza</div><span class="leader"></span><div class="price">12</div></div><div class="desc">6"×12" tavern crust, tomato sauce &amp; Wisconsin brick cheese</div></div>
+      <div class="item"><div class="row"><div class="name">Grilled Cheese</div><span class="leader"></span><div class="price">11</div></div><div class="desc">White American cheese on buttered sourdough · served with fries</div></div>
+      <div class="item"><div class="row"><div class="name">Cheese Quesadilla</div><span class="leader"></span><div class="price">10</div></div><div class="desc">Flour tortilla · melted chihuahua cheese</div></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div><img src="assets/img/logo/logo-gold.png" alt="The Ivy Bar and Kitchen" class="brand-logo-footer"><p style="max-width:340px;">A classic neighborhood bar &amp; kitchen three blocks from Wrigley Field.</p></div>
+      <div><h4>Visit</h4><p>1625 W Irving Park Rd<br>Chicago, IL 60613</p></div>
+      <div><h4>Explore</h4><p><a href="index.html">Home</a></p><p><a href="private-events.html">Private Events</a></p><p><a href="careers.html">Careers</a></p></div>
+    </div>
+    <div class="bottom"><span>© 2026 The Ivy Bar &amp; Kitchen</span><span>Lakeview, Chicago</span></div>
+  </div>
+</footer>
+
+<script>
+  const tabs = document.querySelectorAll('#tabs button');
+  const panels = document.querySelectorAll('[data-panel]');
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b => b.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      window.scrollTo({ top: document.getElementById('tabs').offsetTop - 80, behavior: 'smooth' });
+    });
+  });
+
+  const navToggle = document.getElementById('nav-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  navToggle.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', isOpen);
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    mobileMenu.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,222 @@
+/* ============================================================
+   The Ivy — Color & Type Tokens
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400;1,8..60,500&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  --ivy-deep:    #16301F;
+  --ivy:         #1F3D2A;
+  --ivy-mid:     #2E5238;
+  --ivy-soft:    #5C7A66;
+  --ivy-mist:    #D8E0D5;
+
+  --brass-deep:  #8A6C28;
+  --brass:       #B8923D;
+  --brass-light: #D4B26A;
+  --brass-tint:  #F0E4C4;
+
+  --ink:         #14140F;
+  --ink-soft:    #4A4A42;
+  --ink-mute:    #8A8A80;
+
+  --cream:       #F5EFE3;
+  --cream-warm:  #EBE3D2;
+  --cream-pure:  #FBF7EE;
+  --paper:       #FFFFFF;
+
+  --brick:       #8C3A2B;
+  --brick-soft:  #C7705F;
+
+  --fg-1: var(--ink); --fg-2: var(--ink-soft); --fg-3: var(--ink-mute);
+  --fg-display: var(--ivy); --fg-accent: var(--brass);
+  --fg-on-ivy: var(--cream); --fg-on-brass: var(--ink);
+
+  --bg-page: var(--cream); --bg-alt: var(--cream-warm); --bg-card: var(--cream-pure);
+  --bg-inverse: var(--ivy); --bg-deep: var(--ivy-deep);
+  --bg-modal-scrim: rgba(20, 20, 15, 0.40);
+
+  --border-hair: rgba(31, 61, 42, 0.24);
+  --border-strong: rgba(31, 61, 42, 0.55);
+  --border-brass: var(--brass);
+
+  --status-open: var(--ivy); --status-closed: var(--brick);
+
+  --font-display: "Cormorant Garamond", "Garamond", serif;
+  --font-body:    "Source Serif 4", Georgia, serif;
+  --font-ui:      "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --fs-3xs: 11px; --fs-2xs: 12px; --fs-xs: 13px; --fs-sm: 14px; --fs-md: 16px;
+  --fs-lg: 18px; --fs-xl: 20px; --fs-2xl: 24px; --fs-3xl: 30px; --fs-4xl: 38px;
+  --fs-5xl: 48px; --fs-6xl: 64px; --fs-7xl: 84px; --fs-8xl: 112px;
+
+  --lh-tight: 1.05; --lh-snug: 1.15; --lh-normal: 1.4; --lh-body: 1.6; --lh-loose: 1.75;
+  --tr-tight: -0.02em; --tr-display: -0.01em; --tr-body: 0; --tr-ui: 0.01em; --tr-eyebrow: 0.14em;
+
+  --sp-0: 0; --sp-1: 2px; --sp-2: 4px; --sp-3: 8px; --sp-4: 12px; --sp-5: 16px;
+  --sp-6: 24px; --sp-7: 32px; --sp-8: 48px; --sp-9: 64px; --sp-10: 96px; --sp-11: 128px;
+
+  --r-0: 0; --r-xs: 2px; --r-sm: 4px; --r-pill: 999px;
+
+  --shadow-soft: 0 1px 2px rgba(20, 20, 15, 0.04), 0 8px 24px rgba(20, 20, 15, 0.06);
+  --shadow-deep: 0 24px 64px rgba(20, 20, 15, 0.18);
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-fast: 120ms; --t-base: 220ms; --t-slow: 400ms;
+
+  --content-max: 1200px; --reading-max: 640px;
+  --nav-h-desktop: 80px; --nav-h-mobile: 64px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  color: var(--fg-1);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--fg-display);
+  font-weight: 500;
+  margin: 0 0 var(--sp-5) 0;
+}
+p { margin: 0 0 var(--sp-5) 0; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  letter-spacing: var(--tr-eyebrow);
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.wrap { max-width: var(--content-max); margin: 0 auto; padding: 0 var(--sp-7); }
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  letter-spacing: var(--tr-ui);
+  padding: 14px 28px;
+  border-radius: var(--r-xs);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out), transform 100ms var(--ease-out);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn:active { transform: scale(0.98); filter: brightness(0.96); }
+.btn--primary { background: var(--ivy); color: var(--cream); }
+.btn--primary:hover { background: var(--ivy-deep); }
+.btn--ghost { background: transparent; color: var(--ivy); border-color: var(--ivy); }
+.btn--ghost:hover { background: var(--ivy); color: var(--cream); }
+.btn--brass-outline { background: transparent; color: var(--cream); border-color: var(--brass); }
+.btn--brass-outline:hover { background: var(--brass); color: var(--ink); }
+
+/* ── NAV ───────────────────────────────────────────────── */
+.site-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--cream);
+  border-bottom: 1px solid var(--border-hair);
+  height: var(--nav-h-desktop);
+}
+.site-nav .wrap {
+  height: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.site-nav .brand {
+  font-family: var(--font-display);
+  font-style: italic; font-weight: 600;
+  font-size: var(--fs-2xl);
+  color: var(--ivy);
+  display: flex; align-items: center;
+}
+.brand-logo { height: 52px; width: auto; display: block; }
+.brand-logo-footer { height: 88px; width: auto; display: block; margin-bottom: var(--sp-4); }
+.site-nav nav { display: flex; align-items: center; gap: var(--sp-7); }
+.site-nav nav a {
+  font-family: var(--font-ui); font-size: var(--fs-sm); font-weight: 500;
+  color: var(--ink); padding-bottom: 4px; border-bottom: 1px solid transparent;
+  transition: color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out);
+}
+.site-nav nav a:hover, .site-nav nav a.active { color: var(--brass-deep); border-bottom-color: var(--brass); }
+.nav-phone { font-family: var(--font-ui); font-size: var(--fs-xs); font-weight: 500; color: var(--ivy); border-bottom: 1px solid transparent; }
+.nav-phone:hover { border-bottom-color: var(--brass); }
+
+/* ── MOBILE NAV ───────────────────────────────────────── */
+.nav-toggle {
+  display: none;
+  background: none; border: none; cursor: pointer;
+  padding: 8px; margin: -8px; color: var(--ivy);
+}
+.nav-toggle svg { width: 24px; height: 24px; display: block; }
+
+.mobile-menu {
+  display: none;
+  position: fixed; top: var(--nav-h-mobile); left: 0; right: 0; bottom: 0;
+  background: var(--cream);
+  flex-direction: column;
+  padding: var(--sp-6) var(--sp-5);
+  z-index: 49;
+  overflow-y: auto;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  font-family: var(--font-ui); font-size: var(--fs-lg); font-weight: 500; color: var(--ink);
+  padding: var(--sp-5) 0; border-bottom: 1px solid var(--border-hair);
+}
+.mobile-menu .mobile-phone { color: var(--brass-deep); }
+.mobile-menu .mobile-cta { border-bottom: none; margin-top: var(--sp-5); }
+
+@media (max-width: 860px) {
+  .nav-toggle { display: block; }
+  .site-nav .wrap > .nav-phone,
+  .site-nav .wrap > .btn--primary {
+    display: none;
+  }
+}
+
+/* ── FOOTER ───────────────────────────────────────────────── */
+.site-footer {
+  background: var(--ivy); color: var(--cream);
+  padding: var(--sp-10) 0 var(--sp-7);
+}
+.site-footer .cols {
+  display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: var(--sp-9);
+  padding-bottom: var(--sp-8);
+  border-bottom: 1px solid rgba(245,239,227,.2);
+}
+.site-footer h4 {
+  color: var(--brass-light);
+  font-family: var(--font-ui); font-size: var(--fs-2xs); font-weight: 600;
+  letter-spacing: var(--tr-eyebrow); text-transform: uppercase;
+  margin-bottom: var(--sp-5);
+}
+.site-footer p, .site-footer a { color: rgba(245,239,227,.85); font-size: var(--fs-sm); }
+.site-footer a:hover { color: var(--brass-light); }
+.site-footer .brand-line {
+  font-family: var(--font-display); font-style: italic; font-size: var(--fs-3xl); color: var(--cream);
+  margin-bottom: var(--sp-4);
+}
+.site-footer .bottom {
+  display: flex; justify-content: space-between; padding-top: var(--sp-6);
+  font-family: var(--font-ui); font-size: var(--fs-2xs); color: rgba(245,239,227,.6);
+  letter-spacing: .04em;
+}
+
+@media (max-width: 860px) {
+  .site-nav nav { display: none; }
+  .site-footer .cols { grid-template-columns: 1fr; gap: var(--sp-7); }
+  .wrap { padding: 0 var(--sp-5); }
+}

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="The Ivy monogram">
+  <circle cx="32" cy="32" r="32" fill="#1F3D2A"/>
+  <g transform="translate(32 34) scale(0.62)" fill="none" stroke="#F5EFE3" stroke-width="2.6" stroke-linejoin="round">
+    <path d="M 0 -18 C 12 -18, 22 -8, 22 4 C 22 16, 12 24, 0 24 C -12 24, -22 16, -22 4 C -22 -8, -12 -18, 0 -18 Z M 0 -18 C -3 -10, -5 -2, -5 6 C -5 14, -3 20, 0 24 M 0 -18 C 3 -10, 5 -2, 5 6 C 5 14, 3 20, 0 24 M -18 -2 C -10 -4, 0 -5, 18 -2 M -20 8 C -10 6, 10 6, 20 8"/>
+    <path d="M 0 24 L 0 31"/>
+  </g>
+</svg>
