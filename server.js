@@ -4,7 +4,7 @@ const path = require('path');
 const zlib = require('zlib');
 
 const PORT = process.env.PORT || 3000;
-const ROOT = path.join(__dirname, 'site');
+const ROOT = path.join(__dirname, 'dist');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',

@@ -1,19 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Menu | The Ivy Bar and Kitchen — Lakeview, Chicago</title>
-<meta name="description" content="Full food, pizza, beer, cocktail, wine &amp; spirits menu for The Ivy Bar and Kitchen in Lakeview, Chicago — Chicago Tavern &amp; Detroit Pan pizza, smash burgers, and craft cocktails.">
-<link rel="canonical" href="https://www.theivybk.com/menu">
-<meta property="og:type" content="restaurant.menu">
-<meta property="og:title" content="Menu | The Ivy Bar and Kitchen">
-<meta property="og:description" content="Chicago Tavern &amp; Detroit Pan pizza, smash burgers, craft cocktails and a deep spirits list — the full menu for The Ivy in Lakeview, Chicago.">
-<meta property="og:image" content="https://www.theivybk.com/assets/img/gallery/DSC_0928.jpg">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<script type="application/ld+json">
-{
+---
+import Layout from '../layouts/Layout.astro';
+
+const jsonLd = {
   "@context": "https://schema.org",
   "@type": ["Restaurant", "BarOrPub"],
   "name": "The Ivy Bar and Kitchen",
@@ -30,131 +18,25 @@
     "addressCountry": "US"
   },
   "areaServed": ["Lakeview, Chicago", "Wrigleyville, Chicago", "Chicago, IL"],
-  "menu": "https://www.theivybk.com/menu.html",
+  "menu": "https://www.theivybk.com/menu",
   "sameAs": [
     "https://www.instagram.com/theivybk/",
     "https://www.facebook.com/p/The-Ivy-Bar-and-Kitchen-61587359361446/"
   ]
-}
-</script>
-<link rel="stylesheet" href="assets/css/tokens.css">
-<style>
-  .page-hero {
-    padding: var(--sp-9) 0 var(--sp-7); text-align: center;
-    background: var(--bg-alt); border-bottom: 1px solid var(--border-hair);
-  }
-  .page-hero h1 { font-size: var(--fs-6xl); font-style: italic; margin-bottom: var(--sp-2); }
-  .page-hero p { color: var(--fg-2); font-family: var(--font-ui); font-size: var(--fs-sm); }
-
-  /* Tabs */
-  .tabs {
-    position: sticky; top: var(--nav-h-desktop); z-index: 40;
-    background: var(--cream); border-bottom: 1px solid var(--border-hair);
-    display: flex; justify-content: center; gap: var(--sp-8);
-    overflow-x: auto;
-  }
-  .tabs button {
-    background: none; border: none; cursor: pointer;
-    font-family: var(--font-ui); font-size: var(--fs-xs); font-weight: 600;
-    letter-spacing: .1em; text-transform: uppercase; color: var(--fg-3);
-    padding: var(--sp-5) var(--sp-2); border-bottom: 2px solid transparent;
-    white-space: nowrap;
-    transition: color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out);
-  }
-  .tabs button:hover { color: var(--ivy); }
-  .tabs button.active { color: var(--ivy); border-bottom-color: var(--brass); }
-
-  .panel { display: none; padding: var(--sp-9) 0 var(--sp-11); }
-  .panel.active { display: block; }
-
-  .menu-sections { columns: 2; column-gap: var(--sp-9); }
-  .menu-section { break-inside: avoid; margin-bottom: var(--sp-8); }
-  .menu-section h2 {
-    font-style: italic; font-size: var(--fs-3xl); text-align: center; margin-bottom: 2px;
-  }
-  .menu-section .seclabel {
-    display: block; text-align: center; font-family: var(--font-ui); font-size: var(--fs-2xs);
-    font-weight: 600; letter-spacing: .3em; text-transform: uppercase; color: var(--brass);
-    margin-bottom: var(--sp-5);
-  }
-  .subhead {
-    font-family: var(--font-ui); font-size: var(--fs-2xs); font-weight: 600;
-    letter-spacing: .18em; text-transform: uppercase; color: var(--ivy);
-    margin: var(--sp-5) 0 var(--sp-3); padding-bottom: 4px; border-bottom: 1px solid var(--border-hair);
-  }
-  .item { margin: 0 0 var(--sp-4); }
-  .item .row { display: flex; align-items: baseline; gap: 8px; }
-  .item .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); white-space: nowrap; }
-  .item .leader { flex: 1; height: 1px; border-bottom: 1px dotted var(--border-strong); transform: translateY(-4px); min-width: 12px; }
-  .item .price { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); color: var(--brass-deep); }
-  .item .desc { font-style: italic; color: var(--fg-2); font-size: var(--fs-sm); margin-top: 2px; }
-  .item .opts { font-family: var(--font-ui); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--brass-deep); margin-top: 2px; }
-
-  .beer-row { display: flex; align-items: baseline; gap: 6px; margin: 3px 0; }
-  .beer-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
-  .beer-row .name em { font-style: normal; font-family: var(--font-ui); font-size: 10px; color: var(--fg-3); margin-left: 6px; text-transform: uppercase; }
-  .beer-row .leader { flex: 1; height: 1px; border-bottom: 1px dotted var(--border-strong); transform: translateY(-3px); min-width: 10px; }
-  .beer-row .price { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); color: var(--brass-deep); }
-
-  .wine-head { display: grid; grid-template-columns: 1fr 40px 40px; font-family: var(--font-ui); font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-3); border-bottom: 1px solid var(--border-hair); padding-bottom: 4px; margin-bottom: 4px; }
-  .wine-head span:not(:first-child) { text-align: right; }
-  .wine-row { display: grid; grid-template-columns: 1fr 40px 40px; align-items: start; margin-bottom: 6px; }
-  .wine-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); }
-  .wine-row .meta { font-style: italic; color: var(--fg-3); font-size: 11px; }
-  .wine-row .price { font-family: var(--font-display); font-weight: 600; color: var(--brass-deep); text-align: right; font-size: var(--fs-sm); }
-
-  .pour-row { display: flex; align-items: baseline; gap: 6px; margin: 1px 0; }
-  .pour-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
-  .pour-row .name em { font-style: italic; color: var(--fg-3); font-size: 11px; margin-left: 3px; }
-  .pour-row .leader { flex: 1; border-bottom: 1px dotted var(--border-strong); margin: 0 4px 3px; min-width: 8px; }
-  .pour-row .price { font-family: var(--font-display); font-weight: 600; color: var(--brass-deep); font-size: var(--fs-sm); white-space: nowrap; }
-
-  .pour-note { font-style: italic; color: var(--fg-3); font-size: 12px; text-align: center; margin: 0 0 var(--sp-3); }
-
-  .byo-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0 var(--sp-6); margin-top: var(--sp-5); }
-  .byo-grid h3 { font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--ivy); text-align:center; border-bottom: 1px solid var(--border-hair); padding-bottom: 6px; margin-bottom: 8px;}
-  .byo-grid ul { list-style: none; padding: 0; margin: 0; text-align: center; }
-  .byo-grid li { font-family: var(--font-display); font-size: var(--fs-sm); margin-bottom: 4px; }
-  .byo-grid li span { font-family: var(--font-ui); font-size: 11px; color: var(--brass-deep); margin-left: 4px; }
-  .toppings-list { columns: 3; margin-top: var(--sp-5); }
-  .toppings-list li { font-family: var(--font-display); font-size: var(--fs-sm); margin-bottom: 4px; break-inside: avoid; }
-  .toppings-list li::before { content: "· "; color: var(--brass); }
-
-  .menu-footnote { text-align: center; font-family: var(--font-ui); font-size: 11px; color: var(--fg-3); letter-spacing: .06em; margin-top: var(--sp-7); }
-
-  @media (max-width: 860px) { .menu-sections { columns: 1; } .byo-grid { grid-template-columns: 1fr; gap: var(--sp-5); } .toppings-list { columns: 2; } }
-</style>
-</head>
-<body>
-
-<header class="site-nav">
-  <div class="wrap">
-    <a href="index.html" class="brand"><img src="assets/img/logo/logo-green.png" alt="The Ivy Bar and Kitchen" class="brand-logo"></a>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="menu.html" class="active">Menu</a>
-      <a href="private-events.html">Private Events</a>
-      <a href="careers.html">Careers</a>
-      <a href="index.html#hours">Hours &amp; Location</a>
-      <a href="index.html#contact">Contact</a>
-    </nav>
-    <a href="tel:+17737998160" class="nav-phone">(773) 799-8160</a>
-    <a href="index.html#reserve" class="btn btn--primary">Reserve a Table</a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="mobile-menu" id="mobile-menu">
-    <a href="index.html">Home</a>
-    <a href="menu.html" class="active">Menu</a>
-    <a href="private-events.html">Private Events</a>
-    <a href="careers.html">Careers</a>
-    <a href="index.html#hours">Hours &amp; Location</a>
-    <a href="index.html#contact">Contact</a>
-    <a href="tel:+17737998160" class="mobile-phone">(773) 799-8160</a>
-    <a href="index.html#reserve" class="btn btn--primary mobile-cta">Reserve a Table</a>
-  </div>
-</header>
+};
+---
+<Layout
+  title="Menu | The Ivy Bar and Kitchen — Lakeview, Chicago"
+  description="Full food, pizza, beer, cocktail, wine &amp; spirits menu for The Ivy Bar and Kitchen in Lakeview, Chicago — Chicago Tavern &amp; Detroit Pan pizza, smash burgers, and craft cocktails."
+  ogTitle="Menu | The Ivy Bar and Kitchen"
+  ogDescription="Chicago Tavern &amp; Detroit Pan pizza, smash burgers, craft cocktails and a deep spirits list — the full menu for The Ivy in Lakeview, Chicago."
+  ogImage="https://www.theivybk.com/assets/img/gallery/DSC_0928.jpg"
+  canonicalPath="/menu"
+  jsonLd={jsonLd}
+  active="menu"
+  navCtaLabel="Reserve a Table"
+  navCtaHref="/#reserve"
+>
 
 <section class="page-hero">
   <div class="wrap">
@@ -615,41 +497,104 @@
   </div>
 </section>
 
-<footer class="site-footer">
-  <div class="wrap">
-    <div class="cols">
-      <div><img src="assets/img/logo/logo-gold.png" alt="The Ivy Bar and Kitchen" class="brand-logo-footer"><p style="max-width:340px;">A classic neighborhood bar &amp; kitchen three blocks from Wrigley Field.</p></div>
-      <div><h4>Visit</h4><p>1625 W Irving Park Rd<br>Chicago, IL 60613</p></div>
-      <div><h4>Explore</h4><p><a href="index.html">Home</a></p><p><a href="private-events.html">Private Events</a></p><p><a href="careers.html">Careers</a></p></div>
-    </div>
-    <div class="bottom"><span>© 2026 The Ivy Bar &amp; Kitchen</span><span>Lakeview, Chicago</span></div>
-  </div>
-</footer>
-
-<script>
+<script is:inline>
   const tabs = document.querySelectorAll('#tabs button');
   const panels = document.querySelectorAll('[data-panel]');
-  tabs.forEach(btn => {
+  tabs.forEach((btn) => {
     btn.addEventListener('click', () => {
-      tabs.forEach(b => b.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
+      tabs.forEach((b) => b.classList.remove('active'));
+      panels.forEach((p) => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById(btn.dataset.tab).classList.add('active');
       window.scrollTo({ top: document.getElementById('tabs').offsetTop - 80, behavior: 'smooth' });
     });
   });
-
-  const navToggle = document.getElementById('nav-toggle');
-  const mobileMenu = document.getElementById('mobile-menu');
-  navToggle.addEventListener('click', () => {
-    const isOpen = mobileMenu.classList.toggle('open');
-    navToggle.setAttribute('aria-expanded', isOpen);
-  });
-  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    mobileMenu.classList.remove('open');
-    navToggle.setAttribute('aria-expanded', 'false');
-  }));
 </script>
+</Layout>
 
-</body>
-</html>
+<style is:global>
+  .page-hero {
+    padding: var(--sp-9) 0 var(--sp-7); text-align: center;
+    background: var(--bg-alt); border-bottom: 1px solid var(--border-hair);
+  }
+  .page-hero h1 { font-size: var(--fs-6xl); font-style: italic; margin-bottom: var(--sp-2); }
+  .page-hero p { color: var(--fg-2); font-family: var(--font-ui); font-size: var(--fs-sm); }
+
+  /* Tabs */
+  .tabs {
+    position: sticky; top: var(--nav-h-desktop); z-index: 40;
+    background: var(--cream); border-bottom: 1px solid var(--border-hair);
+    display: flex; justify-content: center; gap: var(--sp-8);
+    overflow-x: auto;
+  }
+  .tabs button {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--font-ui); font-size: var(--fs-xs); font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--fg-3);
+    padding: var(--sp-5) var(--sp-2); border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out);
+  }
+  .tabs button:hover { color: var(--ivy); }
+  .tabs button.active { color: var(--ivy); border-bottom-color: var(--brass); }
+
+  .panel { display: none; padding: var(--sp-9) 0 var(--sp-11); }
+  .panel.active { display: block; }
+
+  .menu-sections { columns: 2; column-gap: var(--sp-9); }
+  .menu-section { break-inside: avoid; margin-bottom: var(--sp-8); }
+  .menu-section h2 {
+    font-style: italic; font-size: var(--fs-3xl); text-align: center; margin-bottom: 2px;
+  }
+  .menu-section .seclabel {
+    display: block; text-align: center; font-family: var(--font-ui); font-size: var(--fs-2xs);
+    font-weight: 600; letter-spacing: .3em; text-transform: uppercase; color: var(--brass);
+    margin-bottom: var(--sp-5);
+  }
+  .subhead {
+    font-family: var(--font-ui); font-size: var(--fs-2xs); font-weight: 600;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--ivy);
+    margin: var(--sp-5) 0 var(--sp-3); padding-bottom: 4px; border-bottom: 1px solid var(--border-hair);
+  }
+  .item { margin: 0 0 var(--sp-4); }
+  .item .row { display: flex; align-items: baseline; gap: 8px; }
+  .item .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); white-space: nowrap; }
+  .item .leader { flex: 1; height: 1px; border-bottom: 1px dotted var(--border-strong); transform: translateY(-4px); min-width: 12px; }
+  .item .price { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); color: var(--brass-deep); }
+  .item .desc { font-style: italic; color: var(--fg-2); font-size: var(--fs-sm); margin-top: 2px; }
+  .item .opts { font-family: var(--font-ui); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--brass-deep); margin-top: 2px; }
+
+  .beer-row { display: flex; align-items: baseline; gap: 6px; margin: 3px 0; }
+  .beer-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
+  .beer-row .name em { font-style: normal; font-family: var(--font-ui); font-size: 10px; color: var(--fg-3); margin-left: 6px; text-transform: uppercase; }
+  .beer-row .leader { flex: 1; height: 1px; border-bottom: 1px dotted var(--border-strong); transform: translateY(-3px); min-width: 10px; }
+  .beer-row .price { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); color: var(--brass-deep); }
+
+  .wine-head { display: grid; grid-template-columns: 1fr 40px 40px; font-family: var(--font-ui); font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-3); border-bottom: 1px solid var(--border-hair); padding-bottom: 4px; margin-bottom: 4px; }
+  .wine-head span:not(:first-child) { text-align: right; }
+  .wine-row { display: grid; grid-template-columns: 1fr 40px 40px; align-items: start; margin-bottom: 6px; }
+  .wine-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); }
+  .wine-row .meta { font-style: italic; color: var(--fg-3); font-size: 11px; }
+  .wine-row .price { font-family: var(--font-display); font-weight: 600; color: var(--brass-deep); text-align: right; font-size: var(--fs-sm); }
+
+  .pour-row { display: flex; align-items: baseline; gap: 6px; margin: 1px 0; }
+  .pour-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; }
+  .pour-row .name em { font-style: italic; color: var(--fg-3); font-size: 11px; margin-left: 3px; }
+  .pour-row .leader { flex: 1; border-bottom: 1px dotted var(--border-strong); margin: 0 4px 3px; min-width: 8px; }
+  .pour-row .price { font-family: var(--font-display); font-weight: 600; color: var(--brass-deep); font-size: var(--fs-sm); white-space: nowrap; }
+
+  .pour-note { font-style: italic; color: var(--fg-3); font-size: 12px; text-align: center; margin: 0 0 var(--sp-3); }
+
+  .byo-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0 var(--sp-6); margin-top: var(--sp-5); }
+  .byo-grid h3 { font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--ivy); text-align:center; border-bottom: 1px solid var(--border-hair); padding-bottom: 6px; margin-bottom: 8px;}
+  .byo-grid ul { list-style: none; padding: 0; margin: 0; text-align: center; }
+  .byo-grid li { font-family: var(--font-display); font-size: var(--fs-sm); margin-bottom: 4px; }
+  .byo-grid li span { font-family: var(--font-ui); font-size: 11px; color: var(--brass-deep); margin-left: 4px; }
+  .toppings-list { columns: 3; margin-top: var(--sp-5); }
+  .toppings-list li { font-family: var(--font-display); font-size: var(--fs-sm); margin-bottom: 4px; break-inside: avoid; }
+  .toppings-list li::before { content: "· "; color: var(--brass); }
+
+  .menu-footnote { text-align: center; font-family: var(--font-ui); font-size: 11px; color: var(--fg-3); letter-spacing: .06em; margin-top: var(--sp-7); }
+
+  @media (max-width: 860px) { .menu-sections { columns: 1; } .byo-grid { grid-template-columns: 1fr; gap: var(--sp-5); } .toppings-list { columns: 2; } }
+</style>

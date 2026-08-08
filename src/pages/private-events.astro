@@ -1,19 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Private Event Space | The Ivy Bar and Kitchen — Lakeview, Chicago</title>
-<meta name="description" content="Private event space in Lakeview, Chicago — rooftop buyouts, semi-private dining, and full-venue rentals at The Ivy Bar and Kitchen for birthdays, showers, rehearsal dinners, and corporate events.">
-<link rel="canonical" href="https://www.theivybk.com/private-events">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Private Event Space | The Ivy Bar and Kitchen — Lakeview, Chicago">
-<meta property="og:description" content="Book the room. We'll handle the rest. Rooftop and private event space at The Ivy in Lakeview, Chicago.">
-<meta property="og:image" content="https://www.theivybk.com/assets/img/gallery/DSC_1103.jpg">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<script type="application/ld+json">
-{
+---
+import Layout from '../layouts/Layout.astro';
+
+const jsonLd = {
   "@context": "https://schema.org",
   "@type": ["Restaurant", "BarOrPub"],
   "name": "The Ivy Bar and Kitchen",
@@ -38,134 +26,20 @@
     { "@type": "LocationFeatureSpecification", "name": "Private Event Space", "value": true },
     { "@type": "LocationFeatureSpecification", "name": "Full Venue Buyout", "value": true }
   ]
-}
-</script>
-<link rel="stylesheet" href="assets/css/tokens.css">
-<style>
-  .page-hero {
-    position: relative; padding: var(--sp-11) 0 var(--sp-9); text-align: center; color: var(--cream);
-    background: linear-gradient(180deg, rgba(22,48,31,.55), rgba(22,48,31,.88)),
-                url('assets/img/gallery/DSC_1103.jpg') center/cover no-repeat;
-  }
-  .page-hero h1 { color: var(--cream); font-size: var(--fs-6xl); font-style: italic; margin-bottom: var(--sp-4); }
-  .page-hero p { max-width: 560px; margin: 0 auto; color: rgba(245,239,227,.88); }
-
-  .occasions { padding: var(--sp-9) 0; background: var(--bg-alt); }
-  .occ-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); text-align: center; }
-  .occ-grid div {
-    font-family: var(--font-ui); font-size: var(--fs-xs); font-weight: 500; letter-spacing: .04em;
-    padding: var(--sp-4); background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm);
-  }
-
-  .spaces { padding: var(--sp-11) 0; }
-  .spaces-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
-  .space-card {
-    background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm);
-    padding: var(--sp-7); text-align: center;
-  }
-  .space-card .eyebrow { display: block; margin-bottom: var(--sp-2); }
-  .space-card h3 { font-size: var(--fs-xl); margin-bottom: var(--sp-3); }
-  .space-card p { color: var(--fg-2); font-size: var(--fs-sm); margin: 0; }
-  .space-card--photo {
-    padding: 0; text-align: left; overflow: hidden; position: relative; min-height: 320px;
-    display: flex; align-items: flex-end;
-    background-size: cover; background-position: center;
-  }
-  .space-card--photo::before {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(180deg, rgba(22,48,31,0) 40%, rgba(22,48,31,.88) 100%);
-  }
-  .space-card--photo .card-inner { position: relative; z-index: 1; padding: var(--sp-6); }
-  .space-card--photo .eyebrow { color: var(--brass-light); }
-  .space-card--photo h3 { color: var(--cream); }
-  .space-card--photo p { color: rgba(245,239,227,.85); }
-  @media (max-width: 860px) { .spaces-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 560px) { .spaces-grid { grid-template-columns: 1fr; } }
-
-  .form-section { padding: var(--sp-11) 0; }
-  .form-wrap { max-width: 720px; margin: 0 auto; }
-  .form-wrap .section-head { text-align: center; margin-bottom: var(--sp-8); }
-  .form-wrap .section-head h2 { font-size: var(--fs-4xl); font-style: italic; }
-  .form-wrap .section-head p { color: var(--fg-2); font-size: var(--fs-sm); }
-
-  form.event-form { background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm); padding: var(--sp-8); }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); margin-bottom: var(--sp-5); }
-  .form-row.single { grid-template-columns: 1fr; }
-  .field label {
-    display: block; font-family: var(--font-ui); font-size: var(--fs-2xs); font-weight: 600;
-    letter-spacing: .08em; text-transform: uppercase; color: var(--ivy); margin-bottom: var(--sp-2);
-  }
-  .field .req { color: var(--brick); margin-left: 2px; }
-  .field input, .field select, .field textarea {
-    width: 100%; font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink);
-    background: var(--cream-pure); border: 1px solid var(--border-hair); border-radius: var(--r-xs);
-    padding: 12px 14px; transition: border-color var(--t-fast) var(--ease-out);
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    outline: none; border-color: var(--ivy);
-  }
-  .field textarea { resize: vertical; min-height: 110px; font-family: var(--font-body); }
-  .field-note { font-size: 12px; color: var(--fg-3); margin-top: 4px; font-style: italic; }
-
-  .consent-row { display: flex; align-items: flex-start; gap: 10px; margin: var(--sp-6) 0; }
-  .consent-row input { margin-top: 4px; width: auto; }
-  .consent-row label { font-family: var(--font-ui); font-size: 12px; color: var(--fg-2); line-height: 1.5; }
-  .consent-row a { border-bottom: 1px solid var(--brass); }
-
-  .submit-row { text-align: center; margin-top: var(--sp-7); }
-  .submit-row .btn { width: 100%; justify-content: center; padding: 16px; font-size: var(--fs-sm); }
-  .submit-note { text-align: center; font-size: 12px; color: var(--fg-3); margin-top: var(--sp-4); }
-
-  .form-confirm { background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm); padding: var(--sp-8); text-align: center; }
-  .form-confirm h2 { font-style: italic; font-size: var(--fs-4xl); }
-  .form-confirm p { color: var(--fg-2); margin: 0; }
-
-  .why-us { padding: var(--sp-9) 0; background: var(--bg-inverse); color: var(--cream); text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--sp-7); margin-top: var(--sp-7); text-align: left; }
-  .why-grid h3 { color: var(--cream); font-size: var(--fs-xl); }
-  .why-grid p { color: rgba(245,239,227,.8); font-size: var(--fs-sm); margin: 0; }
-
-  @media (max-width: 860px) {
-    .occ-grid { grid-template-columns: repeat(2,1fr); }
-    .form-row { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 560px) {
-    .why-grid { grid-template-columns: 1fr; }
-  }
-</style>
-</head>
-<body>
-
-<header class="site-nav">
-  <div class="wrap">
-    <a href="index.html" class="brand"><img src="assets/img/logo/logo-green.png" alt="The Ivy Bar and Kitchen" class="brand-logo"></a>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="menu.html">Menu</a>
-      <a href="private-events.html" class="active">Private Events</a>
-      <a href="careers.html">Careers</a>
-      <a href="index.html#hours">Hours &amp; Location</a>
-      <a href="index.html#contact">Contact</a>
-    </nav>
-    <a href="tel:+17737998160" class="nav-phone">(773) 799-8160</a>
-    <a href="#inquiry" class="btn btn--primary">Start an Inquiry</a>
-    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="mobile-menu" id="mobile-menu">
-    <a href="index.html">Home</a>
-    <a href="menu.html">Menu</a>
-    <a href="private-events.html" class="active">Private Events</a>
-    <a href="careers.html">Careers</a>
-    <a href="index.html#hours">Hours &amp; Location</a>
-    <a href="index.html#contact">Contact</a>
-    <a href="tel:+17737998160" class="mobile-phone">(773) 799-8160</a>
-    <a href="index.html#reserve" class="btn btn--brass-outline mobile-cta" style="margin-top:8px;">Reserve a Table</a>
-    <a href="#inquiry" class="btn btn--primary mobile-cta">Start an Inquiry</a>
-  </div>
-</header>
+};
+---
+<Layout
+  title="Private Event Space | The Ivy Bar and Kitchen — Lakeview, Chicago"
+  description="Private event space in Lakeview, Chicago — rooftop buyouts, semi-private dining, and full-venue rentals at The Ivy Bar and Kitchen for birthdays, showers, rehearsal dinners, and corporate events."
+  ogTitle="Private Event Space | The Ivy Bar and Kitchen — Lakeview, Chicago"
+  ogDescription="Book the room. We'll handle the rest. Rooftop and private event space at The Ivy in Lakeview, Chicago."
+  ogImage="https://www.theivybk.com/assets/img/gallery/DSC_1103.jpg"
+  canonicalPath="/private-events"
+  jsonLd={jsonLd}
+  active="events"
+  navCtaLabel="Start an Inquiry"
+  navCtaHref="#inquiry"
+>
 
 <section class="page-hero">
   <div class="wrap">
@@ -192,14 +66,14 @@
       <p>From a full rooftop buyout to a quiet back-room dinner — tell us your headcount and we'll match you to the right room.</p>
     </div>
     <div class="spaces-grid">
-      <div class="space-card space-card--photo" style="background-image:url('assets/img/gallery/DSC_0785.jpg')">
+      <div class="space-card space-card--photo" style="background-image:url('/assets/img/gallery/DSC_0785.jpg')">
         <div class="card-inner">
           <span class="eyebrow">Rooftop</span>
           <h3>Second-Floor Rooftop</h3>
           <p>Open-air and covered seating above the bar — one of the only rooftops of its kind in this stretch of Lakeview. Ideal for summer parties and game-day buyouts.</p>
         </div>
       </div>
-      <div class="space-card space-card--photo" style="background-image:url('assets/img/gallery/DSC_1105.jpg')">
+      <div class="space-card space-card--photo" style="background-image:url('/assets/img/gallery/DSC_1105.jpg')">
         <div class="card-inner">
           <span class="eyebrow">Full Buyout</span>
           <h3>Whole-Venue Buyout</h3>
@@ -377,18 +251,7 @@
   </div>
 </section>
 
-<footer class="site-footer">
-  <div class="wrap">
-    <div class="cols">
-      <div><img src="assets/img/logo/logo-gold.png" alt="The Ivy Bar and Kitchen" class="brand-logo-footer"><p style="max-width:340px;">A classic neighborhood bar &amp; kitchen three blocks from Wrigley Field.</p></div>
-      <div><h4>Visit</h4><p>1625 W Irving Park Rd<br>Chicago, IL 60613</p></div>
-      <div><h4>Explore</h4><p><a href="index.html">Home</a></p><p><a href="menu.html">Menu</a></p><p><a href="careers.html">Careers</a></p></div>
-    </div>
-    <div class="bottom"><span>© 2026 The Ivy Bar &amp; Kitchen</span><span>Lakeview, Chicago</span></div>
-  </div>
-</footer>
-
-<script>
+<script is:inline>
   const form = document.getElementById('event-form');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -420,18 +283,99 @@
     document.getElementById('form-confirm').hidden = false;
     document.getElementById('form-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-
-  const navToggle = document.getElementById('nav-toggle');
-  const mobileMenu = document.getElementById('mobile-menu');
-  navToggle.addEventListener('click', () => {
-    const isOpen = mobileMenu.classList.toggle('open');
-    navToggle.setAttribute('aria-expanded', isOpen);
-  });
-  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    mobileMenu.classList.remove('open');
-    navToggle.setAttribute('aria-expanded', 'false');
-  }));
 </script>
+</Layout>
 
-</body>
-</html>
+<style is:global>
+  .page-hero {
+    position: relative; padding: var(--sp-11) 0 var(--sp-9); text-align: center; color: var(--cream);
+    background: linear-gradient(180deg, rgba(22,48,31,.55), rgba(22,48,31,.88)),
+                url('/assets/img/gallery/DSC_1103.jpg') center/cover no-repeat;
+  }
+  .page-hero h1 { color: var(--cream); font-size: var(--fs-6xl); font-style: italic; margin-bottom: var(--sp-4); }
+  .page-hero p { max-width: 560px; margin: 0 auto; color: rgba(245,239,227,.88); }
+
+  .occasions { padding: var(--sp-9) 0; background: var(--bg-alt); }
+  .occ-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); text-align: center; }
+  .occ-grid div {
+    font-family: var(--font-ui); font-size: var(--fs-xs); font-weight: 500; letter-spacing: .04em;
+    padding: var(--sp-4); background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm);
+  }
+
+  .spaces { padding: var(--sp-11) 0; }
+  .spaces-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+  .space-card {
+    background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm);
+    padding: var(--sp-7); text-align: center;
+  }
+  .space-card .eyebrow { display: block; margin-bottom: var(--sp-2); }
+  .space-card h3 { font-size: var(--fs-xl); margin-bottom: var(--sp-3); }
+  .space-card p { color: var(--fg-2); font-size: var(--fs-sm); margin: 0; }
+  .space-card--photo {
+    padding: 0; text-align: left; overflow: hidden; position: relative; min-height: 320px;
+    display: flex; align-items: flex-end;
+    background-size: cover; background-position: center;
+  }
+  .space-card--photo::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(22,48,31,0) 40%, rgba(22,48,31,.88) 100%);
+  }
+  .space-card--photo .card-inner { position: relative; z-index: 1; padding: var(--sp-6); }
+  .space-card--photo .eyebrow { color: var(--brass-light); }
+  .space-card--photo h3 { color: var(--cream); }
+  .space-card--photo p { color: rgba(245,239,227,.85); }
+  @media (max-width: 860px) { .spaces-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .spaces-grid { grid-template-columns: 1fr; } }
+
+  .form-section { padding: var(--sp-11) 0; }
+  .form-wrap { max-width: 720px; margin: 0 auto; }
+  .form-wrap .section-head { text-align: center; margin-bottom: var(--sp-8); }
+  .form-wrap .section-head h2 { font-size: var(--fs-4xl); font-style: italic; }
+  .form-wrap .section-head p { color: var(--fg-2); font-size: var(--fs-sm); }
+
+  form.event-form { background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm); padding: var(--sp-8); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); margin-bottom: var(--sp-5); }
+  .form-row.single { grid-template-columns: 1fr; }
+  .field label {
+    display: block; font-family: var(--font-ui); font-size: var(--fs-2xs); font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--ivy); margin-bottom: var(--sp-2);
+  }
+  .field .req { color: var(--brick); margin-left: 2px; }
+  .field input, .field select, .field textarea {
+    width: 100%; font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink);
+    background: var(--cream-pure); border: 1px solid var(--border-hair); border-radius: var(--r-xs);
+    padding: 12px 14px; transition: border-color var(--t-fast) var(--ease-out);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--ivy);
+  }
+  .field textarea { resize: vertical; min-height: 110px; font-family: var(--font-body); }
+  .field-note { font-size: 12px; color: var(--fg-3); margin-top: 4px; font-style: italic; }
+
+  .consent-row { display: flex; align-items: flex-start; gap: 10px; margin: var(--sp-6) 0; }
+  .consent-row input { margin-top: 4px; width: auto; }
+  .consent-row label { font-family: var(--font-ui); font-size: 12px; color: var(--fg-2); line-height: 1.5; }
+  .consent-row a { border-bottom: 1px solid var(--brass); }
+
+  .submit-row { text-align: center; margin-top: var(--sp-7); }
+  .submit-row .btn { width: 100%; justify-content: center; padding: 16px; font-size: var(--fs-sm); }
+  .submit-note { text-align: center; font-size: 12px; color: var(--fg-3); margin-top: var(--sp-4); }
+
+  .form-confirm { background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm); padding: var(--sp-8); text-align: center; }
+  .form-confirm h2 { font-style: italic; font-size: var(--fs-4xl); }
+  .form-confirm p { color: var(--fg-2); margin: 0; }
+
+  .why-us { padding: var(--sp-9) 0; background: var(--bg-inverse); color: var(--cream); text-align: center; }
+  .why-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--sp-7); margin-top: var(--sp-7); text-align: left; }
+  .why-grid h3 { color: var(--cream); font-size: var(--fs-xl); }
+  .why-grid p { color: rgba(245,239,227,.8); font-size: var(--fs-sm); margin: 0; }
+
+  @media (max-width: 860px) {
+    .occ-grid { grid-template-columns: repeat(2,1fr); }
+    .form-row { grid-template-columns: 1fr; }
+    .why-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .why-grid { grid-template-columns: 1fr; }
+  }
+</style>

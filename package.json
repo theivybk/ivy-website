@@ -2,9 +2,16 @@
   "name": "the-ivy-website",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "The Ivy Bar and Kitchen — website",
   "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
     "start": "node server.js"
+  },
+  "dependencies": {
+    "astro": "^4.16.0"
   },
   "engines": {
     "node": ">=18"

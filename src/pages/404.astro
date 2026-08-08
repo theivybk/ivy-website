@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": ["Restaurant", "BarOrPub"],
+  "name": "The Ivy Bar and Kitchen",
+  "url": "https://www.theivybk.com/404",
+  "telephone": "+17737998160",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "1625 W Irving Park Rd",
+    "addressLocality": "Chicago",
+    "addressRegion": "IL",
+    "postalCode": "60613",
+    "addressCountry": "US"
+  }
+};
+---
+<Layout
+  title="Page Not Found | The Ivy Bar and Kitchen"
+  description="The page you're looking for doesn't exist. Head back to The Ivy Bar and Kitchen homepage."
+  ogImage="https://www.theivybk.com/assets/img/gallery/DSC_1105.jpg"
+  canonicalPath="/404"
+  jsonLd={jsonLd}
+  active="none"
+  navCtaLabel="Reserve a Table"
+  navCtaHref="/#reserve"
+>
+
+<section class="notfound">
+  <div>
+    <span class="eyebrow">404</span>
+    <h1>Nothing here yet.</h1>
+    <p>The page you're looking for wandered off the rooftop. Let's get you back to the table.</p>
+    <a href="/" class="btn btn--primary">Back to Home</a>
+  </div>
+</section>
+</Layout>
+
+<style is:global>
+  .notfound {
+    min-height: 70vh; display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: var(--sp-9) var(--sp-5);
+  }
+  .notfound h1 { font-size: var(--fs-6xl); font-style: italic; margin-bottom: var(--sp-4); }
+  .notfound p { color: var(--fg-2); max-width: 440px; margin: 0 auto var(--sp-7); }
+</style>
