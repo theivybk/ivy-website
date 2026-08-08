@@ -1,10 +1,94 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
 const PORT = process.env.PORT || 3000;
 const ROOT = path.join(__dirname, 'dist');
+
+const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY;
+const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;
+const MAILCHIMP_SERVER_PREFIX = process.env.MAILCHIMP_SERVER_PREFIX;
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', (chunk) => {
+      data += chunk;
+      if (data.length > 10_000) req.destroy();
+    });
+    req.on('end', () => {
+      try {
+        resolve(data ? JSON.parse(data) : {});
+      } catch {
+        reject(new Error('Invalid JSON'));
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
+function mailchimpSubscribe(email) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({ email_address: email, status: 'subscribed' });
+    const auth = Buffer.from(`anystring:${MAILCHIMP_API_KEY}`).toString('base64');
+    const options = {
+      hostname: `${MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com`,
+      path: `/3.0/lists/${MAILCHIMP_LIST_ID}/members`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+        Authorization: `Basic ${auth}`,
+      },
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => (data += chunk));
+      res.on('end', () => {
+        let parsed = {};
+        try { parsed = JSON.parse(data); } catch {}
+        resolve({ status: res.statusCode, body: parsed });
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+async function handleNewsletterSignup(req, res) {
+  if (!MAILCHIMP_API_KEY || !MAILCHIMP_LIST_ID || !MAILCHIMP_SERVER_PREFIX) {
+    res.writeHead(503, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Newsletter signup is not configured yet.' }));
+    return;
+  }
+  try {
+    const { email } = await readJsonBody(req);
+    if (typeof email !== 'string' || !EMAIL_RE.test(email)) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Please enter a valid email address.' }));
+      return;
+    }
+    const result = await mailchimpSubscribe(email);
+    if (result.status === 200 || result.status === 201) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } else if (result.body && result.body.title === 'Member Exists') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, alreadySubscribed: true }));
+    } else {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Could not complete signup. Please try again.' }));
+    }
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Invalid request.' }));
+  }
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -48,6 +132,12 @@ function serveFile(filePath, req, res) {
 
 const server = http.createServer((req, res) => {
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
+
+  if (req.method === 'POST' && urlPath === '/api/newsletter') {
+    handleNewsletterSignup(req, res);
+    return;
+  }
+
   if (urlPath === '/') urlPath = '/index.html';
   const filePath = path.join(ROOT, urlPath);
 

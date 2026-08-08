@@ -326,7 +326,7 @@ const jsonLd = {
   <div class="wrap">
     <h2>Stay in the loop</h2>
     <p>Specials, game-day promos, and first word on private-event openings — straight to your inbox, no spam.</p>
-    <form class="newsletter-form" id="newsletter-form" data-recipient="info@theivybk.com">
+    <form class="newsletter-form" id="newsletter-form">
       <input type="email" id="newsletter-email" name="email" placeholder="you@email.com" required aria-label="Email address">
       <button type="submit" class="btn btn--brass-outline">Sign Up</button>
     </form>
@@ -364,13 +364,37 @@ const jsonLd = {
   });
 
   const newsletterForm = document.getElementById('newsletter-form');
-  newsletterForm.addEventListener('submit', (e) => {
+  newsletterForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('newsletter-email').value;
-    const mailto = `mailto:${newsletterForm.dataset.recipient}?subject=${encodeURIComponent('Newsletter Signup')}&body=${encodeURIComponent('Please add this email to The Ivy newsletter list: ' + email)}`;
-    window.location.href = mailto;
-    document.getElementById('newsletter-confirm').classList.add('show');
-    newsletterForm.reset();
+    const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+    const confirmEl = document.getElementById('newsletter-confirm');
+    submitBtn.disabled = true;
+    confirmEl.classList.remove('show', 'newsletter-error');
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        confirmEl.textContent = data.alreadySubscribed
+          ? "You're already on the list!"
+          : "Thanks — we'll add you to the list.";
+        confirmEl.classList.add('show');
+        newsletterForm.reset();
+      } else {
+        confirmEl.textContent = data.error || 'Something went wrong — please try again.';
+        confirmEl.classList.add('show', 'newsletter-error');
+      }
+    } catch {
+      confirmEl.textContent = 'Something went wrong — please try again.';
+      confirmEl.classList.add('show', 'newsletter-error');
+    } finally {
+      submitBtn.disabled = false;
+    }
   });
 </script>
 </Layout>
@@ -536,6 +560,7 @@ const jsonLd = {
   .newsletter-note { font-size: 12px; color: rgba(245,239,227,.6); margin-top: var(--sp-4); max-width: none; }
   .newsletter-confirm { display: none; font-style: italic; color: var(--brass-light); }
   .newsletter-confirm.show { display: block; }
+  .newsletter-confirm.newsletter-error { color: #E8A0A0; }
 
   /* ── INSTAGRAM ────────────────────────────────────────── */
   .instagram-feed { padding: var(--sp-11) 0; }
