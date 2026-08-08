@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 
 const PORT = process.env.PORT || 3000;
 const ROOT = path.join(__dirname, 'site');
@@ -18,10 +19,31 @@ const MIME = {
   '.ico': 'image/x-icon',
 };
 
-function serveFile(filePath, res) {
+// Only compress text-based formats — images/fonts are already compressed.
+const COMPRESSIBLE = new Set(['.html', '.css', '.js', '.json', '.svg']);
+
+function pickEncoding(acceptEncoding) {
+  const accepted = acceptEncoding || '';
+  if (/\bbr\b/.test(accepted)) return 'br';
+  if (/\bgzip\b/.test(accepted)) return 'gzip';
+  return null;
+}
+
+function serveFile(filePath, req, res) {
   const ext = path.extname(filePath).toLowerCase();
-  res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
-  fs.createReadStream(filePath).pipe(res);
+  const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream' };
+  const encoding = COMPRESSIBLE.has(ext) ? pickEncoding(req.headers['accept-encoding']) : null;
+
+  if (encoding) {
+    headers['Content-Encoding'] = encoding;
+    headers['Vary'] = 'Accept-Encoding';
+    res.writeHead(200, headers);
+    const compressor = encoding === 'br' ? zlib.createBrotliCompress() : zlib.createGzip();
+    fs.createReadStream(filePath).pipe(compressor).pipe(res);
+  } else {
+    res.writeHead(200, headers);
+    fs.createReadStream(filePath).pipe(res);
+  }
 }
 
 const server = http.createServer((req, res) => {
@@ -37,13 +59,13 @@ const server = http.createServer((req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (!err && stats.isFile()) {
-      serveFile(filePath, res);
+      serveFile(filePath, req, res);
       return;
     }
     const withHtml = filePath + '.html';
     fs.stat(withHtml, (err2, stats2) => {
       if (!err2 && stats2.isFile()) {
-        serveFile(withHtml, res);
+        serveFile(withHtml, req, res);
       } else {
         fs.readFile(path.join(ROOT, '404.html'), (err3, data) => {
           res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
