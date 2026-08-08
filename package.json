@@ -8,7 +8,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "start": "node server.js"
+    "start": "node server.cjs"
   },
   "dependencies": {
     "astro": "^4.16.0"
