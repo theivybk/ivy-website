@@ -108,6 +108,15 @@ const navLinks = [
         <p><a href="/careers">Careers</a></p>
         <p><a href="/#reserve">Reserve a Table</a></p>
       </div>
+      <div>
+        <h4>Stay in the Loop</h4>
+        <p>Specials, game-day promos, and first word on private-event openings.</p>
+        <form class="footer-newsletter-form" id="newsletter-form">
+          <input type="email" id="newsletter-email" name="email" placeholder="you@email.com" required aria-label="Email address">
+          <button type="submit" class="btn btn--brass-outline">Sign Up</button>
+        </form>
+        <p class="newsletter-note" id="newsletter-confirm"></p>
+      </div>
     </div>
     <div class="bottom">
       <span>&copy; 2026 The Ivy Bar &amp; Kitchen</span>
@@ -127,6 +136,40 @@ const navLinks = [
     mobileMenu.classList.remove('open');
     navToggle.setAttribute('aria-expanded', 'false');
   }));
+
+  const newsletterForm = document.getElementById('newsletter-form');
+  newsletterForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('newsletter-email').value;
+    const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+    const confirmEl = document.getElementById('newsletter-confirm');
+    submitBtn.disabled = true;
+    confirmEl.classList.remove('show', 'newsletter-error');
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        confirmEl.textContent = data.alreadySubscribed
+          ? "You're already on the list!"
+          : "Thanks — we'll add you to the list.";
+        confirmEl.classList.add('show');
+        newsletterForm.reset();
+      } else {
+        confirmEl.textContent = data.error || 'Something went wrong — please try again.';
+        confirmEl.classList.add('show', 'newsletter-error');
+      }
+    } catch {
+      confirmEl.textContent = 'Something went wrong — please try again.';
+      confirmEl.classList.add('show', 'newsletter-error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
 </script>
 
 </body>

@@ -322,19 +322,6 @@ const jsonLd = {
   </div>
 </section>
 
-<section class="newsletter">
-  <div class="wrap">
-    <h2>Stay in the loop</h2>
-    <p>Specials, game-day promos, and first word on private-event openings — straight to your inbox, no spam.</p>
-    <form class="newsletter-form" id="newsletter-form">
-      <input type="email" id="newsletter-email" name="email" placeholder="you@email.com" required aria-label="Email address">
-      <button type="submit" class="btn btn--brass-outline">Sign Up</button>
-    </form>
-    <p class="newsletter-note">We respect your inbox — unsubscribe anytime.</p>
-    <p class="newsletter-note newsletter-confirm" id="newsletter-confirm">Thanks — we'll add you to the list.</p>
-  </div>
-</section>
-
 <script is:inline>
   const reserveForm = document.getElementById('reserve-form');
   reserveForm.addEventListener('submit', (e) => {
@@ -361,40 +348,6 @@ const jsonLd = {
     reserveForm.hidden = true;
     document.getElementById('reserve-confirm').hidden = false;
     document.getElementById('reserve-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  });
-
-  const newsletterForm = document.getElementById('newsletter-form');
-  newsletterForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('newsletter-email').value;
-    const submitBtn = newsletterForm.querySelector('button[type="submit"]');
-    const confirmEl = document.getElementById('newsletter-confirm');
-    submitBtn.disabled = true;
-    confirmEl.classList.remove('show', 'newsletter-error');
-
-    try {
-      const res = await fetch('/api/newsletter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (res.ok && data.ok) {
-        confirmEl.textContent = data.alreadySubscribed
-          ? "You're already on the list!"
-          : "Thanks — we'll add you to the list.";
-        confirmEl.classList.add('show');
-        newsletterForm.reset();
-      } else {
-        confirmEl.textContent = data.error || 'Something went wrong — please try again.';
-        confirmEl.classList.add('show', 'newsletter-error');
-      }
-    } catch {
-      confirmEl.textContent = 'Something went wrong — please try again.';
-      confirmEl.classList.add('show', 'newsletter-error');
-    } finally {
-      submitBtn.disabled = false;
-    }
   });
 </script>
 </Layout>
@@ -546,22 +499,6 @@ const jsonLd = {
   .form-confirm p { color: var(--fg-2); margin: 0; }
   .party-note { text-align: center; font-size: 12px; color: var(--fg-3); font-style: italic; margin: -4px 0 var(--sp-6); }
 
-  /* ── NEWSLETTER ───────────────────────────────────────── */
-  .newsletter { padding: var(--sp-9) 0; background: var(--bg-inverse); color: var(--cream); text-align: center; }
-  .newsletter h2 { color: var(--cream); font-style: italic; font-size: var(--fs-3xl); margin-bottom: var(--sp-2); }
-  .newsletter p { color: rgba(245,239,227,.8); max-width: 460px; margin: 0 auto var(--sp-6); }
-  .newsletter-form { display: flex; gap: var(--sp-3); max-width: 420px; margin: 0 auto; }
-  .newsletter-form input {
-    flex: 1; font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink);
-    background: var(--cream-pure); border: 1px solid transparent; border-radius: var(--r-xs);
-    padding: 12px 14px;
-  }
-  .newsletter-form input:focus { outline: none; border-color: var(--brass); }
-  .newsletter-note { font-size: 12px; color: rgba(245,239,227,.6); margin-top: var(--sp-4); max-width: none; }
-  .newsletter-confirm { display: none; font-style: italic; color: var(--brass-light); }
-  .newsletter-confirm.show { display: block; }
-  .newsletter-confirm.newsletter-error { color: #E8A0A0; }
-
   /* ── INSTAGRAM ────────────────────────────────────────── */
   .instagram-feed { padding: var(--sp-11) 0; }
   .ig-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-3); }
@@ -579,7 +516,6 @@ const jsonLd = {
     .review-grid { grid-template-columns: 1fr; }
     .order-direct .wrap { flex-direction: column; align-items: flex-start; text-align: left; }
     .form-row, .form-row.triple { grid-template-columns: 1fr; }
-    .newsletter-form { flex-direction: column; }
     .ig-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
