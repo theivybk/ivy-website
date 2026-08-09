@@ -60,6 +60,8 @@ const navLinks = [
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
 <slot name="top" />
 
 <header class="site-nav">
@@ -85,7 +87,7 @@ const navLinks = [
   </div>
 </header>
 
-<slot />
+<main id="main-content"><slot /></main>
 
 <footer class="site-footer">
   <div class="wrap">
