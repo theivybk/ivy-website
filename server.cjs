@@ -107,10 +107,12 @@ const MIME = {
   '.jpeg': 'image/jpeg',
   '.woff2': 'font/woff2',
   '.ico': 'image/x-icon',
+  '.xml': 'application/xml; charset=utf-8',
+  '.txt': 'text/plain; charset=utf-8',
 };
 
 // Only compress text-based formats — images/fonts are already compressed.
-const COMPRESSIBLE = new Set(['.html', '.css', '.js', '.json', '.svg']);
+const COMPRESSIBLE = new Set(['.html', '.css', '.js', '.json', '.svg', '.xml', '.txt']);
 
 function pickEncoding(acceptEncoding) {
   const accepted = acceptEncoding || '';

@@ -1,8 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const jsonLd = {
-  "@context": "https://schema.org",
+const restaurantLd = {
   "@type": ["Restaurant", "BarOrPub"],
   "name": "The Ivy Bar and Kitchen",
   "alternateName": "The Ivy",
@@ -48,6 +47,65 @@ const jsonLd = {
     "ratingValue": "4.9",
     "reviewCount": "28"
   }
+};
+
+const faqLd = {
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Do you take reservations?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We hold a mix of reservations and walk-in seating at the bar and in the dining room. Request a table on our homepage or call us at (773) 799-8160 — recommended for parties of six or more and game-day visits."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there parking near the restaurant?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Street parking is available along Irving Park Rd and the surrounding side streets. On Cubs game days, we recommend budgeting extra time or using rideshare."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you have gluten-free or vegetarian options?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — a dedicated gluten-free beer selection, a Beyond patty swap on any burger, and vegetarian-friendly items across the menu including our White Out pizza and House Salad."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can kids eat here?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutely. We have a full kids menu for guests twelve and under, plus activity pages to keep them busy while the food comes out."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I book a private event?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Head to our Private Events page and fill out the inquiry form — our events team follows up within one business day with availability and pricing."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are you hiring?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We're currently hiring for all positions. Visit our Careers page for open roles and how to apply."
+      }
+    }
+  ]
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [restaurantLd, faqLd]
 };
 ---
 <Layout
