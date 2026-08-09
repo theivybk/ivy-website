@@ -60,7 +60,7 @@ function resendSubscribe(email) {
 function resendSendEmail({ to, subject, text, replyTo }) {
   return new Promise((resolve, reject) => {
     const payload = {
-      from: 'The Ivy Bar and Kitchen <onboarding@resend.dev>',
+      from: 'The Ivy Bar and Kitchen <info@theivybk.com>',
       to: [to],
       subject,
       text,
