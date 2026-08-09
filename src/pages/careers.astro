@@ -42,41 +42,6 @@ const jsonLd = {
   </div>
 </section>
 
-<section class="roles">
-  <div class="wrap">
-    <div class="section-head" style="text-align:center; margin-bottom:var(--sp-8);">
-      <span class="eyebrow">Open Roles</span>
-      <h2 style="font-size:var(--fs-4xl); font-style:italic;">Now hiring</h2>
-    </div>
-    <div class="roles-grid">
-      <div class="role-card">
-        <h3>Servers</h3>
-        <p>Full-time &amp; part-time. Experience preferred but not required — we train the right attitude.</p>
-      </div>
-      <div class="role-card">
-        <h3>Bartenders</h3>
-        <p>Cocktail and beer program experience a plus. Rooftop and main bar shifts available.</p>
-      </div>
-      <div class="role-card">
-        <h3>Line Cooks</h3>
-        <p>Pizza and kitchen line experience preferred. Fast-paced, high-volume environment.</p>
-      </div>
-      <div class="role-card">
-        <h3>Hosts</h3>
-        <p>First point of contact for every guest. Friendly, organized, and unbothered by a packed room on game day.</p>
-      </div>
-      <div class="role-card">
-        <h3>Barbacks</h3>
-        <p>Support the bar team during peak service — great entry point into the industry.</p>
-      </div>
-      <div class="role-card">
-        <h3>Kitchen Management</h3>
-        <p>Experienced kitchen leaders — help run the line, manage inventory, and train the team.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="why-work">
   <div class="wrap">
     <span class="eyebrow" style="color:var(--brass-light)">Why Work Here</span>
@@ -103,7 +68,7 @@ const jsonLd = {
     <div class="section-head">
       <span class="eyebrow">Apply Now</span>
       <h2>Tell us about yourself</h2>
-      <p>Fill this out and we'll follow up to schedule an interview. Have a resume? Attach it to the email that opens after you submit.</p>
+      <p>Fill this out and we'll follow up to schedule an interview. Attach your resume below if you have one.</p>
     </div>
 
     <form class="apply-form" id="apply-form" data-recipient="info@theivybk.com">
@@ -154,6 +119,12 @@ const jsonLd = {
       </div>
       <div class="form-row single">
         <div class="field">
+          <label for="a-resume">Resume <span style="font-weight:400; text-transform:none; color:var(--fg-3);">(optional, PDF or Word, max 8MB)</span></label>
+          <input type="file" id="a-resume" name="resume" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="field">
           <label for="a-message">Tell Us About Yourself <span style="font-weight:400; text-transform:none; color:var(--fg-3);">(optional)</span></label>
           <textarea id="a-message" name="message" placeholder="Relevant experience, availability details, anything else we should know."></textarea>
         </div>
@@ -161,40 +132,44 @@ const jsonLd = {
       <div class="submit-row">
         <button type="submit" class="btn btn--primary">Submit Application</button>
         <p class="submit-note">Applications are sent to <a href="mailto:info@theivybk.com" style="border-bottom:1px solid var(--brass);">info@theivybk.com</a> — we'll follow up within a few days.</p>
+        <p class="submit-error" id="apply-error" hidden></p>
       </div>
     </form>
 
     <div class="form-confirm" id="apply-confirm" hidden>
       <h2>Got it.</h2>
-      <p>Your application is on its way to our hiring team. If your email client didn't open automatically, attach your resume and send it directly to <a href="mailto:info@theivybk.com" style="border-bottom:1px solid var(--brass);">info@theivybk.com</a>.</p>
+      <p>Your application is on its way to our hiring team. We'll follow up within a few days.</p>
     </div>
   </div>
 </section>
 
 <script is:inline>
   const applyForm = document.getElementById('apply-form');
-  applyForm.addEventListener('submit', (e) => {
+  applyForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const data = new FormData(applyForm);
-    const label = (v) => v && v.trim() ? v : '—';
-    const lines = [
-      `Name: ${label(data.get('full_name'))}`,
-      `Phone: ${label(data.get('phone'))}`,
-      `Email: ${label(data.get('email'))}`,
-      `Position: ${label(data.get('position'))}`,
-      `Availability: ${label(data.get('availability'))}`,
-      `Experience: ${label(data.get('experience'))}`,
-      ``,
-      `Message:`,
-      label(data.get('message'))
-    ].join('\n');
-    const subject = `Job Application — ${label(data.get('position'))} — ${label(data.get('full_name'))}`;
-    const mailto = `mailto:${applyForm.dataset.recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines)}`;
-    window.location.href = mailto;
+    const formData = new FormData(applyForm);
+    const submitBtn = applyForm.querySelector('button[type="submit"]');
+    const errorEl = document.getElementById('apply-error');
+    submitBtn.disabled = true;
+    errorEl.hidden = true;
 
-    applyForm.hidden = true;
-    document.getElementById('apply-confirm').hidden = false;
-    document.getElementById('apply-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    try {
+      const res = await fetch('/api/apply', { method: 'POST', body: formData });
+      const result = await res.json();
+      if (res.ok && result.ok) {
+        applyForm.hidden = true;
+        document.getElementById('apply-confirm').hidden = false;
+        document.getElementById('apply-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        errorEl.textContent = result.error || 'Something went wrong — please try again or email us directly.';
+        errorEl.hidden = false;
+      }
+    } catch {
+      errorEl.textContent = 'Something went wrong — please try again or email us directly.';
+      errorEl.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+    }
   });
 </script>
 </Layout>
@@ -207,17 +182,6 @@ const jsonLd = {
   }
   .page-hero h1 { color: var(--cream); font-size: var(--fs-6xl); font-style: italic; margin-bottom: var(--sp-4); }
   .page-hero p { max-width: 560px; margin: 0 auto; color: rgba(245,239,227,.88); }
-
-  .roles { padding: var(--sp-11) 0; }
-  .roles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
-  .role-card {
-    background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm);
-    padding: var(--sp-7); text-align: center;
-  }
-  .role-card h3 { font-size: var(--fs-xl); margin-bottom: var(--sp-3); }
-  .role-card p { color: var(--fg-2); font-size: var(--fs-sm); margin: 0; }
-  @media (max-width: 860px) { .roles-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 560px) { .roles-grid { grid-template-columns: 1fr; } }
 
   .why-work { padding: var(--sp-9) 0; background: var(--bg-inverse); color: var(--cream); text-align: center; }
   .why-work-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--sp-7); margin-top: var(--sp-7); text-align: left; }
@@ -245,9 +209,16 @@ const jsonLd = {
   }
   .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--ivy); outline-offset: 1px; border-color: var(--ivy); }
   .field textarea { resize: vertical; min-height: 100px; }
+  .field input[type="file"] { padding: 10px 14px; font-size: var(--fs-sm); }
+  .field input[type="file"]::file-selector-button {
+    font-family: var(--font-ui); font-size: var(--fs-xs); font-weight: 500; color: var(--cream);
+    background: var(--ivy); border: none; border-radius: var(--r-xs); padding: 8px 14px; margin-right: 12px;
+    cursor: pointer;
+  }
   .submit-row { text-align: center; margin-top: var(--sp-7); }
   .submit-row .btn { width: 100%; justify-content: center; padding: 16px; font-size: var(--fs-sm); }
   .submit-note { text-align: center; font-size: 12px; color: var(--fg-3); margin-top: var(--sp-4); }
+  .submit-error { text-align: center; font-size: 13px; color: var(--brick); margin-top: var(--sp-4); }
   .form-confirm { background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm); padding: var(--sp-8); text-align: center; }
   .form-confirm h2 { font-style: italic; font-size: var(--fs-4xl); }
   .form-confirm p { color: var(--fg-2); margin: 0; }

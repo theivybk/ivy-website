@@ -270,6 +270,72 @@ async function handleWeeklyReportEmail(req, res, query) {
   }
 }
 
+function parseMultipart(req, { maxBytes = 8 * 1024 * 1024 } = {}) {
+  return new Promise((resolve, reject) => {
+    const contentType = req.headers['content-type'] || '';
+    const boundaryMatch = /boundary=(?:"([^"]+)"|([^;]+))/i.exec(contentType);
+    if (!boundaryMatch) {
+      reject(new Error('Not multipart'));
+      return;
+    }
+    const boundaryBuf = Buffer.from(`--${boundaryMatch[1] || boundaryMatch[2]}`);
+
+    const chunks = [];
+    let size = 0;
+    let tooLarge = false;
+    req.on('data', (chunk) => {
+      size += chunk.length;
+      if (size > maxBytes) {
+        tooLarge = true;
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      if (tooLarge) {
+        reject(new Error('File too large'));
+        return;
+      }
+      const body = Buffer.concat(chunks);
+      const fields = {};
+      let file = null;
+
+      let start = body.indexOf(boundaryBuf);
+      while (start !== -1) {
+        const partStart = start + boundaryBuf.length;
+        const next = body.indexOf(boundaryBuf, partStart);
+        if (next === -1) break;
+
+        const headerEnd = body.indexOf('\r\n\r\n', partStart);
+        if (headerEnd === -1 || headerEnd >= next) { start = next; continue; }
+
+        const rawHeaders = body.slice(partStart, headerEnd).toString('utf8');
+        let content = body.slice(headerEnd + 4, next);
+        if (content.slice(-2).toString('latin1') === '\r\n') content = content.slice(0, -2);
+
+        const dispositionMatch = /Content-Disposition:\s*form-data;\s*name="([^"]*)"(?:;\s*filename="([^"]*)")?/i.exec(rawHeaders);
+        if (dispositionMatch) {
+          const fieldName = dispositionMatch[1];
+          const filename = dispositionMatch[2];
+          if (filename) {
+            if (filename.trim()) {
+              const ctMatch = /Content-Type:\s*([^\r\n]+)/i.exec(rawHeaders);
+              file = { filename: filename.trim(), contentType: ctMatch ? ctMatch[1].trim() : 'application/octet-stream', buffer: content };
+            }
+          } else {
+            fields[fieldName] = content.toString('utf8');
+          }
+        }
+        start = next;
+      }
+
+      resolve({ fields, file });
+    });
+    req.on('error', reject);
+  });
+}
+
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
     let data = '';
@@ -316,7 +382,7 @@ function resendSubscribe(email) {
   });
 }
 
-function resendSendEmail({ to, subject, text, replyTo }) {
+function resendSendEmail({ to, subject, text, replyTo, attachments }) {
   return new Promise((resolve, reject) => {
     const payload = {
       from: 'The Ivy Bar and Kitchen <info@theivybk.com>',
@@ -325,6 +391,7 @@ function resendSendEmail({ to, subject, text, replyTo }) {
       text,
     };
     if (replyTo) payload.reply_to = replyTo;
+    if (attachments && attachments.length) payload.attachments = attachments;
     const body = JSON.stringify(payload);
     const options = {
       hostname: 'api.resend.com',
@@ -419,6 +486,79 @@ async function handleReservation(req, res) {
   }
 }
 
+async function handleApply(req, res) {
+  if (!RESEND_API_KEY) {
+    res.writeHead(503, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Applications are not configured yet.' }));
+    return;
+  }
+
+  let fields, file;
+  try {
+    ({ fields, file } = await parseMultipart(req));
+  } catch (err) {
+    const message = err.message === 'File too large' ? 'Resume file is too large (max 8MB).' : 'Invalid request.';
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: message }));
+    return;
+  }
+
+  const label = (v) => (typeof v === 'string' && v.trim() ? v.trim() : '—');
+  const fullName = label(fields.full_name);
+  const phone = label(fields.phone);
+  const email = label(fields.email);
+  const position = label(fields.position);
+  const availability = label(fields.availability);
+  const experience = label(fields.experience);
+  const message = label(fields.message);
+
+  if (fullName === '—' || phone === '—' || email === '—' || position === '—' || availability === '—') {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Please fill in all required fields.' }));
+    return;
+  }
+  if (!EMAIL_RE.test(email)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Please enter a valid email address.' }));
+    return;
+  }
+
+  const subject = `Job Application — ${position} — ${fullName}`;
+  const text = [
+    `Name: ${fullName}`,
+    `Phone: ${phone}`,
+    `Email: ${email}`,
+    `Position: ${position}`,
+    `Availability: ${availability}`,
+    `Experience: ${experience}`,
+    `Resume: ${file ? file.filename : '—'}`,
+    ``,
+    `Message:`,
+    message,
+  ].join('\n');
+
+  const attachments = [];
+  if (file && file.buffer && file.buffer.length) {
+    attachments.push({ filename: file.filename, content: file.buffer.toString('base64') });
+  }
+
+  try {
+    const result = await resendSendEmail({ to: RESERVATION_TO_EMAIL, subject, text, replyTo: email, attachments });
+    if (result.status === 200 || result.status === 201) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } else {
+      console.error('Resend send failed:', result.status, result.body);
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Could not send your application. Please email us directly instead.' }));
+    }
+  } catch (err) {
+    console.error('Resend request error:', err.message);
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Could not reach the application service. Please email us directly instead.' }));
+  }
+}
+
 async function handleNewsletterSignup(req, res) {
   if (!RESEND_API_KEY) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
@@ -510,6 +650,11 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'POST' && urlPath === '/api/reserve') {
     handleReservation(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/apply') {
+    handleApply(req, res);
     return;
   }
 
