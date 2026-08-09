@@ -278,17 +278,18 @@ const jsonLd = {
       <div class="specials-card">
         <span class="specials-day">Thursday</span>
         <h3>Girl Dinner Thursday</h3>
-        <p>Salad, truffle fries &amp; a glass of wine, $30<span class="asterisk">*</span></p>
+        <p>Salad, truffle fries &amp; a glass of wine, $30</p>
+        <p class="specials-note">*Select wines</p>
       </div>
     </div>
     <div class="happy-hour-bar">
       <div>
         <span class="eyebrow" style="color:var(--brass-light)">Happy Hour</span>
-        <h3>Monday – Thursday, 3–5pm</h3>
+        <h3>Monday – Thursday · 3–5pm</h3>
       </div>
       <p>$1 off beer &nbsp;·&nbsp; $2 off wine &nbsp;·&nbsp; $3 off cocktails</p>
     </div>
-    <p class="specials-footnote">*Select wines · Add-ons subject to extra charge</p>
+    <p class="specials-footnote">Add-ons subject to extra charge</p>
   </div>
 </section>
 
@@ -548,7 +549,7 @@ const jsonLd = {
   }
   .specials-card h3 { font-size: var(--fs-2xl); margin-bottom: var(--sp-2); }
   .specials-card p { color: var(--fg-2); font-size: var(--fs-sm); margin: 0; }
-  .specials-card .asterisk { color: var(--brass-deep); }
+  .specials-card .specials-note { font-style: italic; color: var(--fg-3); font-size: 11px; margin-top: var(--sp-2); }
   .happy-hour-bar {
     display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); flex-wrap: wrap;
     background: var(--ivy); color: var(--cream); border-radius: var(--r-sm); padding: var(--sp-7) var(--sp-8);
