@@ -10,25 +10,18 @@ const ROOT = path.join(__dirname, 'dist');
 const RESEND_API_KEY = (process.env.RESEND_API_KEY || '').trim();
 const ADMIN_USER = (process.env.ADMIN_USER || '').trim();
 const ADMIN_PASS = (process.env.ADMIN_PASS || '').trim();
-const AIRTABLE_TOKEN = (process.env.AIRTABLE_TOKEN || '').trim();
-const AIRTABLE_BASE_ID = (process.env.AIRTABLE_BASE_ID || '').trim();
-const AIRTABLE_TABLE = 'Reservations';
+const WEEKLY_REPORT_SECRET = (process.env.WEEKLY_REPORT_SECRET || '').trim();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function airtableRequest(method, query, body) {
+function resendGet(pathAndQuery) {
   return new Promise((resolve, reject) => {
-    const bodyStr = body ? JSON.stringify(body) : null;
     const options = {
-      hostname: 'api.airtable.com',
-      path: `/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE)}${query || ''}`,
-      method,
-      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+      hostname: 'api.resend.com',
+      path: pathAndQuery,
+      method: 'GET',
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}` },
     };
-    if (bodyStr) {
-      options.headers['Content-Type'] = 'application/json';
-      options.headers['Content-Length'] = Buffer.byteLength(bodyStr);
-    }
     const req = https.request(options, (res) => {
       let data = '';
       res.on('data', (chunk) => (data += chunk));
@@ -39,64 +32,70 @@ function airtableRequest(method, query, body) {
       });
     });
     req.on('error', reject);
-    if (bodyStr) req.write(bodyStr);
     req.end();
   });
 }
 
-async function logReservation(entry) {
-  if (!AIRTABLE_TOKEN || !AIRTABLE_BASE_ID) {
-    console.error('Airtable not configured; reservation not logged.');
-    return;
-  }
-  try {
-    const result = await airtableRequest('POST', '', {
-      fields: {
-        'Full Name': entry.full_name,
-        'Phone': entry.phone,
-        'Email': entry.email,
-        'Date': entry.date,
-        'Time': entry.time,
-        'Party Size': entry.party_size,
-        'Notes': entry.notes,
-        'Received At': entry.received_at,
-      },
-    });
-    if (result.status >= 300) console.error('Airtable log failed:', result.status, result.body);
-  } catch (err) {
-    console.error('Airtable log error:', err.message);
-  }
+function parseReservationEmailText(text) {
+  const get = (label) => {
+    const m = new RegExp(`^${label}: (.*)$`, 'm').exec(text || '');
+    return m ? m[1].trim() : '';
+  };
+  const notesMatch = /Special Requests:\n([\s\S]*)$/.exec(text || '');
+  const notesRaw = notesMatch ? notesMatch[1].trim() : '';
+  return {
+    full_name: get('Name'),
+    phone: get('Phone'),
+    email: get('Email'),
+    date: get('Date'),
+    time: get('Time'),
+    party_size: get('Party Size'),
+    notes: notesRaw === '—' ? '' : notesRaw,
+  };
 }
 
+// Reservation history lives entirely in already-sent Resend emails -- no
+// separate database needed. We list recent emails, keep the ones whose
+// subject matches our reservation format, then fetch each one's full body
+// (the list endpoint only returns metadata) to recover the structured data.
 async function readReservations() {
-  if (!AIRTABLE_TOKEN || !AIRTABLE_BASE_ID) return [];
-  let all = [];
-  let offset;
+  if (!RESEND_API_KEY) return [];
+  const matches = [];
+  let after;
   try {
-    do {
-      const qs = `?pageSize=100${offset ? `&offset=${encodeURIComponent(offset)}` : ''}`;
-      const result = await airtableRequest('GET', qs);
+    for (let page = 0; page < 10; page++) {
+      const qs = `?limit=100${after ? `&after=${encodeURIComponent(after)}` : ''}`;
+      const result = await resendGet(`/emails${qs}`);
       if (result.status >= 300) {
-        console.error('Airtable read failed:', result.status, result.body);
+        console.error('Resend list emails failed:', result.status, result.body);
         break;
       }
-      const records = result.body.records || [];
-      all = all.concat(records.map((r) => ({
-        full_name: r.fields['Full Name'] || '',
-        phone: r.fields['Phone'] || '',
-        email: r.fields['Email'] || '',
-        date: r.fields['Date'] || '',
-        time: r.fields['Time'] || '',
-        party_size: r.fields['Party Size'] || '',
-        notes: r.fields['Notes'] || '',
-        received_at: r.fields['Received At'] || '',
-      })));
-      offset = result.body.offset;
-    } while (offset);
+      const items = result.body.data || [];
+      for (const item of items) {
+        if (typeof item.subject === 'string' && item.subject.startsWith('Table Reservation — ')) {
+          matches.push(item.id);
+        }
+      }
+      if (!result.body.has_more || items.length === 0) break;
+      after = items[items.length - 1].id;
+    }
   } catch (err) {
-    console.error('Airtable read error:', err.message);
+    console.error('Resend list emails error:', err.message);
+    return [];
   }
-  return all;
+
+  const reservations = [];
+  for (const id of matches) {
+    try {
+      const result = await resendGet(`/emails/${id}`);
+      if (result.status < 300 && result.body.text) {
+        reservations.push(parseReservationEmailText(result.body.text));
+      }
+    } catch (err) {
+      console.error('Resend fetch email error:', err.message);
+    }
+  }
+  return reservations;
 }
 
 function checkBasicAuth(req) {
@@ -136,22 +135,14 @@ function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-async function handleReservationsReport(req, res, query) {
-  if (!checkBasicAuth(req)) {
-    res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
-    res.end('Authentication required.');
-    return;
-  }
+const dayLabel = (dateStr) => new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-  const weekParam = query.get('week');
+async function getWeekReservations(weekParam) {
   const monday = mondayOf(weekParam);
   const sunday = new Date(monday);
   sunday.setDate(sunday.getDate() + 6);
   const mondayStr = toDateStr(monday);
   const sundayStr = toDateStr(sunday);
-
-  const prevWeek = new Date(monday); prevWeek.setDate(prevWeek.getDate() - 7);
-  const nextWeek = new Date(monday); nextWeek.setDate(nextWeek.getDate() + 7);
 
   const all = await readReservations();
   const inRange = all.filter((r) => r.date >= mondayStr && r.date <= sundayStr);
@@ -162,7 +153,19 @@ async function handleReservationsReport(req, res, query) {
     (byDay[r.date] = byDay[r.date] || []).push(r);
   }
 
-  const dayLabel = (dateStr) => new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  return { monday, sunday, mondayStr, sundayStr, inRange, byDay };
+}
+
+async function handleReservationsReport(req, res, query) {
+  if (!checkBasicAuth(req)) {
+    res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+    res.end('Authentication required.');
+    return;
+  }
+
+  const { monday, mondayStr, sundayStr, inRange, byDay } = await getWeekReservations(query.get('week'));
+  const prevWeek = new Date(monday); prevWeek.setDate(prevWeek.getDate() - 7);
+  const nextWeek = new Date(monday); nextWeek.setDate(nextWeek.getDate() + 7);
 
   let rowsHtml = '';
   const days = Object.keys(byDay).sort();
@@ -173,7 +176,7 @@ async function handleReservationsReport(req, res, query) {
       rowsHtml += `<h2>${escapeHtml(dayLabel(dateStr))}</h2>`;
       rowsHtml += '<table><thead><tr><th>Time</th><th>Name</th><th>Party</th><th>Phone</th><th>Email</th><th>Notes</th></tr></thead><tbody>';
       for (const r of byDay[dateStr]) {
-        rowsHtml += `<tr><td>${escapeHtml(r.time)}</td><td>${escapeHtml(r.full_name)}</td><td>${escapeHtml(r.party_size)}</td><td>${escapeHtml(r.phone)}</td><td>${escapeHtml(r.email)}</td><td>${escapeHtml(r.notes === '—' ? '' : r.notes)}</td></tr>`;
+        rowsHtml += `<tr><td>${escapeHtml(r.time)}</td><td>${escapeHtml(r.full_name)}</td><td>${escapeHtml(r.party_size)}</td><td>${escapeHtml(r.phone)}</td><td>${escapeHtml(r.email)}</td><td>${escapeHtml(r.notes)}</td></tr>`;
       }
       rowsHtml += '</tbody></table>';
     }
@@ -216,6 +219,55 @@ async function handleReservationsReport(req, res, query) {
 
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
   res.end(html);
+}
+
+async function handleWeeklyReportEmail(req, res, query) {
+  if (!WEEKLY_REPORT_SECRET || query.get('secret') !== WEEKLY_REPORT_SECRET) {
+    res.writeHead(401, { 'Content-Type': 'text/plain' });
+    res.end('Unauthorized.');
+    return;
+  }
+  if (!RESEND_API_KEY) {
+    res.writeHead(503, { 'Content-Type': 'text/plain' });
+    res.end('Not configured.');
+    return;
+  }
+
+  const { mondayStr, sundayStr, inRange, byDay } = await getWeekReservations(query.get('week'));
+
+  const lines = [`Reservation requests for the week of ${dayLabel(mondayStr)} - ${dayLabel(sundayStr)}`, ''];
+  if (inRange.length === 0) {
+    lines.push('No reservation requests for this week.');
+  } else {
+    for (const dateStr of Object.keys(byDay).sort()) {
+      lines.push(dayLabel(dateStr).toUpperCase());
+      for (const r of byDay[dateStr]) {
+        lines.push(`  ${r.time} — ${r.full_name}, party of ${r.party_size} — ${r.phone} — ${r.email}${r.notes ? ` — ${r.notes}` : ''}`);
+      }
+      lines.push('');
+    }
+  }
+  lines.push(`Full printable report: https://www.theivybk.com/admin/reservations?week=${mondayStr}`);
+
+  try {
+    const result = await resendSendEmail({
+      to: RESERVATION_TO_EMAIL,
+      subject: `Weekly Reservations — ${mondayStr} to ${sundayStr} (${inRange.length})`,
+      text: lines.join('\n'),
+    });
+    if (result.status === 200 || result.status === 201) {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end(`Sent. ${inRange.length} reservation(s) for ${mondayStr} to ${sundayStr}.`);
+    } else {
+      console.error('Weekly report send failed:', result.status, result.body);
+      res.writeHead(502, { 'Content-Type': 'text/plain' });
+      res.end('Failed to send.');
+    }
+  } catch (err) {
+    console.error('Weekly report send error:', err.message);
+    res.writeHead(502, { 'Content-Type': 'text/plain' });
+    res.end('Failed to send.');
+  }
 }
 
 function readJsonBody(req) {
@@ -355,7 +407,6 @@ async function handleReservation(req, res) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
       resendSubscribe(email).catch((err) => console.error('Reservation newsletter subscribe error:', err.message));
-      logReservation({ full_name: fullName, phone, email, date, time, party_size: partySize, notes, received_at: new Date().toISOString() }).catch((err) => console.error('logReservation error:', err.message));
     } else {
       console.error('Resend send failed:', result.status, result.body);
       res.writeHead(502, { 'Content-Type': 'application/json' });
@@ -465,6 +516,12 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && urlPath === '/admin/reservations') {
     const query = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams;
     handleReservationsReport(req, res, query);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/weekly-report-email') {
+    const query = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams;
+    handleWeeklyReportEmail(req, res, query);
     return;
   }
 
