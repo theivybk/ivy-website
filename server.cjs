@@ -10,29 +10,93 @@ const ROOT = path.join(__dirname, 'dist');
 const RESEND_API_KEY = (process.env.RESEND_API_KEY || '').trim();
 const ADMIN_USER = (process.env.ADMIN_USER || '').trim();
 const ADMIN_PASS = (process.env.ADMIN_PASS || '').trim();
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
-const RESERVATIONS_LOG = path.join(DATA_DIR, 'reservations.jsonl');
+const AIRTABLE_TOKEN = (process.env.AIRTABLE_TOKEN || '').trim();
+const AIRTABLE_BASE_ID = (process.env.AIRTABLE_BASE_ID || '').trim();
+const AIRTABLE_TABLE = 'Reservations';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function logReservation(entry) {
+function airtableRequest(method, query, body) {
+  return new Promise((resolve, reject) => {
+    const bodyStr = body ? JSON.stringify(body) : null;
+    const options = {
+      hostname: 'api.airtable.com',
+      path: `/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE)}${query || ''}`,
+      method,
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+    };
+    if (bodyStr) {
+      options.headers['Content-Type'] = 'application/json';
+      options.headers['Content-Length'] = Buffer.byteLength(bodyStr);
+    }
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => (data += chunk));
+      res.on('end', () => {
+        let parsed = {};
+        try { parsed = JSON.parse(data); } catch {}
+        resolve({ status: res.statusCode, body: parsed });
+      });
+    });
+    req.on('error', reject);
+    if (bodyStr) req.write(bodyStr);
+    req.end();
+  });
+}
+
+async function logReservation(entry) {
+  if (!AIRTABLE_TOKEN || !AIRTABLE_BASE_ID) {
+    console.error('Airtable not configured; reservation not logged.');
+    return;
+  }
   try {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-    fs.appendFileSync(RESERVATIONS_LOG, JSON.stringify(entry) + '\n');
+    const result = await airtableRequest('POST', '', {
+      fields: {
+        'Full Name': entry.full_name,
+        'Phone': entry.phone,
+        'Email': entry.email,
+        'Date': entry.date,
+        'Time': entry.time,
+        'Party Size': entry.party_size,
+        'Notes': entry.notes,
+        'Received At': entry.received_at,
+      },
+    });
+    if (result.status >= 300) console.error('Airtable log failed:', result.status, result.body);
   } catch (err) {
-    console.error('Failed to log reservation:', err.message);
+    console.error('Airtable log error:', err.message);
   }
 }
 
-function readReservations() {
+async function readReservations() {
+  if (!AIRTABLE_TOKEN || !AIRTABLE_BASE_ID) return [];
+  let all = [];
+  let offset;
   try {
-    const raw = fs.readFileSync(RESERVATIONS_LOG, 'utf8');
-    return raw.split('\n').filter(Boolean).map((line) => {
-      try { return JSON.parse(line); } catch { return null; }
-    }).filter(Boolean);
-  } catch {
-    return [];
+    do {
+      const qs = `?pageSize=100${offset ? `&offset=${encodeURIComponent(offset)}` : ''}`;
+      const result = await airtableRequest('GET', qs);
+      if (result.status >= 300) {
+        console.error('Airtable read failed:', result.status, result.body);
+        break;
+      }
+      const records = result.body.records || [];
+      all = all.concat(records.map((r) => ({
+        full_name: r.fields['Full Name'] || '',
+        phone: r.fields['Phone'] || '',
+        email: r.fields['Email'] || '',
+        date: r.fields['Date'] || '',
+        time: r.fields['Time'] || '',
+        party_size: r.fields['Party Size'] || '',
+        notes: r.fields['Notes'] || '',
+        received_at: r.fields['Received At'] || '',
+      })));
+      offset = result.body.offset;
+    } while (offset);
+  } catch (err) {
+    console.error('Airtable read error:', err.message);
   }
+  return all;
 }
 
 function checkBasicAuth(req) {
@@ -89,7 +153,7 @@ async function handleReservationsReport(req, res, query) {
   const prevWeek = new Date(monday); prevWeek.setDate(prevWeek.getDate() - 7);
   const nextWeek = new Date(monday); nextWeek.setDate(nextWeek.getDate() + 7);
 
-  const all = readReservations();
+  const all = await readReservations();
   const inRange = all.filter((r) => r.date >= mondayStr && r.date <= sundayStr);
   inRange.sort((a, b) => (a.date === b.date ? timeToMinutes(a.time) - timeToMinutes(b.time) : a.date < b.date ? -1 : 1));
 
@@ -291,7 +355,7 @@ async function handleReservation(req, res) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
       resendSubscribe(email).catch((err) => console.error('Reservation newsletter subscribe error:', err.message));
-      logReservation({ full_name: fullName, phone, email, date, time, party_size: partySize, notes, received_at: new Date().toISOString() });
+      logReservation({ full_name: fullName, phone, email, date, time, party_size: partySize, notes, received_at: new Date().toISOString() }).catch((err) => console.error('logReservation error:', err.message));
     } else {
       console.error('Resend send failed:', result.status, result.body);
       res.writeHead(502, { 'Content-Type': 'application/json' });
