@@ -285,7 +285,7 @@ const jsonLd = {
     <div class="happy-hour-bar">
       <div>
         <span class="eyebrow" style="color:var(--brass-light)">Happy Hour</span>
-        <h3>Monday – Thursday · 3pm – 5pm</h3>
+        <h3>Monday – Thursday <span class="hh-time">· 3pm – 5pm</span></h3>
       </div>
       <p>$1 off beer &nbsp;·&nbsp; $2 off wine &nbsp;·&nbsp; $3 off cocktails</p>
     </div>
@@ -555,6 +555,7 @@ const jsonLd = {
     background: var(--ivy); color: var(--cream); border-radius: var(--r-sm); padding: var(--sp-7) var(--sp-8);
   }
   .happy-hour-bar h3 { color: var(--cream); font-style: italic; font-size: var(--fs-2xl); margin: 4px 0 0; }
+  .happy-hour-bar h3 .hh-time { white-space: nowrap; }
   .happy-hour-bar p { color: rgba(245,239,227,.85); margin: 0; font-family: var(--font-ui); font-size: var(--fs-sm); }
   .specials-footnote { text-align: center; font-family: var(--font-ui); font-size: 11px; color: var(--fg-3); letter-spacing: .04em; margin-top: var(--sp-6); }
 
