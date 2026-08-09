@@ -8,8 +8,151 @@ const PORT = process.env.PORT || 3000;
 const ROOT = path.join(__dirname, 'dist');
 
 const RESEND_API_KEY = (process.env.RESEND_API_KEY || '').trim();
+const ADMIN_USER = (process.env.ADMIN_USER || '').trim();
+const ADMIN_PASS = (process.env.ADMIN_PASS || '').trim();
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+const RESERVATIONS_LOG = path.join(DATA_DIR, 'reservations.jsonl');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function logReservation(entry) {
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.appendFileSync(RESERVATIONS_LOG, JSON.stringify(entry) + '\n');
+  } catch (err) {
+    console.error('Failed to log reservation:', err.message);
+  }
+}
+
+function readReservations() {
+  try {
+    const raw = fs.readFileSync(RESERVATIONS_LOG, 'utf8');
+    return raw.split('\n').filter(Boolean).map((line) => {
+      try { return JSON.parse(line); } catch { return null; }
+    }).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function checkBasicAuth(req) {
+  if (!ADMIN_USER || !ADMIN_PASS) return false;
+  const header = req.headers['authorization'] || '';
+  const match = header.match(/^Basic (.+)$/);
+  if (!match) return false;
+  const decoded = Buffer.from(match[1], 'base64').toString('utf8');
+  const sepIdx = decoded.indexOf(':');
+  if (sepIdx === -1) return false;
+  const user = decoded.slice(0, sepIdx);
+  const pass = decoded.slice(sepIdx + 1);
+  return user === ADMIN_USER && pass === ADMIN_PASS;
+}
+
+function mondayOf(dateStr) {
+  const d = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
+  const day = d.getDay(); // 0=Sun..6=Sat
+  const diff = day === 0 ? -6 : 1 - day; // shift back to Monday
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+function toDateStr(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function timeToMinutes(t) {
+  const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec((t || '').trim());
+  if (!m) return 0;
+  let h = parseInt(m[1], 10) % 12;
+  if (/pm/i.test(m[3])) h += 12;
+  return h * 60 + parseInt(m[2], 10);
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function handleReservationsReport(req, res, query) {
+  if (!checkBasicAuth(req)) {
+    res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+    res.end('Authentication required.');
+    return;
+  }
+
+  const weekParam = query.get('week');
+  const monday = mondayOf(weekParam);
+  const sunday = new Date(monday);
+  sunday.setDate(sunday.getDate() + 6);
+  const mondayStr = toDateStr(monday);
+  const sundayStr = toDateStr(sunday);
+
+  const prevWeek = new Date(monday); prevWeek.setDate(prevWeek.getDate() - 7);
+  const nextWeek = new Date(monday); nextWeek.setDate(nextWeek.getDate() + 7);
+
+  const all = readReservations();
+  const inRange = all.filter((r) => r.date >= mondayStr && r.date <= sundayStr);
+  inRange.sort((a, b) => (a.date === b.date ? timeToMinutes(a.time) - timeToMinutes(b.time) : a.date < b.date ? -1 : 1));
+
+  const byDay = {};
+  for (const r of inRange) {
+    (byDay[r.date] = byDay[r.date] || []).push(r);
+  }
+
+  const dayLabel = (dateStr) => new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  let rowsHtml = '';
+  const days = Object.keys(byDay).sort();
+  if (days.length === 0) {
+    rowsHtml = '<p class="empty">No reservation requests for this week.</p>';
+  } else {
+    for (const dateStr of days) {
+      rowsHtml += `<h2>${escapeHtml(dayLabel(dateStr))}</h2>`;
+      rowsHtml += '<table><thead><tr><th>Time</th><th>Name</th><th>Party</th><th>Phone</th><th>Email</th><th>Notes</th></tr></thead><tbody>';
+      for (const r of byDay[dateStr]) {
+        rowsHtml += `<tr><td>${escapeHtml(r.time)}</td><td>${escapeHtml(r.full_name)}</td><td>${escapeHtml(r.party_size)}</td><td>${escapeHtml(r.phone)}</td><td>${escapeHtml(r.email)}</td><td>${escapeHtml(r.notes === '—' ? '' : r.notes)}</td></tr>`;
+      }
+      rowsHtml += '</tbody></table>';
+    }
+  }
+
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reservations — ${escapeHtml(mondayStr)} to ${escapeHtml(sundayStr)}</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Arial, sans-serif; color: #14140F; max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: #555; font-size: 13px; margin: 0 0 24px; }
+  .nav { display: flex; justify-content: space-between; margin-bottom: 24px; font-size: 14px; }
+  .nav a { color: #1F3D2A; text-decoration: none; border-bottom: 1px solid #B8923D; }
+  .print-btn { background: #1F3D2A; color: #F5EFE3; border: none; padding: 8px 16px; border-radius: 2px; cursor: pointer; font-size: 13px; }
+  h2 { font-size: 16px; margin: 28px 0 8px; border-bottom: 2px solid #1F3D2A; padding-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+  th, td { text-align: left; padding: 6px 8px; font-size: 13px; border-bottom: 1px solid #ddd; vertical-align: top; }
+  th { color: #555; text-transform: uppercase; font-size: 11px; letter-spacing: .04em; }
+  .empty { color: #777; font-style: italic; }
+  @media print {
+    .nav, .print-btn { display: none; }
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="nav">
+    <a href="/admin/reservations?week=${toDateStr(prevWeek)}">&larr; Previous Week</a>
+    <button class="print-btn" onclick="window.print()">Print</button>
+    <a href="/admin/reservations?week=${toDateStr(nextWeek)}">Next Week &rarr;</a>
+  </div>
+  <h1>The Ivy Bar and Kitchen — Reservation Requests</h1>
+  <p class="sub">Week of ${escapeHtml(dayLabel(mondayStr))} &ndash; ${escapeHtml(dayLabel(sundayStr))} &middot; ${inRange.length} request${inRange.length === 1 ? '' : 's'}</p>
+  ${rowsHtml}
+</body>
+</html>`;
+
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.end(html);
+}
 
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -148,6 +291,7 @@ async function handleReservation(req, res) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
       resendSubscribe(email).catch((err) => console.error('Reservation newsletter subscribe error:', err.message));
+      logReservation({ full_name: fullName, phone, email, date, time, party_size: partySize, notes, received_at: new Date().toISOString() });
     } else {
       console.error('Resend send failed:', result.status, result.body);
       res.writeHead(502, { 'Content-Type': 'application/json' });
@@ -251,6 +395,12 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'POST' && urlPath === '/api/reserve') {
     handleReservation(req, res);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/admin/reservations') {
+    const query = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams;
+    handleReservationsReport(req, res, query);
     return;
   }
 
