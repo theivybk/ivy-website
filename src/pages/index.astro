@@ -374,7 +374,7 @@ const jsonLd = {
     background: linear-gradient(180deg, rgba(20,20,15,.15) 0%, rgba(22,48,31,.55) 60%, rgba(22,48,31,.85) 100%),
                 url('/assets/img/gallery/DSC_1105.jpg') center/cover no-repeat;
   }
-  .hero-inner { padding-bottom: var(--sp-10); color: var(--cream); }
+  .hero-inner { padding-bottom: var(--sp-10); color: var(--cream); width: 100%; }
   .hero .eyebrow { color: var(--brass-light); }
   .hero h1 {
     font-size: clamp(48px, 7vw, 96px);
@@ -385,7 +385,8 @@ const jsonLd = {
     max-width: 780px;
   }
   .hero p.lead { max-width: 480px; color: rgba(245,239,227,.88); font-size: var(--fs-lg); }
-  .hero .cta-row { display: flex; gap: var(--sp-5); margin-top: var(--sp-6); flex-wrap: wrap; }
+  .hero .cta-row { display: flex; gap: var(--sp-5); margin-top: var(--sp-6); flex-wrap: wrap; justify-content: center; }
+  .hero .cta-row .btn { flex: 0 1 200px; justify-content: center; text-align: center; }
   .hiring-strip {
     background: var(--brass); color: var(--ink);
     text-align: center; padding: 10px var(--sp-5);
@@ -536,7 +537,6 @@ const jsonLd = {
   .ig-handle a { font-family: var(--font-ui); font-size: var(--fs-sm); font-weight: 600; color: var(--brass-deep); border-bottom: 1px solid var(--brass); padding-bottom: 2px; }
 
   @media (max-width: 860px) {
-    .hero .cta-row { justify-content: center; }
     .strip-grid { grid-template-columns: repeat(3, 1fr); }
     .hl-grid { gap: var(--sp-7); }
     .about-grid { gap: var(--sp-7); }
