@@ -42,7 +42,12 @@ const jsonLd = {
     { "@type": "LocationFeatureSpecification", "name": "Private Event Space", "value": true },
     { "@type": "LocationFeatureSpecification", "name": "Outdoor Seating", "value": true },
     { "@type": "LocationFeatureSpecification", "name": "Full Bar", "value": true }
-  ]
+  ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "28"
+  }
 };
 ---
 <Layout
@@ -227,6 +232,11 @@ const jsonLd = {
     <div class="section-head">
       <span class="eyebrow">From the Neighborhood</span>
       <h2>What guests are saying</h2>
+      <a class="rating-badge" href="https://www.google.com/maps?cid=15165809700464267913" target="_blank" rel="noopener">
+        <span class="stars">★★★★★</span>
+        <span class="rating-value">4.9</span>
+        <span class="rating-count">(28 Google reviews)</span>
+      </a>
     </div>
     <div class="review-grid">
       <div class="review-card">
@@ -450,6 +460,15 @@ const jsonLd = {
 
   /* ── REVIEWS ───────────────────────────────────────── */
   .reviews { padding: var(--sp-11) 0; }
+  .rating-badge {
+    display: inline-flex; align-items: center; gap: var(--sp-2);
+    margin-top: var(--sp-4); font-family: var(--font-ui); font-size: var(--fs-sm);
+    border-bottom: 1px solid transparent;
+  }
+  .rating-badge:hover { border-bottom-color: var(--brass); }
+  .rating-badge .stars { color: var(--brass); letter-spacing: .1em; font-size: var(--fs-md); }
+  .rating-badge .rating-value { font-weight: 600; color: var(--ivy); }
+  .rating-badge .rating-count { color: var(--fg-3); }
   .review-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-7); }
   .review-card { background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm); padding: var(--sp-7); }
   .review-card .stars { color: var(--brass); font-family: var(--font-ui); letter-spacing: .2em; margin-bottom: var(--sp-4); }
