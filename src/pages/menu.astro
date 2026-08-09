@@ -55,7 +55,7 @@ const jsonLd = {
   <button data-tab="food" class="active">Food</button>
   <button data-tab="pizza">Pizza</button>
   <button data-tab="beer">Beer</button>
-  <button data-tab="cocktails">Cocktails &amp; Wine</button>
+  <button data-tab="cocktails"><span class="tab-label-full">Cocktails &amp; Wine</span><span class="tab-label-short">Drinks</span></button>
   <button data-tab="spirits">Spirits</button>
   <button data-tab="kids">Kids</button>
 </nav>
@@ -602,4 +602,13 @@ const jsonLd = {
   .menu-footnote { text-align: center; font-family: var(--font-ui); font-size: 11px; color: var(--fg-3); letter-spacing: .06em; margin-top: var(--sp-7); }
 
   @media (max-width: 860px) { .menu-sections { columns: 1; } .byo-grid { grid-template-columns: 1fr; gap: var(--sp-5); } .toppings-list { columns: 2; } }
+
+  .tab-label-short { display: none; }
+
+  @media (max-width: 480px) {
+    .tabs { gap: 6px; justify-content: flex-start; }
+    .tabs button { padding-left: 0; padding-right: 0; letter-spacing: .04em; }
+    .tab-label-full { display: none; }
+    .tab-label-short { display: inline; }
+  }
 </style>
