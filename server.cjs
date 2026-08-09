@@ -147,6 +147,7 @@ async function handleReservation(req, res) {
     if (result.status === 200 || result.status === 201) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
+      resendSubscribe(email).catch((err) => console.error('Reservation newsletter subscribe error:', err.message));
     } else {
       console.error('Resend send failed:', result.status, result.body);
       res.writeHead(502, { 'Content-Type': 'application/json' });
