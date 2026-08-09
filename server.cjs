@@ -7,9 +7,7 @@ const zlib = require('zlib');
 const PORT = process.env.PORT || 3000;
 const ROOT = path.join(__dirname, 'dist');
 
-const MAILCHIMP_API_KEY = (process.env.MAILCHIMP_API_KEY || '').trim();
-const MAILCHIMP_LIST_ID = (process.env.MAILCHIMP_LIST_ID || '').trim();
-const MAILCHIMP_SERVER_PREFIX = (process.env.MAILCHIMP_SERVER_PREFIX || '').trim();
+const RESEND_API_KEY = (process.env.RESEND_API_KEY || '').trim();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -31,18 +29,17 @@ function readJsonBody(req) {
   });
 }
 
-function mailchimpSubscribe(email) {
+function resendSubscribe(email) {
   return new Promise((resolve, reject) => {
-    const body = JSON.stringify({ email_address: email, status: 'subscribed' });
-    const auth = Buffer.from(`anystring:${MAILCHIMP_API_KEY}`).toString('base64');
+    const body = JSON.stringify({ email, unsubscribed: false });
     const options = {
-      hostname: `${MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com`,
-      path: `/3.0/lists/${MAILCHIMP_LIST_ID}/members`,
+      hostname: 'api.resend.com',
+      path: '/contacts',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(body),
-        Authorization: `Basic ${auth}`,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
       },
     };
     const req = https.request(options, (res) => {
@@ -61,7 +58,7 @@ function mailchimpSubscribe(email) {
 }
 
 async function handleNewsletterSignup(req, res) {
-  if (!MAILCHIMP_API_KEY || !MAILCHIMP_LIST_ID || !MAILCHIMP_SERVER_PREFIX) {
+  if (!RESEND_API_KEY) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: false, error: 'Newsletter signup is not configured yet.' }));
     return;
@@ -82,20 +79,18 @@ async function handleNewsletterSignup(req, res) {
   }
 
   try {
-    const result = await mailchimpSubscribe(email);
-    if (result.status === 200 || result.status === 201) {
+    const result = await resendSubscribe(email);
+    const alreadyExists = /already|exist/i.test(result.body && result.body.message || '');
+    if (result.status === 200 || result.status === 201 || alreadyExists) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: true }));
-    } else if (result.body && result.body.title === 'Member Exists') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: true, alreadySubscribed: true }));
+      res.end(JSON.stringify({ ok: true, alreadySubscribed: alreadyExists && result.status >= 400 }));
     } else {
-      console.error('Mailchimp subscribe failed:', result.status, result.body);
+      console.error('Resend subscribe failed:', result.status, result.body);
       res.writeHead(502, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: false, error: 'Could not complete signup. Please try again.' }));
     }
   } catch (err) {
-    console.error('Mailchimp request error:', err.message);
+    console.error('Resend request error:', err.message);
     res.writeHead(502, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: false, error: 'Could not reach the signup service. Please try again.' }));
   }
