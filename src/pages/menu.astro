@@ -47,7 +47,7 @@ const jsonLd = {
   <div class="wrap">
     <span class="eyebrow">The Full Spread</span>
     <h1>Menus</h1>
-    <p>1625 W Irving Park Rd · Please notify your server of any allergies · 3% credit card processing fee applied to all card transactions</p>
+    <p>Please notify your server of any allergies · 3% credit card processing fee applied to all card transactions</p>
   </div>
 </section>
 
@@ -551,7 +551,11 @@ const jsonLd = {
   .tabs button.active { color: var(--ivy); border-bottom-color: var(--brass); }
   .tabs button:active { opacity: 0.6; }
 
-  .panel { display: none; padding: var(--sp-9) 0 var(--sp-11); }
+  .panel {
+    display: none; padding: var(--sp-9) 0 var(--sp-11);
+    background-image: url('/assets/img/decor/ivy-vine-pattern.svg');
+    background-repeat: repeat; background-position: top center;
+  }
   .panel.active { display: block; }
 
   .menu-sections { columns: 2; column-gap: var(--sp-9); }
