@@ -7,9 +7,9 @@ const zlib = require('zlib');
 const PORT = process.env.PORT || 3000;
 const ROOT = path.join(__dirname, 'dist');
 
-const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY;
-const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;
-const MAILCHIMP_SERVER_PREFIX = process.env.MAILCHIMP_SERVER_PREFIX;
+const MAILCHIMP_API_KEY = (process.env.MAILCHIMP_API_KEY || '').trim();
+const MAILCHIMP_LIST_ID = (process.env.MAILCHIMP_LIST_ID || '').trim();
+const MAILCHIMP_SERVER_PREFIX = (process.env.MAILCHIMP_SERVER_PREFIX || '').trim();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -66,13 +66,22 @@ async function handleNewsletterSignup(req, res) {
     res.end(JSON.stringify({ ok: false, error: 'Newsletter signup is not configured yet.' }));
     return;
   }
+  let email;
   try {
-    const { email } = await readJsonBody(req);
-    if (typeof email !== 'string' || !EMAIL_RE.test(email)) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: false, error: 'Please enter a valid email address.' }));
-      return;
-    }
+    ({ email } = await readJsonBody(req));
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Invalid request.' }));
+    return;
+  }
+
+  if (typeof email !== 'string' || !EMAIL_RE.test(email)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Please enter a valid email address.' }));
+    return;
+  }
+
+  try {
     const result = await mailchimpSubscribe(email);
     if (result.status === 200 || result.status === 201) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -81,12 +90,14 @@ async function handleNewsletterSignup(req, res) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, alreadySubscribed: true }));
     } else {
+      console.error('Mailchimp subscribe failed:', result.status, result.body);
       res.writeHead(502, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: false, error: 'Could not complete signup. Please try again.' }));
     }
-  } catch {
-    res.writeHead(400, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: false, error: 'Invalid request.' }));
+  } catch (err) {
+    console.error('Mailchimp request error:', err.message);
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Could not reach the signup service. Please try again.' }));
   }
 }
 
