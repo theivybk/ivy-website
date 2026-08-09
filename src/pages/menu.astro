@@ -62,6 +62,7 @@ const jsonLd = {
 
 <!-- ══════════════════ FOOD ══════════════════ -->
 <section class="panel active" id="food" data-panel>
+  <svg class="panel-vine" viewBox="0 0 200 200" aria-hidden="true"><use href="#ivy-vine"></use></svg>
   <div class="wrap">
     <div class="menu-sections">
 
@@ -153,6 +154,7 @@ const jsonLd = {
 
 <!-- ══════════════════ PIZZA ══════════════════ -->
 <section class="panel" id="pizza" data-panel>
+  <svg class="panel-vine" viewBox="0 0 200 200" aria-hidden="true"><use href="#ivy-vine"></use></svg>
   <div class="wrap">
     <div class="menu-sections">
       <div class="menu-section">
@@ -196,6 +198,7 @@ const jsonLd = {
 
 <!-- ══════════════════ BEER ══════════════════ -->
 <section class="panel" id="beer" data-panel>
+  <svg class="panel-vine" viewBox="0 0 200 200" aria-hidden="true"><use href="#ivy-vine"></use></svg>
   <div class="wrap">
     <div class="menu-sections">
       <div class="menu-section">
@@ -286,6 +289,7 @@ const jsonLd = {
 
 <!-- ══════════════════ COCKTAILS & WINE ══════════════════ -->
 <section class="panel" id="cocktails" data-panel>
+  <svg class="panel-vine" viewBox="0 0 200 200" aria-hidden="true"><use href="#ivy-vine"></use></svg>
   <div class="wrap">
     <div class="menu-sections">
       <div class="menu-section">
@@ -355,6 +359,7 @@ const jsonLd = {
 
 <!-- ══════════════════ SPIRITS ══════════════════ -->
 <section class="panel" id="spirits" data-panel>
+  <svg class="panel-vine" viewBox="0 0 200 200" aria-hidden="true"><use href="#ivy-vine"></use></svg>
   <div class="wrap">
     <p class="pour-note">Prices listed by pour — 1.5 oz / 2 oz</p>
     <div class="menu-sections">
@@ -494,6 +499,7 @@ const jsonLd = {
 
 <!-- ══════════════════ KIDS ══════════════════ -->
 <section class="panel" id="kids" data-panel>
+  <svg class="panel-vine" viewBox="0 0 200 200" aria-hidden="true"><use href="#ivy-vine"></use></svg>
   <div class="wrap" style="max-width:640px;">
     <div class="menu-section">
       <h2>For the Little Ones</h2><span class="seclabel">guests twelve &amp; under</span>
@@ -551,12 +557,13 @@ const jsonLd = {
   .tabs button.active { color: var(--ivy); border-bottom-color: var(--brass); }
   .tabs button:active { opacity: 0.6; }
 
-  .panel {
-    display: none; padding: var(--sp-9) 0 var(--sp-11);
-    background-image: url('/assets/img/decor/ivy-vine-pattern.svg');
-    background-repeat: repeat; background-position: top center;
-  }
+  .panel { display: none; padding: var(--sp-9) 0 var(--sp-11); position: relative; overflow: hidden; }
   .panel.active { display: block; }
+  .panel-vine {
+    position: absolute; top: -12px; right: -12px; width: 170px; height: 170px;
+    color: var(--ivy); opacity: 0.14; z-index: 0; pointer-events: none;
+  }
+  .panel > .wrap { position: relative; z-index: 1; }
 
   .menu-sections { columns: 2; column-gap: var(--sp-9); }
   .menu-section { break-inside: avoid; margin-bottom: var(--sp-8); }
