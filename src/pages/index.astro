@@ -481,14 +481,19 @@ const jsonLd = {
   /* ── FAQ ───────────────────────────────────────────── */
   .faq { padding: var(--sp-11) 0; background: var(--bg-alt); }
   .faq-list { max-width: 760px; margin: 0 auto; }
-  .faq-item { border-bottom: 1px solid var(--border-hair); padding: var(--sp-6) 0; }
+  .faq-item { border-bottom: 1px solid var(--border-hair); padding: var(--sp-4) 0; }
   .faq-item summary {
     font-family: var(--font-ui); font-size: var(--fs-md); font-weight: 500; color: var(--ivy);
     cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;
+    padding: var(--sp-3) 0;
   }
   .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: "+"; font-size: var(--fs-2xl); color: var(--brass-deep); font-weight: 400; margin-left: var(--sp-4); }
-  .faq-item[open] summary::after { content: "–"; }
+  .faq-item summary:active { opacity: 0.6; }
+  .faq-item summary::after {
+    content: "+"; font-size: var(--fs-2xl); color: var(--brass-deep); font-weight: 400; margin-left: var(--sp-4);
+    display: inline-block; transition: transform var(--t-base) var(--ease-out);
+  }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
   .faq-item p { color: var(--fg-2); margin: var(--sp-3) 0 0; max-width: 640px; }
 
   /* ── RESERVATIONS ─────────────────────────────────────── */
@@ -532,13 +537,18 @@ const jsonLd = {
 
   @media (max-width: 860px) {
     .hero .cta-row { justify-content: center; }
-    .feature-grid { grid-template-columns: 1fr; }
     .strip-grid { grid-template-columns: repeat(3, 1fr); }
+    .hl-grid { gap: var(--sp-7); }
+    .about-grid { gap: var(--sp-7); }
+    .order-direct .wrap { flex-direction: column; align-items: flex-start; text-align: left; }
+    .ig-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .feature-grid { grid-template-columns: 1fr; }
     .hl-grid { grid-template-columns: 1fr; }
     .about-grid { grid-template-columns: 1fr; }
     .review-grid { grid-template-columns: 1fr; }
-    .order-direct .wrap { flex-direction: column; align-items: flex-start; text-align: left; }
     .form-row, .form-row.triple { grid-template-columns: 1fr; }
-    .ig-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
