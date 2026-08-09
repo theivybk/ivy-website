@@ -147,7 +147,7 @@ const jsonLd = {
       <p>We hold a mix of reservations and walk-in seating. Send us your details and we'll confirm by phone or email.</p>
     </div>
 
-    <form class="reserve-form" id="reserve-form" data-recipient="info@theivybk.com">
+    <form class="reserve-form" id="reserve-form">
       <div class="form-row">
         <div class="field">
           <label for="r-name">Full Name<span class="req">*</span></label>
@@ -204,6 +204,7 @@ const jsonLd = {
       <div class="submit-row" id="submit-row">
         <button type="submit" class="btn btn--primary">Request Reservation</button>
         <p class="submit-note">Requests are sent to <a href="mailto:info@theivybk.com" style="border-bottom:1px solid var(--brass);">info@theivybk.com</a> — we'll confirm by phone or email.</p>
+        <p class="submit-error" id="reserve-error" hidden></p>
       </div>
     </form>
 
@@ -412,30 +413,38 @@ const jsonLd = {
   dateInput.addEventListener('change', updateSameDayState);
   updateSameDayState();
 
-  reserveForm.addEventListener('submit', (e) => {
+  reserveForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = new FormData(reserveForm);
-    const label = (v) => v && v.trim() ? v : '—';
-    const lines = [
-      `Name: ${label(data.get('full_name'))}`,
-      `Phone: ${label(data.get('phone'))}`,
-      `Email: ${label(data.get('email'))}`,
-      `Date: ${label(data.get('date'))}`,
-      `Time: ${label(data.get('time'))}`,
-      `Party Size: ${label(data.get('party_size'))}`,
-      ``,
-      `Special Requests:`,
-      label(data.get('notes'))
-    ].join('\n');
-    const subject = `Table Reservation — ${label(data.get('date'))} at ${label(data.get('time'))} — ${label(data.get('full_name'))}`;
-    const mailto = `mailto:${reserveForm.dataset.recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines)}`;
-    window.location.href = mailto;
+    const payload = Object.fromEntries(data.entries());
+    const submitBtn = reserveForm.querySelector('button[type="submit"]');
+    const errorEl = document.getElementById('reserve-error');
+    submitBtn.disabled = true;
+    errorEl.hidden = true;
 
-    const dateVal = data.get('date') ? new Date(data.get('date') + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : 'you soon';
-    document.getElementById('reserve-confirm-text').textContent = `We'll see you ${dateVal}${data.get('time') ? ' at ' + data.get('time') : ''}. A confirmation will follow by phone or email.`;
-    reserveForm.hidden = true;
-    document.getElementById('reserve-confirm').hidden = false;
-    document.getElementById('reserve-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    try {
+      const res = await fetch('/api/reserve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+      if (res.ok && result.ok) {
+        const dateVal = payload.date ? new Date(payload.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : 'you soon';
+        document.getElementById('reserve-confirm-text').textContent = `We'll see you ${dateVal}${payload.time ? ' at ' + payload.time : ''}. A confirmation will follow by phone or email.`;
+        reserveForm.hidden = true;
+        document.getElementById('reserve-confirm').hidden = false;
+        document.getElementById('reserve-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        errorEl.textContent = result.error || 'Something went wrong — please try again or call us.';
+        errorEl.hidden = false;
+      }
+    } catch {
+      errorEl.textContent = 'Something went wrong — please try again or call us.';
+      errorEl.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+    }
   });
 </script>
 </Layout>
@@ -593,6 +602,7 @@ const jsonLd = {
   .submit-row { text-align: center; margin-top: var(--sp-7); }
   .submit-row .btn { width: 100%; justify-content: center; padding: 16px; font-size: var(--fs-sm); }
   .submit-note { text-align: center; font-size: 12px; color: var(--fg-3); margin-top: var(--sp-4); }
+  .submit-error { text-align: center; font-size: 13px; color: var(--brick); margin-top: var(--sp-4); }
   .same-day-notice {
     text-align: center; margin-top: var(--sp-7); padding: var(--sp-6);
     background: var(--cream-warm); border: 1px solid var(--brass); border-radius: var(--r-sm);

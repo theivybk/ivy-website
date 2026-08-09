@@ -57,6 +57,108 @@ function resendSubscribe(email) {
   });
 }
 
+function resendSendEmail({ to, subject, text, replyTo }) {
+  return new Promise((resolve, reject) => {
+    const payload = {
+      from: 'The Ivy Bar and Kitchen <onboarding@resend.dev>',
+      to: [to],
+      subject,
+      text,
+    };
+    if (replyTo) payload.reply_to = replyTo;
+    const body = JSON.stringify(payload);
+    const options = {
+      hostname: 'api.resend.com',
+      path: '/emails',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+      },
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => (data += chunk));
+      res.on('end', () => {
+        let parsed = {};
+        try { parsed = JSON.parse(data); } catch {}
+        resolve({ status: res.statusCode, body: parsed });
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+const RESERVATION_TO_EMAIL = 'info@theivybk.com';
+
+async function handleReservation(req, res) {
+  if (!RESEND_API_KEY) {
+    res.writeHead(503, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Reservation requests are not configured yet.' }));
+    return;
+  }
+  let data;
+  try {
+    data = await readJsonBody(req);
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Invalid request.' }));
+    return;
+  }
+
+  const label = (v) => (typeof v === 'string' && v.trim() ? v.trim() : '—');
+  const fullName = label(data.full_name);
+  const phone = label(data.phone);
+  const email = label(data.email);
+  const date = label(data.date);
+  const time = label(data.time);
+  const partySize = label(data.party_size);
+  const notes = label(data.notes);
+
+  if (fullName === '—' || phone === '—' || email === '—' || date === '—' || time === '—' || partySize === '—') {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Please fill in all required fields.' }));
+    return;
+  }
+  if (!EMAIL_RE.test(email)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Please enter a valid email address.' }));
+    return;
+  }
+
+  const subject = `Table Reservation — ${date} at ${time} — ${fullName}`;
+  const text = [
+    `Name: ${fullName}`,
+    `Phone: ${phone}`,
+    `Email: ${email}`,
+    `Date: ${date}`,
+    `Time: ${time}`,
+    `Party Size: ${partySize}`,
+    ``,
+    `Special Requests:`,
+    notes,
+  ].join('\n');
+
+  try {
+    const result = await resendSendEmail({ to: RESERVATION_TO_EMAIL, subject, text, replyTo: email });
+    if (result.status === 200 || result.status === 201) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+    } else {
+      console.error('Resend send failed:', result.status, result.body);
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Could not send your request. Please call us instead.' }));
+    }
+  } catch (err) {
+    console.error('Resend request error:', err.message);
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Could not reach the reservation service. Please call us instead.' }));
+  }
+}
+
 async function handleNewsletterSignup(req, res) {
   if (!RESEND_API_KEY) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
@@ -143,6 +245,11 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'POST' && urlPath === '/api/newsletter') {
     handleNewsletterSignup(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/reserve') {
+    handleReservation(req, res);
     return;
   }
 
