@@ -130,7 +130,7 @@ const jsonLd = {
     <div class="cta-row">
       <a href="#reserve" class="btn btn--primary">Reserve a Table</a>
       <a href="/menu" class="btn btn--brass-outline">View Menus</a>
-      <a href="#order" class="btn btn--brass-outline">Order Now</a>
+      <a href="https://order.toasttab.com/online/the-ivy-1625-west-irving-park-road" target="_blank" rel="noopener" class="btn btn--brass-outline">Order Online</a>
       <a href="/private-events" class="btn btn--brass-outline">Plan an Event</a>
     </div>
   </div>
@@ -297,9 +297,12 @@ const jsonLd = {
   <div class="wrap">
     <div>
       <h2>Order direct, skip the fees</h2>
-      <p>Call it in and skip the third-party markup — more of every dollar stays in the neighborhood, and your order gets to the kitchen faster.</p>
+      <p>Order online for pickup or delivery, or call it in — either way you skip the third-party markup, more of every dollar stays in the neighborhood, and your order gets to the kitchen faster.</p>
     </div>
-    <a href="tel:+17737998160" class="btn btn--primary">Call to Order</a>
+    <div class="order-direct-ctas">
+      <a href="https://order.toasttab.com/online/the-ivy-1625-west-irving-park-road" target="_blank" rel="noopener" class="btn btn--primary">Order Online</a>
+      <a href="tel:+17737998160" class="btn btn--ghost">Call to Order</a>
+    </div>
   </div>
 </section>
 
@@ -601,6 +604,7 @@ const jsonLd = {
   .order-direct .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-7); flex-wrap: wrap; }
   .order-direct h2 { font-size: var(--fs-3xl); font-style: italic; margin-bottom: var(--sp-2); }
   .order-direct p { color: var(--fg-2); margin: 0; max-width: 480px; font-size: var(--fs-sm); }
+  .order-direct-ctas { display: flex; gap: var(--sp-4); flex-wrap: wrap; }
 
   /* ── REVIEWS ───────────────────────────────────────── */
   .reviews { padding: var(--sp-11) 0; }
@@ -688,6 +692,8 @@ const jsonLd = {
     .hl-grid { gap: var(--sp-7); }
     .about-grid { gap: var(--sp-7); }
     .order-direct .wrap { flex-direction: column; align-items: flex-start; text-align: left; }
+    .order-direct-ctas { width: 100%; }
+    .order-direct-ctas .btn { flex: 1 1 auto; justify-content: center; }
     .ig-grid { grid-template-columns: repeat(2, 1fr); }
     .specials-grid { grid-template-columns: repeat(2, 1fr); }
   }
