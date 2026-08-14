@@ -670,6 +670,12 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'GET' && urlPath === '/mailer') {
+    res.writeHead(302, { Location: '/?utm_source=eddm&utm_medium=direct_mail&utm_campaign=eddm_mailer' });
+    res.end();
+    return;
+  }
+
   if (urlPath === '/') urlPath = '/index.html';
   const filePath = path.join(ROOT, urlPath);
 
