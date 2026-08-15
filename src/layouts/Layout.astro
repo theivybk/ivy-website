@@ -25,7 +25,7 @@ const {
   navCtaHref,
 } = Astro.props;
 
-const canonicalUrl = `https://www.theivybk.com${canonicalPath}`;
+const canonicalUrl = `https://theivybk.com${canonicalPath}`;
 const navLink = (href: string, key: typeof active, label: string) =>
   ({ href, label, cls: active === key ? 'active' : '' });
 
