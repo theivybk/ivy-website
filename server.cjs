@@ -93,6 +93,12 @@ function parseReservationEmailText(text) {
 // separate database needed. We list recent emails, keep the ones whose
 // subject matches our reservation format, then fetch each one's full body
 // (the list endpoint only returns metadata) to recover the structured data.
+//
+// Resend has no email-delete API, so "clearing" old (test) reservations
+// isn't possible at the source -- instead we hide anything sent before this
+// cutoff. Real reservations from this point on are unaffected.
+const RESERVATIONS_VISIBLE_SINCE = '2026-08-15 23:21:34+00';
+
 async function readReservations() {
   if (!RESEND_API_KEY) return [];
   const matches = [];
@@ -107,7 +113,11 @@ async function readReservations() {
       }
       const items = result.body.data || [];
       for (const item of items) {
-        if (typeof item.subject === 'string' && item.subject.startsWith('Table Reservation — ')) {
+        if (
+          typeof item.subject === 'string' &&
+          item.subject.startsWith('Table Reservation — ') &&
+          item.created_at >= RESERVATIONS_VISIBLE_SINCE
+        ) {
           matches.push(item.id);
         }
       }
