@@ -209,7 +209,7 @@ const dayLabel = (dateStr) => new Date(dateStr + 'T00:00:00').toLocaleDateString
 // Simple branded HTML wrapper for customer-facing emails — table-based layout
 // with inline styles, since email clients don't support external stylesheets
 // or much modern CSS.
-function emailTemplate({ heading, bodyHtml }) {
+function emailTemplate({ heading, bodyHtml, unsubscribeUrl }) {
   return `<!doctype html>
 <html>
 <body style="margin:0; padding:0; background-color:#EBE3D2;">
@@ -235,6 +235,7 @@ function emailTemplate({ heading, bodyHtml }) {
               <p style="font-size:12px; color:#686860; text-align:center; margin:16px 0 0; border-top:1px solid rgba(31,61,42,.15); padding-top:16px;">
                 The Ivy Bar and Kitchen &middot; 1625 W Irving Park Rd, Chicago, IL 60613 &middot; (773) 799-8160
               </p>
+              ${unsubscribeUrl ? `<p style="font-size:12px; color:#686860; text-align:center; margin:8px 0 0;"><a href="${unsubscribeUrl}" style="color:#686860;">Unsubscribe from marketing emails</a></p>` : ''}
             </td>
           </tr>
         </table>
@@ -378,6 +379,54 @@ async function handleWeeklyReportEmail(req, res, query) {
   }
 }
 
+async function handleUnsubscribe(req, res, query) {
+  const email = (query.get('email') || '').trim();
+  if (!EMAIL_RE.test(email)) {
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    res.end('Invalid email address.');
+    return;
+  }
+
+  try {
+    await resendUnsubscribe(email);
+  } catch (err) {
+    console.error('Unsubscribe error:', err.message);
+  }
+
+  // RFC 8058 one-click unsubscribe: mail clients POST here automatically
+  // without loading a page, so just acknowledge and stop.
+  if (req.method === 'POST') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('OK');
+    return;
+  }
+
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unsubscribed — The Ivy Bar and Kitchen</title>
+<style>
+  body { margin: 0; font-family: -apple-system, Segoe UI, Arial, sans-serif; background: #F5EFE3; color: #14140F; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+  .card { background: #FBF7EE; border-radius: 4px; padding: 40px 32px; max-width: 420px; text-align: center; box-shadow: 0 8px 24px rgba(20,20,15,.06); }
+  h1 { font-family: Georgia, 'Times New Roman', serif; font-style: italic; color: #1F3D2A; font-size: 26px; margin: 0 0 12px; }
+  p { font-size: 15px; line-height: 1.6; color: #4A4A42; margin: 0 0 20px; }
+  a { color: #1F3D2A; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>You're unsubscribed</h1>
+    <p>${escapeHtml(email)} won't receive any more marketing emails from The Ivy Bar and Kitchen. You'll still get emails tied to a reservation you make.</p>
+    <p><a href="/">Back to theivybk.com</a></p>
+  </div>
+</body>
+</html>`;
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.end(html);
+}
+
 function parseMultipart(req, { maxBytes = 8 * 1024 * 1024 } = {}) {
   return new Promise((resolve, reject) => {
     const contentType = req.headers['content-type'] || '';
@@ -492,7 +541,35 @@ function resendSubscribe(email) {
   });
 }
 
-function resendSendEmail({ to, subject, text, html, replyTo, attachments }) {
+function resendUnsubscribe(email) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({ unsubscribed: true });
+    const options = {
+      hostname: 'api.resend.com',
+      path: `/audiences/${RESEND_AUDIENCE_ID}/contacts/${encodeURIComponent(email)}`,
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+      },
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => (data += chunk));
+      res.on('end', () => {
+        let parsed = {};
+        try { parsed = JSON.parse(data); } catch {}
+        resolve({ status: res.statusCode, body: parsed });
+      });
+    });
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+function resendSendEmail({ to, subject, text, html, replyTo, attachments, headers }) {
   return new Promise((resolve, reject) => {
     const payload = {
       from: 'The Ivy Bar and Kitchen <info@theivybk.com>',
@@ -503,6 +580,7 @@ function resendSendEmail({ to, subject, text, html, replyTo, attachments }) {
     if (html) payload.html = html;
     if (replyTo) payload.reply_to = replyTo;
     if (attachments && attachments.length) payload.attachments = attachments;
+    if (headers) payload.headers = headers;
     const body = JSON.stringify(payload);
     const options = {
       hostname: 'api.resend.com',
@@ -791,6 +869,8 @@ async function handleNewsletterSignup(req, res) {
           `The Ivy Bar and Kitchen`,
           `1625 W Irving Park Rd, Chicago, IL 60613`,
           `(773) 799-8160`,
+          ``,
+          `Unsubscribe from marketing emails: https://theivybk.com/unsubscribe?email=${encodeURIComponent(email)}`,
         ].join('\n');
         const welcomeHtml = emailTemplate({
           heading: "You're on the list!",
@@ -826,9 +906,18 @@ async function handleNewsletterSignup(req, res) {
             </p>
             <p style="margin:0;">See you soon.</p>
           `,
+          unsubscribeUrl: `https://theivybk.com/unsubscribe?email=${encodeURIComponent(email)}`,
         });
-        resendSendEmail({ to: email, subject: "You're on the list — The Ivy Bar and Kitchen", text: welcomeText, html: welcomeHtml })
-          .catch((err) => console.error('Newsletter welcome email error:', err.message));
+        resendSendEmail({
+          to: email,
+          subject: "You're on the list — The Ivy Bar and Kitchen",
+          text: welcomeText,
+          html: welcomeHtml,
+          headers: {
+            'List-Unsubscribe': `<https://theivybk.com/unsubscribe?email=${encodeURIComponent(email)}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          },
+        }).catch((err) => console.error('Newsletter welcome email error:', err.message));
       }
     } else {
       console.error('Resend subscribe failed:', result.status, result.body);
@@ -1104,6 +1193,12 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && urlPath === '/api/weekly-report-email') {
     const query = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams;
     handleWeeklyReportEmail(req, res, query);
+    return;
+  }
+
+  if ((req.method === 'GET' || req.method === 'POST') && urlPath === '/unsubscribe') {
+    const query = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams;
+    handleUnsubscribe(req, res, query);
     return;
   }
 
