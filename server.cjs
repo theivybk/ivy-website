@@ -15,12 +15,17 @@ const WEEKLY_REPORT_SECRET = (process.env.WEEKLY_REPORT_SECRET || '').trim();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Railway's free tier has no persistent disk, so this file is wiped on every
+// redeploy/restart. Resend (sent-email history + audience contacts) is the
+// actual durable store; on boot we rehydrate this table from there, keyed by
+// Resend's own IDs so re-running the rehydration never creates duplicates.
 const DB_PATH = (process.env.DB_PATH || path.join(__dirname, 'data', 'ivy.db')).trim();
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 const db = new DatabaseSync(DB_PATH);
 db.exec(`
   CREATE TABLE IF NOT EXISTS reservations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    resend_email_id TEXT UNIQUE,
     full_name TEXT,
     phone TEXT,
     email TEXT,
@@ -32,14 +37,17 @@ db.exec(`
   );
   CREATE TABLE IF NOT EXISTS newsletter_signups (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    resend_contact_id TEXT UNIQUE,
     email TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 `);
 const insertReservation = db.prepare(
-  `INSERT INTO reservations (full_name, phone, email, date, time, party_size, notes) VALUES (?, ?, ?, ?, ?, ?, ?)`
+  `INSERT OR IGNORE INTO reservations (resend_email_id, full_name, phone, email, date, time, party_size, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 );
-const insertNewsletterSignup = db.prepare(`INSERT INTO newsletter_signups (email) VALUES (?)`);
+const insertNewsletterSignup = db.prepare(
+  `INSERT OR IGNORE INTO newsletter_signups (resend_contact_id, email) VALUES (?, ?)`
+);
 
 function resendGet(pathAndQuery) {
   return new Promise((resolve, reject) => {
@@ -116,13 +124,37 @@ async function readReservations() {
     try {
       const result = await resendGet(`/emails/${id}`);
       if (result.status < 300 && result.body.text) {
-        reservations.push(parseReservationEmailText(result.body.text));
+        reservations.push({ resend_email_id: id, ...parseReservationEmailText(result.body.text) });
       }
     } catch (err) {
       console.error('Resend fetch email error:', err.message);
     }
   }
   return reservations;
+}
+
+async function hydrateDbFromResend() {
+  if (!RESEND_API_KEY) return;
+  try {
+    const reservations = await readReservations();
+    for (const r of reservations) {
+      insertReservation.run(r.resend_email_id, r.full_name, r.phone, r.email, r.date, r.time, r.party_size, r.notes);
+    }
+    console.log(`DB hydration: ${reservations.length} reservation(s) from Resend history.`);
+  } catch (err) {
+    console.error('DB hydration (reservations) error:', err.message);
+  }
+
+  try {
+    const result = await resendGet(`/audiences/${RESEND_AUDIENCE_ID}/contacts`);
+    const contacts = (result.status < 300 && result.body.data) || [];
+    for (const c of contacts) {
+      insertNewsletterSignup.run(c.id, c.email);
+    }
+    console.log(`DB hydration: ${contacts.length} newsletter signup(s) from Resend audience.`);
+  } catch (err) {
+    console.error('DB hydration (newsletter) error:', err.message);
+  }
 }
 
 function checkBasicAuth(req) {
@@ -524,12 +556,6 @@ async function handleReservation(req, res) {
     return;
   }
 
-  try {
-    insertReservation.run(fullName, phone, email, date, time, partySize, notes);
-  } catch (err) {
-    console.error('Reservation DB insert error:', err.message);
-  }
-
   const subject = `Table Reservation — ${date} at ${time} — ${fullName}`;
   const text = [
     `Name: ${fullName}`,
@@ -568,6 +594,12 @@ async function handleReservation(req, res) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
       resendSubscribe(email).catch((err) => console.error('Reservation newsletter subscribe error:', err.message));
+
+      try {
+        insertReservation.run(result.body.id, fullName, phone, email, date, time, partySize, notes);
+      } catch (err) {
+        console.error('Reservation DB insert error:', err.message);
+      }
 
       const confirmationText = [
         `Hi ${fullName},`,
@@ -718,7 +750,7 @@ async function handleNewsletterSignup(req, res) {
       res.end(JSON.stringify({ ok: true, alreadySubscribed: alreadyExists && result.status >= 400 }));
 
       try {
-        insertNewsletterSignup.run(email);
+        insertNewsletterSignup.run(result.body && result.body.id, email);
       } catch (err) {
         console.error('Newsletter signup DB insert error:', err.message);
       }
@@ -937,4 +969,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`The Ivy site running on port ${PORT}`);
+  hydrateDbFromResend();
 });
