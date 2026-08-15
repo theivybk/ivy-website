@@ -258,15 +258,17 @@ const navLinks = [
 
   function openPopup() {
     if (localStorage.getItem(POPUP_SEEN_KEY)) return;
+    const reserveForm = document.getElementById('reserve-form');
+    if (reserveForm && reserveForm.contains(document.activeElement)) return;
     popupLastFocused = document.activeElement;
     popupScrim.classList.add('open');
-    document.getElementById('newsletter-popup-email').focus();
+    document.getElementById('newsletter-popup-email').focus({ preventScroll: true });
   }
 
   function closePopup() {
     popupScrim.classList.remove('open');
     localStorage.setItem(POPUP_SEEN_KEY, '1');
-    if (popupLastFocused) popupLastFocused.focus();
+    if (popupLastFocused) popupLastFocused.focus({ preventScroll: true });
   }
 
   if (!localStorage.getItem(POPUP_SEEN_KEY)) {
