@@ -70,28 +70,40 @@ const jsonLd = {
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Our Spaces</span>
-      <h2>Three ways to host</h2>
-      <p>From a full rooftop buyout to a quiet back-room dinner — tell us your headcount and we'll match you to the right room.</p>
+      <h2>Five ways to host</h2>
+      <p>From an intimate meeting to a full-venue buyout — tell us your headcount and we'll match you to the right room.</p>
     </div>
     <div class="spaces-grid">
-      <div class="space-card space-card--photo" style="background-image:url('/assets/img/gallery/DSC_0785.jpg')">
+      <div class="space-card space-card--photo" style="background-image:url('/assets/img/gallery/ivy-rooftop-string-lights.jpg')">
         <div class="card-inner">
-          <span class="eyebrow">Rooftop</span>
-          <h3>Second-Floor Rooftop</h3>
-          <p>Open-air and covered seating above the bar — one of the only rooftops of its kind in this stretch of Lakeview. Ideal for summer parties and game-day buyouts.</p>
+          <span class="eyebrow">Private</span>
+          <h3>The Ivy Rooftop</h3>
+          <p>Private use of our rooftop bar. Surround yourselves with greenery while enjoying the weather and cold drinks.</p>
         </div>
       </div>
-      <div class="space-card space-card--photo" style="background-image:url('/assets/img/gallery/DSC_1105.jpg')">
+      <div class="space-card space-card--photo" style="background-image:url('/assets/img/gallery/gathering-room-tv.jpg')">
+        <div class="card-inner">
+          <span class="eyebrow">Semi-Private</span>
+          <h3>The Gathering Room</h3>
+          <p>Semi-private use of our formal dining room. Boasting a 98" TV — perfect for meetings, presentations, or draft day shenanigans.</p>
+        </div>
+      </div>
+      <div class="space-card">
+        <span class="eyebrow">Private</span>
+        <h3>The Ivy Room</h3>
+        <p>Private use of our dedicated event space. Equipped with a dry bar and TVs for any occasion.</p>
+      </div>
+      <div class="space-card">
+        <span class="eyebrow">Private</span>
+        <h3>The Ivy Bundle</h3>
+        <p>Private use of our rooftop bar and our dedicated event space.</p>
+      </div>
+      <div class="space-card space-card--photo space-card--wide" style="background-image:url('/assets/img/gallery/DSC_1105.jpg')">
         <div class="card-inner">
           <span class="eyebrow">Full Buyout</span>
-          <h3>Whole-Venue Buyout</h3>
-          <p>The dining room, bar, and rooftop, all yours — built for corporate events, receptions, and large celebrations.</p>
+          <h3>Full Buyout</h3>
+          <p>Exclusive use of the rooftop, event space, dining room &amp; main bar. Perfect for large gatherings and corporate events.</p>
         </div>
-      </div>
-      <div class="space-card space-card--full">
-        <span class="eyebrow">Semi-Private</span>
-        <h3>Private Party Room</h3>
-        <p>An intimate, partitioned space off the main dining room — well suited to showers, rehearsal dinners, and smaller birthdays.</p>
       </div>
     </div>
   </div>
@@ -180,9 +192,11 @@ const jsonLd = {
           <label for="space">Space Preference<span class="req">*</span></label>
           <select id="space" name="space_preference" required>
             <option value="">Select a space</option>
-            <option>Rooftop — Second Floor</option>
-            <option>Semi-Private — Private Party Room</option>
-            <option>Full Venue Buyout</option>
+            <option>The Ivy Room</option>
+            <option>The Ivy Rooftop</option>
+            <option>The Gathering Room</option>
+            <option>The Ivy Bundle</option>
+            <option>Full Buyout</option>
             <option>No Preference</option>
           </select>
         </div>
@@ -313,7 +327,7 @@ const jsonLd = {
   .space-card .eyebrow { display: block; margin-bottom: var(--sp-2); }
   .space-card h3 { font-size: var(--fs-xl); margin-bottom: var(--sp-3); }
   .space-card p { color: var(--fg-2); font-size: var(--fs-sm); margin: 0; }
-  .space-card--full { grid-column: 1 / -1; max-width: 420px; margin: 0 auto; }
+  .space-card--wide { grid-column: 1 / -1; min-height: 260px; }
   .space-card--photo {
     padding: 0; text-align: left; overflow: hidden; position: relative; min-height: 320px;
     display: flex; align-items: flex-end;
