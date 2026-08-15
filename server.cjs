@@ -874,6 +874,21 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'GET' && urlPath === '/admin/db-status') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    const reservations = db.prepare('SELECT * FROM reservations ORDER BY id DESC LIMIT 20').all();
+    const signups = db.prepare('SELECT * FROM newsletter_signups ORDER BY id DESC LIMIT 20').all();
+    const reservationCount = db.prepare('SELECT COUNT(*) AS n FROM reservations').get().n;
+    const signupCount = db.prepare('SELECT COUNT(*) AS n FROM newsletter_signups').get().n;
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ reservationCount, signupCount, reservations, signups }, null, 2));
+    return;
+  }
+
   if (req.method === 'GET' && urlPath === '/admin/reservations') {
     const query = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams;
     handleReservationsReport(req, res, query);
