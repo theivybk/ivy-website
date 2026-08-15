@@ -623,9 +623,23 @@ function pickEncoding(acceptEncoding) {
   return null;
 }
 
+// Astro fingerprints /_astro/ bundle filenames by content hash, so those can
+// be cached forever. Everything else (images, hand-written CSS, HTML) keeps
+// the same filename across deploys, so cache briefly instead of not at all.
+function pickCacheControl(filePath, ext) {
+  const relPath = path.relative(ROOT, filePath).replace(/\\/g, '/');
+  if (relPath.startsWith('_astro/')) return 'public, max-age=31536000, immutable';
+  if (ext === '.html') return 'public, max-age=0, must-revalidate';
+  if (ext === '.css' || ext === '.js') return 'public, max-age=3600';
+  return 'public, max-age=86400';
+}
+
 function serveFile(filePath, req, res) {
   const ext = path.extname(filePath).toLowerCase();
-  const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream' };
+  const headers = {
+    'Content-Type': MIME[ext] || 'application/octet-stream',
+    'Cache-Control': pickCacheControl(filePath, ext),
+  };
   const encoding = COMPRESSIBLE.has(ext) ? pickEncoding(req.headers['accept-encoding']) : null;
 
   if (encoding) {
