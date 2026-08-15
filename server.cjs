@@ -474,6 +474,27 @@ async function handleReservation(req, res) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
       resendSubscribe(email).catch((err) => console.error('Reservation newsletter subscribe error:', err.message));
+
+      const confirmationText = [
+        `Hi ${fullName},`,
+        ``,
+        `You're all set! Here's your reservation at The Ivy Bar and Kitchen:`,
+        ``,
+        `Date: ${dayLabel(date)}`,
+        `Time: ${time}`,
+        `Party Size: ${partySize}`,
+        ...(notes !== '—' ? [`Special Requests: ${notes}`] : []),
+        ``,
+        `Need to make a change or have a question? Call us at (773) 799-8160 — happy to help.`,
+        ``,
+        `We can't wait to see you.`,
+        ``,
+        `The Ivy Bar and Kitchen`,
+        `1625 W Irving Park Rd, Chicago, IL 60613`,
+        `(773) 799-8160`,
+      ].join('\n');
+      resendSendEmail({ to: email, subject: "You're Confirmed — The Ivy Bar and Kitchen", text: confirmationText })
+        .catch((err) => console.error('Reservation confirmation email error:', err.message));
     } else {
       console.error('Resend send failed:', result.status, result.body);
       res.writeHead(502, { 'Content-Type': 'application/json' });
