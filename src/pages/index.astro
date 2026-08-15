@@ -5,7 +5,7 @@ const restaurantLd = {
   "@type": ["Restaurant", "BarOrPub"],
   "name": "The Ivy Bar and Kitchen",
   "alternateName": "The Ivy",
-  "description": "A neighborhood bar & restaurant in Lakeview, Chicago, three blocks from Wrigley Field, serving Chicago Tavern & Detroit Pan pizza, smash burgers, and craft cocktails, with rooftop and private event space.",
+  "description": "A neighborhood bar & restaurant in Lakeview, Chicago, three blocks from Wrigley Field, serving Chicago Tavern & Detroit Pan pizza, smash burgers, and craft cocktails, with rooftop and private event space. A go-to spot before Cubs games and Wrigley Field concerts, with TVs throughout the bar, dining room, and rooftop.",
   "image": [
     "https://theivybk.com/assets/img/gallery/DSC_1103.jpg",
     "https://theivybk.com/assets/img/gallery/DSC_0785.jpg",
@@ -78,6 +78,22 @@ const faqLd = {
     },
     {
       "@type": "Question",
+      "name": "What kind of pizza do you have?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Two styles, made fresh to order — Chicago Tavern (thin, crisp, cut in squares) and Detroit Pan (golden crust, crispy corners) — plus a build-your-own option where you pick the crust, sauce, and toppings."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is The Ivy a good spot before a Cubs game or a Wrigley Field concert?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — we're three blocks from Wrigley Field with TVs throughout the bar, dining room, and rooftop. Grab pizza and a drink before first pitch, or come by after the show. Reservations are recommended on game days and concert nights since we fill up fast."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "Can kids eat here?",
       "acceptedAnswer": {
         "@type": "Answer",
@@ -103,14 +119,46 @@ const faqLd = {
   ]
 };
 
+const triviaLd = {
+  "@type": "Event",
+  "name": "Trivia Night at The Ivy",
+  "description": "Weekly trivia night hosted by Geeks Who Drink at The Ivy Bar and Kitchen.",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "startDate": "2026-08-26T19:00-05:00",
+  "endDate": "2026-08-26T21:00-05:00",
+  "eventSchedule": {
+    "@type": "Schedule",
+    "repeatFrequency": "P1W",
+    "byDay": "https://schema.org/Wednesday",
+    "startTime": "19:00",
+    "endTime": "21:00",
+    "startDate": "2026-08-26"
+  },
+  "location": {
+    "@type": "Place",
+    "name": "The Ivy Bar and Kitchen",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "1625 W Irving Park Rd",
+      "addressLocality": "Chicago",
+      "addressRegion": "IL",
+      "postalCode": "60613",
+      "addressCountry": "US"
+    }
+  },
+  "organizer": { "@type": "Organization", "name": "Geeks Who Drink" },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" }
+};
+
 const jsonLd = {
   "@context": "https://schema.org",
-  "@graph": [restaurantLd, faqLd]
+  "@graph": [restaurantLd, faqLd, triviaLd]
 };
 ---
 <Layout
   title="The Ivy Bar and Kitchen | Bar & Restaurant in Lakeview, Chicago"
-  description="A neighborhood bar & restaurant in Lakeview, Chicago, three blocks from Wrigley Field — rooftop seating, wood-fired pizza, craft cocktails & private events."
+  description="A neighborhood bar & restaurant in Lakeview, Chicago, three blocks from Wrigley Field — Chicago Tavern & Detroit Pan pizza, rooftop seating, craft cocktails & private events."
   ogImage="https://theivybk.com/assets/img/gallery/DSC_1105.jpg"
   canonicalPath="/"
   jsonLd={jsonLd}
@@ -245,6 +293,18 @@ const jsonLd = {
         <h3>Delicious Bites</h3>
         <p>Smash burgers, hand-breaded tenders, and the kind of sandwiches that make game day.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="gameday-teaser" id="gameday">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--brass-light)">Game Day &amp; Concert Nights</span>
+    <h2>Three blocks from Wrigley Field</h2>
+    <p>Catch the game or grab a bite before the show — TVs throughout the bar, dining room, and rooftop, plus Chicago Tavern &amp; Detroit Pan pizza, smash burgers, and drinks to fuel the walk over. Reserve ahead on game days and concert nights, since we fill up fast.</p>
+    <div class="gameday-ctas">
+      <a href="#reserve" class="btn btn--primary">Reserve a Table</a>
+      <a href="/menu" class="btn btn--brass-outline">View Menus</a>
     </div>
   </div>
 </section>
@@ -437,6 +497,14 @@ const jsonLd = {
         <p>Yes — a dedicated gluten-free beer selection, a Beyond patty swap on any burger, and vegetarian-friendly items across the menu including our White Out pizza and House Salad.</p>
       </details>
       <details class="faq-item">
+        <summary>What kind of pizza do you have?</summary>
+        <p>Two styles, made fresh to order — Chicago Tavern (thin, crisp, cut in squares) and Detroit Pan (golden crust, crispy corners) — plus a build-your-own option where you pick the crust, sauce, and toppings.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is The Ivy a good spot before a Cubs game or a Wrigley Field concert?</summary>
+        <p>Yes — we're three blocks from Wrigley Field with TVs throughout the bar, dining room, and rooftop. Grab pizza and a drink before first pitch, or come by after the show. Reservations are recommended on game days and concert nights since we fill up fast.</p>
+      </details>
+      <details class="faq-item">
         <summary>Can kids eat here?</summary>
         <p>Absolutely. We have a full kids menu for guests twelve and under, plus activity pages to keep them busy while the food comes out.</p>
       </details>
@@ -588,6 +656,17 @@ const jsonLd = {
   }
   .events-teaser h2 { color: var(--cream); font-size: var(--fs-5xl); font-style: italic; }
   .events-teaser p { max-width: 560px; margin: 0 auto var(--sp-6); color: rgba(245,239,227,.85); }
+
+  /* ── GAME DAY TEASER ─────────────────────────────────── */
+  .gameday-teaser {
+    position: relative; padding: var(--sp-10) 0; color: var(--cream);
+    background: linear-gradient(180deg, rgba(22,48,31,.75), rgba(22,48,31,.9)),
+                url('/assets/img/gallery/DSC_1103.jpg') center/cover no-repeat;
+    text-align: center;
+  }
+  .gameday-teaser h2 { color: var(--cream); font-size: var(--fs-5xl); font-style: italic; margin-top: var(--sp-2); }
+  .gameday-teaser p { max-width: 620px; margin: 0 auto var(--sp-7); color: rgba(245,239,227,.85); }
+  .gameday-ctas { display: flex; gap: var(--sp-4); justify-content: center; flex-wrap: wrap; }
 
   /* ── TRIVIA TEASER ───────────────────────────────────── */
   .trivia-teaser {
