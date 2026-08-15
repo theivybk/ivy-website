@@ -691,7 +691,7 @@ async function handleNewsletterSignup(req, res) {
           `Thanks for signing up for updates from The Ivy Bar and Kitchen. Here's what's happening every week:`,
           ``,
           `Weekly Specials`,
-          `Monday — Pizza Night: half off pizza with the purchase of a drink`,
+          `Monday — Monday Night Pizza: half off pizza with the purchase of a drink`,
           `Tuesday — Taco Tuesday: $3 tacos, $6 Modelos, $9 margaritas`,
           `Wednesday — Burger & Brew: burger and beer combo, $20`,
           `Thursday — Girl Dinner Thursday: salad, truffle fries & a glass of wine, $30`,
@@ -715,7 +715,7 @@ async function handleNewsletterSignup(req, res) {
             <p style="margin:0 0 20px;">Thanks for signing up for updates from The Ivy Bar and Kitchen. Here's what's happening every week:</p>
             <p style="margin:0 0 8px; font-weight:bold; color:#7A5F27; text-transform:uppercase; font-size:12px; letter-spacing:.04em;">Weekly Specials</p>
             <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 16px; font-size:14px;">
-              <tr><td style="padding:4px 0; font-weight:bold; width:90px; vertical-align:top;">Mon</td><td style="padding:4px 0;">Pizza Night — half off pizza with a drink</td></tr>
+              <tr><td style="padding:4px 0; font-weight:bold; width:90px; vertical-align:top;">Mon</td><td style="padding:4px 0;">Monday Night Pizza — half off pizza with a drink</td></tr>
               <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Tue</td><td style="padding:4px 0;">Taco Tuesday — $3 tacos, $6 Modelos, $9 margaritas</td></tr>
               <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Wed</td><td style="padding:4px 0;">Burger &amp; Brew — burger + beer combo, $20</td></tr>
               <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Thu</td><td style="padding:4px 0;">Girl Dinner Thursday — salad, truffle fries &amp; a glass of wine, $30</td></tr>
