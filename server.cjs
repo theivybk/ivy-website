@@ -688,7 +688,20 @@ async function handleNewsletterSignup(req, res) {
         const welcomeText = [
           `You're on the list!`,
           ``,
-          `Thanks for signing up for updates from The Ivy Bar and Kitchen. We'll let you know about specials, events, and things happening around game days.`,
+          `Thanks for signing up for updates from The Ivy Bar and Kitchen. Here's what's happening every week:`,
+          ``,
+          `Weekly Specials`,
+          `Monday — Pizza Night: half off pizza with the purchase of a drink`,
+          `Tuesday — Taco Tuesday: $3 tacos, $6 Modelos, $9 margaritas`,
+          `Wednesday — Burger & Brew: burger and beer combo, $20`,
+          `Thursday — Girl Dinner Thursday: salad, truffle fries & a glass of wine, $30`,
+          `Happy Hour Monday–Thursday, 3-5pm: $1 off draft/cans/bottles, $2 off wine, $3 off cocktails`,
+          ``,
+          `Trivia Night`,
+          `Every Wednesday, 7-9pm, hosted by Geeks Who Drink.`,
+          ``,
+          `Order Online`,
+          `https://order.toasttab.com/online/the-ivy-1625-west-irving-park-road`,
           ``,
           `See you soon.`,
           ``,
@@ -699,7 +712,20 @@ async function handleNewsletterSignup(req, res) {
         const welcomeHtml = emailTemplate({
           heading: "You're on the list!",
           bodyHtml: `
-            <p style="margin:0 0 16px;">Thanks for signing up for updates from The Ivy Bar and Kitchen. We'll let you know about specials, events, and things happening around game days.</p>
+            <p style="margin:0 0 20px;">Thanks for signing up for updates from The Ivy Bar and Kitchen. Here's what's happening every week:</p>
+            <p style="margin:0 0 8px; font-weight:bold; color:#7A5F27; text-transform:uppercase; font-size:12px; letter-spacing:.04em;">Weekly Specials</p>
+            <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 16px; font-size:14px;">
+              <tr><td style="padding:4px 0; font-weight:bold; width:90px; vertical-align:top;">Mon</td><td style="padding:4px 0;">Pizza Night — half off pizza with a drink</td></tr>
+              <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Tue</td><td style="padding:4px 0;">Taco Tuesday — $3 tacos, $6 Modelos, $9 margaritas</td></tr>
+              <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Wed</td><td style="padding:4px 0;">Burger &amp; Brew — burger + beer combo, $20</td></tr>
+              <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Thu</td><td style="padding:4px 0;">Girl Dinner Thursday — salad, truffle fries &amp; a glass of wine, $30</td></tr>
+            </table>
+            <p style="margin:0 0 20px; font-size:13px; color:#686860;">Happy Hour Mon–Thu, 3-5pm: $1 off draft/cans/bottles &middot; $2 off wine &middot; $3 off cocktails</p>
+            <p style="margin:0 0 8px; font-weight:bold; color:#7A5F27; text-transform:uppercase; font-size:12px; letter-spacing:.04em;">Trivia Night</p>
+            <p style="margin:0 0 20px;">Every Wednesday, 7&ndash;9pm, hosted by Geeks Who Drink.</p>
+            <p style="margin:0 0 24px; text-align:center;">
+              <a href="https://order.toasttab.com/online/the-ivy-1625-west-irving-park-road" style="display:inline-block; background-color:#1F3D2A; color:#FBF7EE; text-decoration:none; padding:12px 28px; border-radius:2px; font-size:14px;">Order Online</a>
+            </p>
             <p style="margin:0;">See you soon.</p>
           `,
         });
