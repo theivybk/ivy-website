@@ -95,10 +95,12 @@ const jsonLd = {
           <p>Private use of our dedicated event space. Equipped with a dry bar and TVs for any occasion.</p>
         </div>
       </div>
-      <div class="space-card space-card--center">
-        <span class="eyebrow">Private</span>
-        <h3>The Ivy Bundle</h3>
-        <p>Private use of our rooftop bar and our dedicated event space.</p>
+      <div class="space-card space-card--photo" style="background-image:url('/assets/img/gallery/ivy-bundle-split.jpg')">
+        <div class="card-inner">
+          <span class="eyebrow">Private</span>
+          <h3>The Ivy Bundle</h3>
+          <p>Private use of our rooftop bar and our dedicated event space.</p>
+        </div>
       </div>
       <div class="space-card space-card--photo space-card--wide" style="background-image:url('/assets/img/gallery/main-bar-game-day.jpg')">
         <div class="card-inner">
@@ -321,7 +323,7 @@ const jsonLd = {
   }
 
   .spaces { padding: var(--sp-11) 0; }
-  .spaces-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+  .spaces-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
   .space-card {
     background: var(--bg-card); border: 1px solid var(--border-hair); border-radius: var(--r-sm);
     padding: var(--sp-7); text-align: center;
@@ -330,7 +332,6 @@ const jsonLd = {
   .space-card h3 { font-size: var(--fs-xl); margin-bottom: var(--sp-3); }
   .space-card p { color: var(--fg-2); font-size: var(--fs-sm); margin: 0; }
   .space-card--wide { grid-column: 1 / -1; min-height: 260px; }
-  .space-card--center { grid-column: 1 / -1; max-width: 420px; margin: 0 auto; }
   .space-card--photo {
     padding: 0; text-align: left; overflow: hidden; position: relative; min-height: 320px;
     display: flex; align-items: flex-end;
