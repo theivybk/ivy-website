@@ -695,10 +695,12 @@ async function handleNewsletterSignup(req, res) {
           `Tuesday — Taco Tuesday: $3 tacos, $6 Modelos, $9 margaritas`,
           `Wednesday — Burger & Brew: burger and beer combo, $20`,
           `Thursday — Girl Dinner Thursday: salad, truffle fries & a glass of wine, $30`,
-          `Happy Hour Monday–Thursday, 3-5pm: $1 off draft/cans/bottles, $2 off wine, $3 off cocktails`,
           ``,
-          `Trivia Night`,
-          `Every Wednesday, 7-9pm, hosted by Geeks Who Drink.`,
+          `HAPPY HOUR — Monday–Thursday, 3-5pm`,
+          `$1 off draft, cans & bottles · $2 off wine · $3 off cocktails`,
+          ``,
+          `TRIVIA NIGHT — Every Wednesday, 7-9pm`,
+          `Hosted by Geeks Who Drink.`,
           ``,
           `Order Online`,
           `https://order.toasttab.com/online/the-ivy-1625-west-irving-park-road`,
@@ -720,9 +722,24 @@ async function handleNewsletterSignup(req, res) {
               <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Wed</td><td style="padding:4px 0;">Burger &amp; Brew — burger + beer combo, $20</td></tr>
               <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Thu</td><td style="padding:4px 0;">Girl Dinner Thursday — salad, truffle fries &amp; a glass of wine, $30</td></tr>
             </table>
-            <p style="margin:0 0 20px; font-size:13px; color:#686860;">Happy Hour Mon–Thu, 3-5pm: $1 off draft/cans/bottles &middot; $2 off wine &middot; $3 off cocktails</p>
-            <p style="margin:0 0 8px; font-weight:bold; color:#7A5F27; text-transform:uppercase; font-size:12px; letter-spacing:.04em;">Trivia Night</p>
-            <p style="margin:0 0 20px;">Every Wednesday, 7&ndash;9pm, hosted by Geeks Who Drink.</p>
+            <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 24px;">
+              <tr>
+                <td style="background-color:#1F3D2A; border-radius:4px; padding:18px 20px; text-align:center;">
+                  <p style="margin:0 0 4px; color:#D8B563; text-transform:uppercase; font-size:12px; letter-spacing:.06em; font-weight:bold;">Happy Hour</p>
+                  <p style="margin:0 0 8px; color:#FBF7EE; font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:19px;">Monday&ndash;Thursday, 3&ndash;5pm</p>
+                  <p style="margin:0; color:rgba(251,247,238,.85); font-size:13px;">$1 off draft, cans &amp; bottles &nbsp;&middot;&nbsp; $2 off wine &nbsp;&middot;&nbsp; $3 off cocktails</p>
+                </td>
+              </tr>
+            </table>
+            <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 24px;">
+              <tr>
+                <td style="background-color:#FBF7EE; border:1px solid #B8923D; border-radius:4px; padding:18px 20px; text-align:center;">
+                  <p style="margin:0 0 4px; color:#7A5F27; text-transform:uppercase; font-size:12px; letter-spacing:.06em; font-weight:bold;">Trivia Night</p>
+                  <p style="margin:0 0 8px; color:#1F3D2A; font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:19px;">Every Wednesday, 7&ndash;9pm</p>
+                  <p style="margin:0; color:#686860; font-size:13px;">Hosted by Geeks Who Drink</p>
+                </td>
+              </tr>
+            </table>
             <p style="margin:0 0 24px; text-align:center;">
               <a href="https://order.toasttab.com/online/the-ivy-1625-west-irving-park-road" style="display:inline-block; background-color:#1F3D2A; color:#FBF7EE; text-decoration:none; padding:12px 28px; border-radius:2px; font-size:14px;">Order Online</a>
             </p>
