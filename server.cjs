@@ -913,10 +913,19 @@ const server = http.createServer((req, res) => {
       return;
     }
     const query = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams;
-    const reservations = db.prepare('SELECT * FROM reservations ORDER BY id DESC LIMIT 50').all();
-    const signups = db.prepare('SELECT * FROM newsletter_signups ORDER BY id DESC LIMIT 50').all();
-    const reservationCount = db.prepare('SELECT COUNT(*) AS n FROM reservations').get().n;
-    const signupCount = db.prepare('SELECT COUNT(*) AS n FROM newsletter_signups').get().n;
+    // Test data from development (Claude-generated reservations/signups) is
+    // permanently baked into Resend's history -- Resend has no email-delete
+    // API -- so we filter it out here rather than at the source.
+    const isTestReservation = (r) =>
+      /test/i.test(r.full_name) || /@example\.com$/i.test(r.email) || /please ignore/i.test(r.notes || '');
+    const isTestSignup = (s) => /@example\.com$/i.test(s.email) || /^sqlite-test@/i.test(s.email);
+
+    const realReservations = db.prepare('SELECT * FROM reservations ORDER BY id DESC').all().filter((r) => !isTestReservation(r));
+    const realSignups = db.prepare('SELECT * FROM newsletter_signups ORDER BY id DESC').all().filter((s) => !isTestSignup(s));
+    const reservations = realReservations.slice(0, 50);
+    const signups = realSignups.slice(0, 50);
+    const reservationCount = realReservations.length;
+    const signupCount = realSignups.length;
 
     if (query.get('format') === 'json') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
