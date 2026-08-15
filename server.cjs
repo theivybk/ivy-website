@@ -912,12 +912,110 @@ const server = http.createServer((req, res) => {
       res.end('Unauthorized');
       return;
     }
-    const reservations = db.prepare('SELECT * FROM reservations ORDER BY id DESC LIMIT 20').all();
-    const signups = db.prepare('SELECT * FROM newsletter_signups ORDER BY id DESC LIMIT 20').all();
+    const query = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams;
+    const reservations = db.prepare('SELECT * FROM reservations ORDER BY id DESC LIMIT 50').all();
+    const signups = db.prepare('SELECT * FROM newsletter_signups ORDER BY id DESC LIMIT 50').all();
     const reservationCount = db.prepare('SELECT COUNT(*) AS n FROM reservations').get().n;
     const signupCount = db.prepare('SELECT COUNT(*) AS n FROM newsletter_signups').get().n;
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ reservationCount, signupCount, reservations, signups }, null, 2));
+
+    if (query.get('format') === 'json') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ reservationCount, signupCount, reservations, signups }, null, 2));
+      return;
+    }
+
+    const reservationRows = reservations.length
+      ? reservations.map((r) => `
+        <tr>
+          <td data-label="Date">${escapeHtml(r.date)}<span class="sub-line">${escapeHtml(r.time)}</span></td>
+          <td data-label="Name">${escapeHtml(r.full_name)}</td>
+          <td data-label="Party" class="center">${escapeHtml(r.party_size)}</td>
+          <td data-label="Contact"><a href="tel:${escapeHtml(r.phone)}">${escapeHtml(r.phone)}</a><span class="sub-line"><a href="mailto:${escapeHtml(r.email)}">${escapeHtml(r.email)}</a></span></td>
+          <td data-label="Notes">${r.notes ? escapeHtml(r.notes) : '<span class="muted">&mdash;</span>'}</td>
+          <td data-label="Added" class="muted small">${escapeHtml(r.created_at)}</td>
+        </tr>`).join('')
+      : `<tr><td colspan="6" class="empty">No reservations yet.</td></tr>`;
+
+    const signupRows = signups.length
+      ? signups.map((s) => `
+        <tr>
+          <td data-label="Email"><a href="mailto:${escapeHtml(s.email)}">${escapeHtml(s.email)}</a></td>
+          <td data-label="Added" class="muted small">${escapeHtml(s.created_at)}</td>
+        </tr>`).join('')
+      : `<tr><td colspan="2" class="empty">No signups yet.</td></tr>`;
+
+    const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Ivy — Database</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=Outfit:wght@400;500;600&display=swap');
+  :root {
+    --ivy: #1F3D2A; --ivy-deep: #16301F; --brass: #B8923D; --brass-deep: #7A5F27;
+    --ink: #14140F; --ink-soft: #4A4A42; --ink-mute: #686860;
+    --cream: #F5EFE3; --cream-warm: #EBE3D2; --cream-pure: #FBF7EE;
+    --border: rgba(31,61,42,.15);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Outfit', -apple-system, sans-serif; color: var(--ink); background: var(--cream); padding: 40px 24px 80px; }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600; font-size: 36px; color: var(--ivy); margin: 0 0 4px; }
+  .stats { display: flex; gap: 16px; margin: 20px 0 40px; flex-wrap: wrap; }
+  .stat { background: var(--cream-pure); border: 1px solid var(--border); border-radius: 4px; padding: 14px 22px; }
+  .stat .n { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 30px; color: var(--ivy); line-height: 1; }
+  .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--brass-deep); font-weight: 600; margin-top: 4px; }
+  section { margin-bottom: 48px; }
+  h2 { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600; font-size: 24px; color: var(--ivy); border-bottom: 2px solid var(--ivy); padding-bottom: 8px; margin: 0 0 4px; }
+  table { width: 100%; border-collapse: collapse; background: var(--cream-pure); border-radius: 4px; overflow: hidden; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--brass-deep); font-weight: 600; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  td { padding: 12px 14px; font-size: 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  a { color: var(--ivy); text-decoration: none; }
+  a:hover { color: var(--brass-deep); }
+  .sub-line { display: block; font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+  .center { text-align: center; }
+  .muted { color: var(--ink-mute); }
+  .small { font-size: 12px; white-space: nowrap; }
+  .empty { text-align: center; color: var(--ink-mute); font-style: italic; padding: 24px; }
+  @media (max-width: 700px) {
+    table, thead, tbody, tr { display: block; }
+    thead { display: none; }
+    tr { border-bottom: 8px solid var(--cream); }
+    td { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border); text-align: right; }
+    td::before { content: attr(data-label); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--brass-deep); font-weight: 600; text-align: left; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>The Ivy — Database</h1>
+    <p class="muted">Rebuilt from Resend on every server restart — nothing here can be lost.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">${reservationCount}</div><div class="label">Reservations</div></div>
+      <div class="stat"><div class="n">${signupCount}</div><div class="label">Newsletter Signups</div></div>
+    </div>
+    <section>
+      <h2>Reservations</h2>
+      <table>
+        <thead><tr><th>Date</th><th>Name</th><th class="center">Party</th><th>Contact</th><th>Notes</th><th>Added</th></tr></thead>
+        <tbody>${reservationRows}</tbody>
+      </table>
+    </section>
+    <section>
+      <h2>Newsletter Signups</h2>
+      <table>
+        <thead><tr><th>Email</th><th>Added</th></tr></thead>
+        <tbody>${signupRows}</tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>`;
+
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(html);
     return;
   }
 
