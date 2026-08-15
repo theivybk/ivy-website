@@ -137,6 +137,45 @@ function escapeHtml(s) {
 
 const dayLabel = (dateStr) => new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
+// Simple branded HTML wrapper for customer-facing emails — table-based layout
+// with inline styles, since email clients don't support external stylesheets
+// or much modern CSS.
+function emailTemplate({ heading, bodyHtml }) {
+  return `<!doctype html>
+<html>
+<body style="margin:0; padding:0; background-color:#EBE3D2;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#EBE3D2; padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="background-color:#FBF7EE; border-radius:4px; overflow:hidden; max-width:480px; width:100%;">
+          <tr>
+            <td align="center" style="background-color:#1F3D2A; padding:32px 24px;">
+              <img src="https://theivybk.com/assets/img/logo/logo-gold.png" alt="The Ivy Bar and Kitchen" width="64" style="display:block; width:64px; height:auto;">
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 32px 8px; font-family:Georgia,'Times New Roman',serif;">
+              <h1 style="font-style:italic; font-weight:normal; font-size:26px; color:#1F3D2A; margin:0 0 16px; text-align:center;">${heading}</h1>
+              <div style="font-size:15px; line-height:1.6; color:#14140F;">
+                ${bodyHtml}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 32px 32px; font-family:Georgia,'Times New Roman',serif;">
+              <p style="font-size:12px; color:#686860; text-align:center; margin:16px 0 0; border-top:1px solid rgba(31,61,42,.15); padding-top:16px;">
+                The Ivy Bar and Kitchen &middot; 1625 W Irving Park Rd, Chicago, IL 60613 &middot; (773) 799-8160
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
 async function getWeekReservations(weekParam) {
   const monday = mondayOf(weekParam);
   const sunday = new Date(monday);
@@ -382,7 +421,7 @@ function resendSubscribe(email) {
   });
 }
 
-function resendSendEmail({ to, subject, text, replyTo, attachments }) {
+function resendSendEmail({ to, subject, text, html, replyTo, attachments }) {
   return new Promise((resolve, reject) => {
     const payload = {
       from: 'The Ivy Bar and Kitchen <info@theivybk.com>',
@@ -390,6 +429,7 @@ function resendSendEmail({ to, subject, text, replyTo, attachments }) {
       subject,
       text,
     };
+    if (html) payload.html = html;
     if (replyTo) payload.reply_to = replyTo;
     if (attachments && attachments.length) payload.attachments = attachments;
     const body = JSON.stringify(payload);
@@ -467,9 +507,28 @@ async function handleReservation(req, res) {
     `Special Requests:`,
     notes,
   ].join('\n');
+  // The admin reservations report parses this exact plain-text format out of
+  // Resend's email history (see parseReservationEmailText), so the `text`
+  // field above must keep its labels as-is. The `html` version below is
+  // purely a nicer-looking display layer on top — it doesn't touch parsing.
+  const notificationHtml = emailTemplate({
+    heading: 'New Reservation Request',
+    bodyHtml: `
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:120px; vertical-align:top;">Name</td><td style="padding:4px 0;">${escapeHtml(fullName)}</td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Phone</td><td style="padding:4px 0;"><a href="tel:${escapeHtml(phone)}" style="color:#1F3D2A;">${escapeHtml(phone)}</a></td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Email</td><td style="padding:4px 0;"><a href="mailto:${escapeHtml(email)}" style="color:#1F3D2A;">${escapeHtml(email)}</a></td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Date</td><td style="padding:4px 0;">${escapeHtml(date)}</td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Time</td><td style="padding:4px 0;">${escapeHtml(time)}</td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Party Size</td><td style="padding:4px 0;">${escapeHtml(partySize)}</td></tr>
+        ${notes !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Special Requests</td><td style="padding:4px 0;">${escapeHtml(notes)}</td></tr>` : ''}
+      </table>
+      <p style="margin:0; font-size:13px; color:#686860;">Reply directly to this email to reach ${escapeHtml(fullName)} at ${escapeHtml(email)}.</p>
+    `,
+  });
 
   try {
-    const result = await resendSendEmail({ to: RESERVATION_TO_EMAIL, subject, text, replyTo: email });
+    const result = await resendSendEmail({ to: RESERVATION_TO_EMAIL, subject, text, html: notificationHtml, replyTo: email });
     if (result.status === 200 || result.status === 201) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
@@ -493,7 +552,22 @@ async function handleReservation(req, res) {
         `1625 W Irving Park Rd, Chicago, IL 60613`,
         `(773) 799-8160`,
       ].join('\n');
-      resendSendEmail({ to: email, subject: "You're Confirmed — The Ivy Bar and Kitchen", text: confirmationText })
+      const confirmationHtml = emailTemplate({
+        heading: "You're all set!",
+        bodyHtml: `
+          <p style="margin:0 0 16px;">Hi ${escapeHtml(fullName)},</p>
+          <p style="margin:0 0 16px;">Here's your reservation at The Ivy Bar and Kitchen:</p>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">
+            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:120px; vertical-align:top;">Date</td><td style="padding:4px 0;">${escapeHtml(dayLabel(date))}</td></tr>
+            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Time</td><td style="padding:4px 0;">${escapeHtml(time)}</td></tr>
+            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Party Size</td><td style="padding:4px 0;">${escapeHtml(partySize)}</td></tr>
+            ${notes !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Special Requests</td><td style="padding:4px 0;">${escapeHtml(notes)}</td></tr>` : ''}
+          </table>
+          <p style="margin:0 0 16px;">Need to make a change or have a question? Call us at <a href="tel:+17737998160" style="color:#1F3D2A;">(773) 799-8160</a> — happy to help.</p>
+          <p style="margin:0;">We can't wait to see you.</p>
+        `,
+      });
+      resendSendEmail({ to: email, subject: "You're Confirmed — The Ivy Bar and Kitchen", text: confirmationText, html: confirmationHtml })
         .catch((err) => console.error('Reservation confirmation email error:', err.message));
     } else {
       console.error('Resend send failed:', result.status, result.body);
