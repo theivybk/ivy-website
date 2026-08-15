@@ -906,7 +906,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.method === 'GET' && urlPath === '/admin/db-status') {
+  if (req.method === 'GET' && urlPath === '/admin/db') {
     if (!checkBasicAuth(req)) {
       res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
       res.end('Unauthorized');
