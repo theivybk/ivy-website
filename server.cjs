@@ -888,20 +888,77 @@ function serveFile(filePath, req, res) {
   }
 }
 
+// Simple in-memory per-IP rate limiter for public write endpoints. Fine for
+// a single Railway instance; resets on restart, which is an acceptable
+// trade-off for a small site.
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+const rateLimitBuckets = new Map();
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, bucket] of rateLimitBuckets) {
+    if (now > bucket.resetAt) rateLimitBuckets.delete(key);
+  }
+}, 30 * 60 * 1000).unref();
+
+function getClientIp(req) {
+  const xff = req.headers['x-forwarded-for'];
+  if (xff) return xff.split(',')[0].trim();
+  return req.socket.remoteAddress || 'unknown';
+}
+
+function checkRateLimit(req, routeGroup) {
+  const key = `${routeGroup}:${getClientIp(req)}`;
+  const now = Date.now();
+  const bucket = rateLimitBuckets.get(key);
+  if (!bucket || now > bucket.resetAt) {
+    rateLimitBuckets.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  if (bucket.count >= RATE_LIMIT_MAX) return false;
+  bucket.count++;
+  return true;
+}
+
+function rejectRateLimited(res) {
+  res.writeHead(429, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ ok: false, error: 'Too many requests. Please try again in a few minutes.' }));
+}
+
 const server = http.createServer((req, res) => {
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
 
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  res.setHeader('Content-Security-Policy', [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com",
+    "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join('; '));
+
   if (req.method === 'POST' && urlPath === '/api/newsletter') {
+    if (!checkRateLimit(req, 'newsletter')) return rejectRateLimited(res);
     handleNewsletterSignup(req, res);
     return;
   }
 
   if (req.method === 'POST' && urlPath === '/api/reserve') {
+    if (!checkRateLimit(req, 'reserve')) return rejectRateLimited(res);
     handleReservation(req, res);
     return;
   }
 
   if (req.method === 'POST' && urlPath === '/api/apply') {
+    if (!checkRateLimit(req, 'apply')) return rejectRateLimited(res);
     handleApply(req, res);
     return;
   }
