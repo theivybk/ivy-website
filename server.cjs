@@ -393,12 +393,14 @@ function readJsonBody(req) {
   });
 }
 
+const RESEND_AUDIENCE_ID = 'b863a5a1-8d0d-429c-ae9c-9f43887f688f';
+
 function resendSubscribe(email) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({ email, unsubscribed: false });
     const options = {
       hostname: 'api.resend.com',
-      path: '/contacts',
+      path: `/audiences/${RESEND_AUDIENCE_ID}/contacts`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -681,6 +683,29 @@ async function handleNewsletterSignup(req, res) {
     if (result.status === 200 || result.status === 201 || alreadyExists) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, alreadySubscribed: alreadyExists && result.status >= 400 }));
+
+      if (!alreadyExists) {
+        const welcomeText = [
+          `You're on the list!`,
+          ``,
+          `Thanks for signing up for updates from The Ivy Bar and Kitchen. We'll let you know about specials, events, and things happening around game days.`,
+          ``,
+          `See you soon.`,
+          ``,
+          `The Ivy Bar and Kitchen`,
+          `1625 W Irving Park Rd, Chicago, IL 60613`,
+          `(773) 799-8160`,
+        ].join('\n');
+        const welcomeHtml = emailTemplate({
+          heading: "You're on the list!",
+          bodyHtml: `
+            <p style="margin:0 0 16px;">Thanks for signing up for updates from The Ivy Bar and Kitchen. We'll let you know about specials, events, and things happening around game days.</p>
+            <p style="margin:0;">See you soon.</p>
+          `,
+        });
+        resendSendEmail({ to: email, subject: "You're on the list — The Ivy Bar and Kitchen", text: welcomeText, html: welcomeHtml })
+          .catch((err) => console.error('Newsletter welcome email error:', err.message));
+      }
     } else {
       console.error('Resend subscribe failed:', result.status, result.body);
       res.writeHead(502, { 'Content-Type': 'application/json' });
