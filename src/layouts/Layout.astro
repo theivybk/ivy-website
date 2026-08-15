@@ -189,6 +189,22 @@ const navLinks = [
   </div>
 </footer>
 
+<div class="newsletter-popup-scrim" id="newsletter-popup-scrim">
+  <div class="newsletter-popup" role="dialog" aria-modal="true" aria-labelledby="newsletter-popup-heading">
+    <button type="button" class="newsletter-popup-close" id="newsletter-popup-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <span class="eyebrow">Stay in the Loop</span>
+    <h3 id="newsletter-popup-heading">Never miss a special</h3>
+    <p>Weekly specials, happy hour, trivia nights, and more — straight to your inbox.</p>
+    <form class="newsletter-popup-form" id="newsletter-popup-form">
+      <input type="email" id="newsletter-popup-email" name="email" placeholder="you@email.com" required aria-label="Email address">
+      <button type="submit" class="btn btn--primary">Sign Up</button>
+    </form>
+    <p class="newsletter-note" id="newsletter-popup-confirm"></p>
+  </div>
+</div>
+
 <script is:inline>
   const navToggle = document.getElementById('nav-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
@@ -223,6 +239,78 @@ const navLinks = [
           : "Thanks — we'll add you to the list.";
         confirmEl.classList.add('show');
         newsletterForm.reset();
+      } else {
+        confirmEl.textContent = data.error || 'Something went wrong — please try again.';
+        confirmEl.classList.add('show', 'newsletter-error');
+      }
+    } catch {
+      confirmEl.textContent = 'Something went wrong — please try again.';
+      confirmEl.classList.add('show', 'newsletter-error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  const popupScrim = document.getElementById('newsletter-popup-scrim');
+  const popupForm = document.getElementById('newsletter-popup-form');
+  const POPUP_SEEN_KEY = 'ivyNewsletterPopupSeen';
+  let popupLastFocused = null;
+
+  function openPopup() {
+    if (localStorage.getItem(POPUP_SEEN_KEY)) return;
+    popupLastFocused = document.activeElement;
+    popupScrim.classList.add('open');
+    document.getElementById('newsletter-popup-email').focus();
+  }
+
+  function closePopup() {
+    popupScrim.classList.remove('open');
+    localStorage.setItem(POPUP_SEEN_KEY, '1');
+    if (popupLastFocused) popupLastFocused.focus();
+  }
+
+  if (!localStorage.getItem(POPUP_SEEN_KEY)) {
+    const popupTimer = setTimeout(openPopup, 15000);
+    const onScroll = () => {
+      const scrolled = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+      if (scrolled > 0.5) {
+        clearTimeout(popupTimer);
+        window.removeEventListener('scroll', onScroll);
+        openPopup();
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  document.getElementById('newsletter-popup-close').addEventListener('click', closePopup);
+  popupScrim.addEventListener('click', (e) => { if (e.target === popupScrim) closePopup(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && popupScrim.classList.contains('open')) closePopup();
+  });
+
+  popupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('newsletter-popup-email').value;
+    const submitBtn = popupForm.querySelector('button[type="submit"]');
+    const confirmEl = document.getElementById('newsletter-popup-confirm');
+    submitBtn.disabled = true;
+    confirmEl.classList.remove('show', 'newsletter-error');
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        confirmEl.textContent = data.alreadySubscribed
+          ? "You're already on the list!"
+          : "Thanks — we'll add you to the list.";
+        confirmEl.classList.add('show');
+        popupForm.reset();
+        localStorage.setItem(POPUP_SEEN_KEY, '1');
+        setTimeout(closePopup, 2000);
       } else {
         confirmEl.textContent = data.error || 'Something went wrong — please try again.';
         confirmEl.classList.add('show', 'newsletter-error');

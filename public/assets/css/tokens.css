@@ -272,3 +272,51 @@ img { max-width: 100%; display: block; }
   .site-footer .cols { grid-template-columns: 1fr; gap: var(--sp-7); }
   .wrap { padding: 0 var(--sp-5); }
 }
+
+/* ── NEWSLETTER POPUP ─────────────────────────────────── */
+.newsletter-popup-scrim {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--bg-modal-scrim);
+  display: grid; place-items: center;
+  overflow-y: auto;
+  padding: var(--sp-5);
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--t-base) var(--ease-out), visibility 0s linear var(--t-base);
+}
+.newsletter-popup-scrim.open {
+  opacity: 1; visibility: visible;
+  transition: opacity var(--t-base) var(--ease-out), visibility 0s linear 0s;
+}
+.newsletter-popup {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-deep);
+  max-width: 420px; width: 100%;
+  padding: var(--sp-8) var(--sp-7);
+  text-align: center;
+  transform: translateY(12px) scale(0.98);
+  transition: transform var(--t-base) var(--ease-out);
+}
+.newsletter-popup-scrim.open .newsletter-popup { transform: translateY(0) scale(1); }
+.newsletter-popup h3 {
+  font-style: italic; font-size: var(--fs-3xl); margin: var(--sp-3) 0 var(--sp-4);
+}
+.newsletter-popup p { color: var(--fg-2); font-size: var(--fs-sm); margin-bottom: var(--sp-6); }
+.newsletter-popup-close {
+  position: absolute; top: var(--sp-4); right: var(--sp-4);
+  background: none; border: none; cursor: pointer; padding: 6px; color: var(--fg-3);
+  transition: color var(--t-fast) var(--ease-out);
+}
+.newsletter-popup-close:hover { color: var(--ivy); }
+.newsletter-popup-close svg { width: 20px; height: 20px; display: block; }
+.newsletter-popup-form { display: flex; flex-direction: column; gap: var(--sp-3); }
+.newsletter-popup-form input {
+  font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink);
+  background: var(--cream-pure); border: 1px solid var(--border-hair); border-radius: var(--r-xs);
+  padding: 12px 14px; width: 100%;
+}
+.newsletter-popup-form input:focus { outline: 2px solid var(--brass-light); outline-offset: 1px; border-color: var(--brass); }
+.newsletter-popup-form .btn { width: 100%; justify-content: center; }
+.newsletter-popup .newsletter-note { color: var(--brass-deep); }
+.newsletter-popup .newsletter-note.newsletter-error { color: var(--brick); }
