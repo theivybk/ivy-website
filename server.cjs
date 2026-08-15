@@ -3,6 +3,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const { DatabaseSync } = require('node:sqlite');
 
 const PORT = process.env.PORT || 3000;
 const ROOT = path.join(__dirname, 'dist');
@@ -13,6 +14,32 @@ const ADMIN_PASS = (process.env.ADMIN_PASS || '').trim();
 const WEEKLY_REPORT_SECRET = (process.env.WEEKLY_REPORT_SECRET || '').trim();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const DB_PATH = (process.env.DB_PATH || path.join(__dirname, 'data', 'ivy.db')).trim();
+fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+const db = new DatabaseSync(DB_PATH);
+db.exec(`
+  CREATE TABLE IF NOT EXISTS reservations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name TEXT,
+    phone TEXT,
+    email TEXT,
+    date TEXT,
+    time TEXT,
+    party_size TEXT,
+    notes TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE TABLE IF NOT EXISTS newsletter_signups (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+const insertReservation = db.prepare(
+  `INSERT INTO reservations (full_name, phone, email, date, time, party_size, notes) VALUES (?, ?, ?, ?, ?, ?, ?)`
+);
+const insertNewsletterSignup = db.prepare(`INSERT INTO newsletter_signups (email) VALUES (?)`);
 
 function resendGet(pathAndQuery) {
   return new Promise((resolve, reject) => {
@@ -497,6 +524,12 @@ async function handleReservation(req, res) {
     return;
   }
 
+  try {
+    insertReservation.run(fullName, phone, email, date, time, partySize, notes);
+  } catch (err) {
+    console.error('Reservation DB insert error:', err.message);
+  }
+
   const subject = `Table Reservation — ${date} at ${time} — ${fullName}`;
   const text = [
     `Name: ${fullName}`,
@@ -683,6 +716,12 @@ async function handleNewsletterSignup(req, res) {
     if (result.status === 200 || result.status === 201 || alreadyExists) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, alreadySubscribed: alreadyExists && result.status >= 400 }));
+
+      try {
+        insertNewsletterSignup.run(email);
+      } catch (err) {
+        console.error('Newsletter signup DB insert error:', err.message);
+      }
 
       if (!alreadyExists) {
         const welcomeText = [
