@@ -41,12 +41,33 @@ db.exec(`
     email TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+  CREATE TABLE IF NOT EXISTS event_inquiries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    resend_email_id TEXT UNIQUE,
+    full_name TEXT,
+    phone TEXT,
+    email TEXT,
+    company TEXT,
+    event_date TEXT,
+    event_time TEXT,
+    guest_count TEXT,
+    duration TEXT,
+    occasion TEXT,
+    space_preference TEXT,
+    budget_per_person TEXT,
+    referral_source TEXT,
+    details TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 const insertReservation = db.prepare(
   `INSERT OR IGNORE INTO reservations (resend_email_id, full_name, phone, email, date, time, party_size, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 );
 const insertNewsletterSignup = db.prepare(
   `INSERT OR IGNORE INTO newsletter_signups (resend_contact_id, email) VALUES (?, ?)`
+);
+const insertEventInquiry = db.prepare(
+  `INSERT OR IGNORE INTO event_inquiries (resend_email_id, full_name, phone, email, company, event_date, event_time, guest_count, duration, occasion, space_preference, budget_per_person, referral_source, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 );
 
 function resendGet(pathAndQuery) {
@@ -87,6 +108,78 @@ function parseReservationEmailText(text) {
     party_size: get('Party Size'),
     notes: notesRaw === '—' ? '' : notesRaw,
   };
+}
+
+function parseEventInquiryEmailText(text) {
+  const get = (label) => {
+    const m = new RegExp(`^${label}: (.*)$`, 'm').exec(text || '');
+    return m ? m[1].trim() : '';
+  };
+  const detailsMatch = /Details:\n([\s\S]*)$/.exec(text || '');
+  const detailsRaw = detailsMatch ? detailsMatch[1].trim() : '';
+  return {
+    full_name: get('Name'),
+    phone: get('Phone'),
+    email: get('Email'),
+    company: get('Company') === '—' ? '' : get('Company'),
+    event_date: get('Preferred Date'),
+    event_time: get('Preferred Time'),
+    guest_count: get('Number of Guests'),
+    duration: get('Duration') === '—' ? '' : get('Duration'),
+    occasion: get('Occasion'),
+    space_preference: get('Space Preference'),
+    budget_per_person: get('Budget Per Person') === '—' ? '' : get('Budget Per Person'),
+    referral_source: get('How They Heard About Us') === '—' ? '' : get('How They Heard About Us'),
+    details: detailsRaw === '—' ? '' : detailsRaw,
+  };
+}
+
+// Event inquiries older than this are excluded (development test data --
+// Resend has no email-delete API, see RESERVATIONS_VISIBLE_SINCE above).
+const EVENT_INQUIRIES_VISIBLE_SINCE = '2026-08-16 00:24:49+00';
+
+async function readEventInquiries() {
+  if (!RESEND_API_KEY) return [];
+  const matches = [];
+  let after;
+  try {
+    for (let page = 0; page < 10; page++) {
+      const qs = `?limit=100${after ? `&after=${encodeURIComponent(after)}` : ''}`;
+      const result = await resendGet(`/emails${qs}`);
+      if (result.status >= 300) {
+        console.error('Resend list emails failed:', result.status, result.body);
+        break;
+      }
+      const items = result.body.data || [];
+      for (const item of items) {
+        if (
+          typeof item.subject === 'string' &&
+          item.subject.startsWith('Private Event Inquiry — ') &&
+          item.created_at >= EVENT_INQUIRIES_VISIBLE_SINCE
+        ) {
+          matches.push(item.id);
+        }
+      }
+      if (!result.body.has_more || items.length === 0) break;
+      after = items[items.length - 1].id;
+    }
+  } catch (err) {
+    console.error('Resend list emails error:', err.message);
+    return [];
+  }
+
+  const inquiries = [];
+  for (const id of matches) {
+    try {
+      const result = await resendGet(`/emails/${id}`);
+      if (result.status < 300 && result.body.text) {
+        inquiries.push({ resend_email_id: id, ...parseEventInquiryEmailText(result.body.text) });
+      }
+    } catch (err) {
+      console.error('Resend fetch email error:', err.message);
+    }
+  }
+  return inquiries;
 }
 
 // Reservation history lives entirely in already-sent Resend emails -- no
@@ -164,6 +257,19 @@ async function hydrateDbFromResend() {
     console.log(`DB hydration: ${contacts.length} newsletter signup(s) from Resend audience.`);
   } catch (err) {
     console.error('DB hydration (newsletter) error:', err.message);
+  }
+
+  try {
+    const inquiries = await readEventInquiries();
+    for (const i of inquiries) {
+      insertEventInquiry.run(
+        i.resend_email_id, i.full_name, i.phone, i.email, i.company, i.event_date, i.event_time,
+        i.guest_count, i.duration, i.occasion, i.space_preference, i.budget_per_person, i.referral_source, i.details
+      );
+    }
+    console.log(`DB hydration: ${inquiries.length} event inquiry(ies) from Resend history.`);
+  } catch (err) {
+    console.error('DB hydration (event inquiries) error:', err.message);
   }
 }
 
@@ -917,6 +1023,15 @@ async function handleEventInquiry(req, res) {
         sendWelcomeEmail(email).catch((err) => console.error('Event inquiry welcome email error:', err.message));
       }, 24 * 60 * 60 * 1000).unref();
 
+      try {
+        insertEventInquiry.run(
+          result.body.id, fullName, phone, email, company, eventDate, eventTime,
+          guestCount, duration, occasion, spacePreference, budgetPerPerson, referralSource, details
+        );
+      } catch (err) {
+        console.error('Event inquiry DB insert error:', err.message);
+      }
+
       const confirmationText = [
         `Hi ${fullName},`,
         ``,
@@ -1236,17 +1351,21 @@ const server = http.createServer((req, res) => {
     const isTestReservation = (r) =>
       /test/i.test(r.full_name) || /@example\.com$/i.test(r.email) || /please ignore/i.test(r.notes || '');
     const isTestSignup = (s) => /@example\.com$/i.test(s.email) || /^sqlite-test@/i.test(s.email);
+    const isTestInquiry = (i) => /test/i.test(i.full_name) || /@example\.com$/i.test(i.email);
 
     const realReservations = db.prepare('SELECT * FROM reservations ORDER BY id DESC').all().filter((r) => !isTestReservation(r));
     const realSignups = db.prepare('SELECT * FROM newsletter_signups ORDER BY id DESC').all().filter((s) => !isTestSignup(s));
+    const realInquiries = db.prepare('SELECT * FROM event_inquiries ORDER BY id DESC').all().filter((i) => !isTestInquiry(i));
     const reservations = realReservations.slice(0, 50);
     const signups = realSignups.slice(0, 50);
+    const inquiries = realInquiries.slice(0, 50);
     const reservationCount = realReservations.length;
     const signupCount = realSignups.length;
+    const inquiryCount = realInquiries.length;
 
     if (query.get('format') === 'json') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ reservationCount, signupCount, reservations, signups }, null, 2));
+      res.end(JSON.stringify({ reservationCount, signupCount, inquiryCount, reservations, signups, inquiries }, null, 2));
       return;
     }
 
@@ -1269,6 +1388,18 @@ const server = http.createServer((req, res) => {
           <td data-label="Added" class="muted small">${escapeHtml(s.created_at)}</td>
         </tr>`).join('')
       : `<tr><td colspan="2" class="empty">No signups yet.</td></tr>`;
+
+    const inquiryRows = inquiries.length
+      ? inquiries.map((i) => `
+        <tr>
+          <td data-label="Date">${escapeHtml(i.event_date)}<span class="sub-line">${escapeHtml(i.event_time)}</span></td>
+          <td data-label="Name">${escapeHtml(i.full_name)}${i.company ? `<span class="sub-line">${escapeHtml(i.company)}</span>` : ''}</td>
+          <td data-label="Occasion">${escapeHtml(i.occasion)}<span class="sub-line">${escapeHtml(i.guest_count)} guests &middot; ${escapeHtml(i.space_preference)}</span></td>
+          <td data-label="Contact"><a href="tel:${escapeHtml(i.phone)}">${escapeHtml(i.phone)}</a><span class="sub-line"><a href="mailto:${escapeHtml(i.email)}">${escapeHtml(i.email)}</a></span></td>
+          <td data-label="Details">${i.details ? escapeHtml(i.details) : '<span class="muted">&mdash;</span>'}</td>
+          <td data-label="Added" class="muted small">${escapeHtml(i.created_at)}</td>
+        </tr>`).join('')
+      : `<tr><td colspan="6" class="empty">No event inquiries yet.</td></tr>`;
 
     const html = `<!doctype html>
 <html lang="en">
@@ -1321,12 +1452,20 @@ const server = http.createServer((req, res) => {
     <div class="stats">
       <div class="stat"><div class="n">${reservationCount}</div><div class="label">Reservations</div></div>
       <div class="stat"><div class="n">${signupCount}</div><div class="label">Newsletter Signups</div></div>
+      <div class="stat"><div class="n">${inquiryCount}</div><div class="label">Event Inquiries</div></div>
     </div>
     <section>
       <h2>Reservations</h2>
       <table>
         <thead><tr><th>Date</th><th>Name</th><th class="center">Party</th><th>Contact</th><th>Notes</th><th>Added</th></tr></thead>
         <tbody>${reservationRows}</tbody>
+      </table>
+    </section>
+    <section>
+      <h2>Private Event Inquiries</h2>
+      <table>
+        <thead><tr><th>Date</th><th>Name</th><th>Occasion</th><th>Contact</th><th>Details</th><th>Added</th></tr></thead>
+        <tbody>${inquiryRows}</tbody>
       </table>
     </section>
     <section>
