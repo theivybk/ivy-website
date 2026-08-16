@@ -136,7 +136,7 @@ function parseEventInquiryEmailText(text) {
 
 // Event inquiries older than this are excluded (development test data --
 // Resend has no email-delete API, see RESERVATIONS_VISIBLE_SINCE above).
-const EVENT_INQUIRIES_VISIBLE_SINCE = '2026-08-16 00:24:49+00';
+const EVENT_INQUIRIES_VISIBLE_SINCE = '2026-08-16 00:34:46+00';
 
 async function readEventInquiries() {
   if (!RESEND_API_KEY) return [];
