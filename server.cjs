@@ -97,7 +97,7 @@ function parseReservationEmailText(text) {
 // Resend has no email-delete API, so "clearing" old (test) reservations
 // isn't possible at the source -- instead we hide anything sent before this
 // cutoff. Real reservations from this point on are unaffected.
-const RESERVATIONS_VISIBLE_SINCE = '2026-08-15 23:30:55+00';
+const RESERVATIONS_VISIBLE_SINCE = '2026-08-16 00:10:46+00';
 
 async function readReservations() {
   if (!RESEND_API_KEY) return [];
