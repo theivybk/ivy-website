@@ -1050,6 +1050,7 @@ const server = http.createServer((req, res) => {
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com",
     "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com",
+    "frame-src https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
