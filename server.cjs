@@ -821,6 +821,148 @@ async function handleReservation(req, res) {
   }
 }
 
+const EVENT_TO_EMAIL = 'events@theivybk.com';
+
+async function handleEventInquiry(req, res) {
+  if (!RESEND_API_KEY) {
+    res.writeHead(503, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Event inquiries are not configured yet.' }));
+    return;
+  }
+  let data;
+  try {
+    data = await readJsonBody(req);
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Invalid request.' }));
+    return;
+  }
+
+  const label = (v) => (typeof v === 'string' && v.trim() ? v.trim() : '—');
+  const fullName = label(data.full_name);
+  const phone = label(data.phone);
+  const email = label(data.email);
+  const company = label(data.company);
+  const eventDate = label(data.event_date);
+  const eventTime = label(data.event_time);
+  const guestCount = label(data.guest_count);
+  const duration = label(data.duration);
+  const occasion = label(data.occasion);
+  const spacePreference = label(data.space_preference);
+  const budgetPerPerson = label(data.budget_per_person);
+  const referralSource = label(data.referral_source);
+  const details = label(data.details);
+
+  if (
+    fullName === '—' || phone === '—' || email === '—' || eventDate === '—' ||
+    eventTime === '—' || guestCount === '—' || occasion === '—' || spacePreference === '—'
+  ) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Please fill in all required fields.' }));
+    return;
+  }
+  if (!EMAIL_RE.test(email)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Please enter a valid email address.' }));
+    return;
+  }
+
+  const subject = `Private Event Inquiry — ${occasion} — ${fullName}`;
+  const text = [
+    `Name: ${fullName}`,
+    `Phone: ${phone}`,
+    `Email: ${email}`,
+    `Company: ${company}`,
+    `Preferred Date: ${eventDate}`,
+    `Preferred Time: ${eventTime}`,
+    `Number of Guests: ${guestCount}`,
+    `Duration: ${duration}`,
+    `Occasion: ${occasion}`,
+    `Space Preference: ${spacePreference}`,
+    `Budget Per Person: ${budgetPerPerson}`,
+    `How They Heard About Us: ${referralSource}`,
+    ``,
+    `Details:`,
+    details,
+  ].join('\n');
+  const notificationHtml = emailTemplate({
+    heading: 'New Private Event Inquiry',
+    bodyHtml: `
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:150px; vertical-align:top;">Name</td><td style="padding:4px 0;">${escapeHtml(fullName)}</td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Phone</td><td style="padding:4px 0;"><a href="tel:${escapeHtml(phone)}" style="color:#1F3D2A;">${escapeHtml(phone)}</a></td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Email</td><td style="padding:4px 0;"><a href="mailto:${escapeHtml(email)}" style="color:#1F3D2A;">${escapeHtml(email)}</a></td></tr>
+        ${company !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Company</td><td style="padding:4px 0;">${escapeHtml(company)}</td></tr>` : ''}
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Preferred Date</td><td style="padding:4px 0;">${escapeHtml(eventDate)}</td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Preferred Time</td><td style="padding:4px 0;">${escapeHtml(eventTime)}</td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Guests</td><td style="padding:4px 0;">${escapeHtml(guestCount)}</td></tr>
+        ${duration !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Duration</td><td style="padding:4px 0;">${escapeHtml(duration)}</td></tr>` : ''}
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Occasion</td><td style="padding:4px 0;">${escapeHtml(occasion)}</td></tr>
+        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Space</td><td style="padding:4px 0;">${escapeHtml(spacePreference)}</td></tr>
+        ${budgetPerPerson !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Budget/Person</td><td style="padding:4px 0;">${escapeHtml(budgetPerPerson)}</td></tr>` : ''}
+        ${referralSource !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Heard About Us</td><td style="padding:4px 0;">${escapeHtml(referralSource)}</td></tr>` : ''}
+        ${details !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Details</td><td style="padding:4px 0;">${escapeHtml(details)}</td></tr>` : ''}
+      </table>
+      <p style="margin:0; font-size:13px; color:#686860;">Reply directly to this email to reach ${escapeHtml(fullName)} at ${escapeHtml(email)}.</p>
+    `,
+  });
+
+  try {
+    const result = await resendSendEmail({ to: EVENT_TO_EMAIL, subject, text, html: notificationHtml, replyTo: email });
+    if (result.status === 200 || result.status === 201) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+      resendSubscribe(email).catch((err) => console.error('Event inquiry newsletter subscribe error:', err.message));
+      setTimeout(() => {
+        sendWelcomeEmail(email).catch((err) => console.error('Event inquiry welcome email error:', err.message));
+      }, 24 * 60 * 60 * 1000).unref();
+
+      const confirmationText = [
+        `Hi ${fullName},`,
+        ``,
+        `Thanks for your interest in hosting at The Ivy Bar and Kitchen! Here's what you sent us:`,
+        ``,
+        `Preferred Date: ${eventDate}`,
+        `Preferred Time: ${eventTime}`,
+        `Number of Guests: ${guestCount}`,
+        `Occasion: ${occasion}`,
+        `Space Preference: ${spacePreference}`,
+        ``,
+        `Our events team will follow up within one business day. Have a question in the meantime? Call us at (773) 799-8160.`,
+        ``,
+        `The Ivy Bar and Kitchen`,
+        `1625 W Irving Park Rd, Chicago, IL 60613`,
+        `(773) 799-8160`,
+      ].join('\n');
+      const confirmationHtml = emailTemplate({
+        heading: 'Got your inquiry!',
+        bodyHtml: `
+          <p style="margin:0 0 16px;">Hi ${escapeHtml(fullName)},</p>
+          <p style="margin:0 0 16px;">Thanks for your interest in hosting at The Ivy Bar and Kitchen! Here's what you sent us:</p>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">
+            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:140px; vertical-align:top;">Preferred Date</td><td style="padding:4px 0;">${escapeHtml(eventDate)}</td></tr>
+            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Preferred Time</td><td style="padding:4px 0;">${escapeHtml(eventTime)}</td></tr>
+            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Guests</td><td style="padding:4px 0;">${escapeHtml(guestCount)}</td></tr>
+            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Occasion</td><td style="padding:4px 0;">${escapeHtml(occasion)}</td></tr>
+            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Space</td><td style="padding:4px 0;">${escapeHtml(spacePreference)}</td></tr>
+          </table>
+          <p style="margin:0 0 16px;">Our events team will follow up within one business day. Have a question in the meantime? Call us at <a href="tel:+17737998160" style="color:#1F3D2A;">(773) 799-8160</a>.</p>
+        `,
+      });
+      resendSendEmail({ to: email, subject: 'Got your inquiry — The Ivy Bar and Kitchen', text: confirmationText, html: confirmationHtml })
+        .catch((err) => console.error('Event inquiry confirmation email error:', err.message));
+    } else {
+      console.error('Resend send failed:', result.status, result.body);
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Could not send your inquiry. Please call us instead.' }));
+    }
+  } catch (err) {
+    console.error('Resend request error:', err.message);
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Could not reach the event inquiry service. Please call us instead.' }));
+  }
+}
+
 async function handleApply(req, res) {
   if (!RESEND_API_KEY) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
@@ -1072,6 +1214,12 @@ const server = http.createServer((req, res) => {
   if (req.method === 'POST' && urlPath === '/api/apply') {
     if (!checkRateLimit(req, 'apply')) return rejectRateLimited(res);
     handleApply(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/private-event') {
+    if (!checkRateLimit(req, 'private-event')) return rejectRateLimited(res);
+    handleEventInquiry(req, res);
     return;
   }
 

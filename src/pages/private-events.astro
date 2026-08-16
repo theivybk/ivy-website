@@ -233,13 +233,14 @@ const jsonLd = {
 
       <div class="submit-row">
         <button type="submit" class="btn btn--primary">Submit Inquiry</button>
-        <p class="submit-note">Inquiries are sent to <a href="mailto:events@theivybk.com" style="border-bottom:1px solid var(--brass);">events@theivybk.com</a> — we'll follow up within one business day.</p>
+        <p class="submit-note">Inquiries go to our events team — we'll follow up within one business day.</p>
+        <p class="submit-error" id="event-error" hidden></p>
       </div>
     </form>
 
     <div class="form-confirm" id="form-confirm" hidden>
-      <h2>Booked.</h2>
-      <p>Your inquiry is on its way to our events team at <a href="mailto:events@theivybk.com" style="border-bottom:1px solid var(--brass);">events@theivybk.com</a>. If your email client didn't open automatically, send it directly there and we'll follow up within one business day.</p>
+      <h2>Got it.</h2>
+      <p>Your inquiry is on its way to our events team. We'll follow up within one business day — call us at <a href="tel:+17737998160" style="border-bottom:1px solid var(--brass);">(773) 799-8160</a> in the meantime if you have questions.</p>
     </div>
   </div>
 </section>
@@ -273,35 +274,36 @@ const jsonLd = {
 
 <script is:inline>
   const form = document.getElementById('event-form');
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = new FormData(form);
-    const label = (v) => v && v.trim() ? v : '—';
-    const lines = [
-      `Name: ${label(data.get('full_name'))}`,
-      `Phone: ${label(data.get('phone'))}`,
-      `Email: ${label(data.get('email'))}`,
-      `Company: ${label(data.get('company'))}`,
-      `Preferred Date: ${label(data.get('event_date'))}`,
-      `Preferred Time: ${label(data.get('event_time'))}`,
-      `Number of Guests: ${label(data.get('guest_count'))}`,
-      `Duration: ${label(data.get('duration'))}`,
-      `Occasion: ${label(data.get('occasion'))}`,
-      `Space Preference: ${label(data.get('space_preference'))}`,
-      `Budget Per Person: ${label(data.get('budget_per_person'))}`,
-      `How They Heard About Us: ${label(data.get('referral_source'))}`,
-      ``,
-      `Details:`,
-      label(data.get('details'))
-    ].join('\n');
+    const payload = Object.fromEntries(data.entries());
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const errorEl = document.getElementById('event-error');
+    submitBtn.disabled = true;
+    errorEl.hidden = true;
 
-    const subject = `Private Event Inquiry — ${label(data.get('occasion'))} — ${label(data.get('full_name'))}`;
-    const mailto = `mailto:${form.dataset.recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines)}`;
-    window.location.href = mailto;
-
-    form.hidden = true;
-    document.getElementById('form-confirm').hidden = false;
-    document.getElementById('form-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    try {
+      const res = await fetch('/api/private-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+      if (res.ok && result.ok) {
+        form.hidden = true;
+        document.getElementById('form-confirm').hidden = false;
+        document.getElementById('form-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        errorEl.textContent = result.error || 'Something went wrong — please try again or call us.';
+        errorEl.hidden = false;
+      }
+    } catch {
+      errorEl.textContent = 'Something went wrong — please try again or call us.';
+      errorEl.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+    }
   });
 </script>
 </Layout>
