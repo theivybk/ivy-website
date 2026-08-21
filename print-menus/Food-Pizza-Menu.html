@@ -1,0 +1,1366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Ivy — Food Menus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #ffffff; --ink: #000000; --accent: #000000; --rule: #111111; --muted: #111111; }
+  @page { size: legal portrait; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #c8c5bd; }
+  body { font-family: "EB Garamond", Georgia, serif; color: var(--ink);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .deck { display: flex; flex-direction: column; align-items: center; padding: 28px 16px 80px; gap: 28px; box-sizing: border-box; }
+  .menu-frame {
+    width: 8.5in; height: 14in; background: var(--bg);
+    position: relative; overflow: hidden; box-sizing: border-box;
+    box-shadow: none;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .menu-frame .stage { display: contents !important; }
+  .menu-frame .page { width: 100% !important; height: 100% !important; min-height: 100% !important; box-shadow: none !important; margin: 0 !important; }
+  .menu-frame .print-btn { display: none !important; }
+
+@scope (.menu-food) {
+
+  
+
+  
+  html, body { background: #c8c5bd; }
+  body { margin: 0; font-family: "EB Garamond", Georgia, serif; color: var(--ink);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 28px 16px 60px;
+    box-sizing: border-box;
+  }
+
+  .page {
+    width: 8.5in;
+    min-height: 14in;
+    padding: 0.35in 0.55in 0.3in;
+    background: var(--bg);
+    box-sizing: border-box;
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* ─── IVY DECOR ─────────────────────────────────────────────── */
+  .vine { position: absolute; pointer-events: none; color: var(--accent); opacity: .55; }
+  .vine svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .vine-tl { top: -26px;  left: -30px;    width: 300px; height: 300px; transform: rotate(-4deg); opacity: .22; }
+  .vine-tr { top: -28px;  right: -32px; width: 320px; height: 320px; transform: scaleX(-1) rotate(-4deg); opacity: .24; }
+  .vine-bl { bottom: -30px; left: -34px; width: 300px; height: 300px; transform: scaleY(-1) rotate(-10deg); opacity: .22; }
+  .vine-br { bottom: 38%; right: -8px;  width: 130px; height: 130px; transform: scale(-1,-1) rotate(22deg); opacity: .14; }
+  .vine-mid {
+    top: 16%; right: 6%; transform: rotate(18deg);
+    width: 32%; height: 130px; opacity: .07;
+  }
+
+
+  /* ─── HEADER ─────────────────────────────────────────────── */
+  .head { text-align: center; padding: 2px 0 2px; position: relative; z-index: 2; }
+
+  .word {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic; font-weight: 500;
+    font-size: 44px; line-height: .95;
+    color: var(--accent);
+    margin: 2px 0 2px;
+    letter-spacing: -0.012em;
+  }
+
+  .tag {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .42em;
+    text-transform: uppercase;
+    color: var(--rule);
+    margin: 4px 0 0;
+    padding-left: .42em;
+  }
+
+  .ornament {
+    margin: 3px auto 0;
+    width: 46%; height: 14px;
+    position: relative;
+  }
+  .ornament::before, .ornament::after {
+    content: ""; position: absolute; top: 50%;
+    height: 1px; background: var(--rule); opacity: .8;
+  }
+  .ornament::before { left: 0; right: calc(50% + 14px); }
+  .ornament::after  { right: 0; left:  calc(50% + 14px); }
+  .ornament .dot {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    color: var(--rule); font-size: 14px; line-height: 1;
+    font-family: "Cormorant Garamond", serif;
+  }
+
+  /* ─── COLUMNS ─────────────────────────────────────────────── */
+  .body {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    column-gap: 0.5in;
+    align-items: start;
+    margin-top: 6px;
+    position: relative;
+    z-index: 2;
+  }
+  .vrule {
+    align-self: stretch;
+    background: rgba(0,0,0,.75);
+  }
+  section {
+    break-inside: avoid;
+    margin: 0 0 4px;
+    padding: 0;
+  }
+  section.flow {
+    break-inside: auto;
+  }
+
+  section h2 {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent);
+    font-size: 28px;
+    margin: 0 0 2px;
+    text-align: center;
+    letter-spacing: 0.005em;
+    line-height: 1;
+  }
+  section .seclabel {
+    font-family: "Inter", sans-serif;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: .38em; text-transform: uppercase;
+    color: var(--rule);
+    text-align: center;
+    margin: 2px 0 5px;
+  }
+  section .seclabel::before, section .seclabel::after {
+    content: "·"; padding: 0 8px; color: var(--rule); opacity: .8;
+  }
+
+  .upgrade-note {
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    margin: -4px 0 5px;
+  }
+  .upgrade-note .up-price {
+    color: var(--accent);
+    font-weight: 600;
+    margin-left: 4px;
+    font-style: normal;
+  }
+
+  /* ─── DISH ROWS ─────────────────────────────────────────────── */
+  .dish { margin: 1px 0; break-inside: avoid; }
+  .dish .row {
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .dish .name {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    font-size: 17.5px;
+    color: var(--ink);
+    letter-spacing: 0.005em;
+    line-height: 1.15;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .dish .name .qual {
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+  .dish .leader {
+    flex: 1 1 auto;
+    height: 1px;
+    border-bottom: 1px dotted rgba(0,0,0,.8);
+    transform: translateY(-4px);
+    min-width: 14px;
+  }
+  .dish .price {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    font-size: 17.5px;
+    color: var(--accent);
+    flex: 0 0 auto;
+    letter-spacing: 0.01em;
+  }
+  .dish .desc {
+    font-family: "EB Garamond", serif;
+    font-size: 13.75px;
+    line-height: 1.27;
+    color: var(--muted);
+    margin: 1px 0 0;
+    text-wrap: pretty;
+  }
+  .dish .opts {
+    font-family: "Inter", sans-serif;
+    font-size: 8.5px;
+    font-weight: 500;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-top: 2px;
+    text-wrap: pretty;
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────────────── */
+  .foot {
+    margin-top: auto;
+    padding-top: 10px;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    font-size: 9px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--muted);
+    position: relative; z-index: 2;
+  }
+  .foot .frule {
+    width: 28%; margin: 0 auto 10px; height: 1px;
+    background: var(--rule); opacity: .55;
+  }
+  .foot p { margin: 3px 0; }
+  .foot .disclaimer {
+    margin-top: 12px;
+    font-size: 8px;
+    letter-spacing: .18em;
+    line-height: 1.7;
+    max-width: 6in;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--muted);
+    opacity: .85;
+  }
+
+  /* ─── PRINT ─────────────────────────────────────────────── */
+  @media print {
+    html, body { background: var(--bg) !important; }
+    .stage { padding: 0; min-height: auto; }
+    .page { box-shadow: none; width: 8.5in; height: 13.4in; min-height: 13.4in; overflow: hidden;
+      -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .print-btn { display: none !important; }
+  }
+
+  @media (max-width: 900px) { .stage { padding: 12px; } }
+
+  .print-btn {
+    position: fixed; left: 16px; bottom: 16px; z-index: 5;
+    appearance: none; border: 1px solid rgba(245,239,225,.25);
+    background: rgba(245,239,225,.08); color: #f5efe1;
+    font-family: "Inter", sans-serif; font-size: 11px; font-weight: 500;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: 9px 16px; border-radius: 999px; cursor: pointer;
+    backdrop-filter: blur(8px);
+  }
+  .print-btn:hover { background: rgba(245,239,225,.14); }
+
+}
+
+
+@scope (.menu-pizza) {
+
+  
+
+  
+  html, body { background: #c8c5bd; }
+  body { margin: 0; font-family: "EB Garamond", Georgia, serif; color: var(--ink); }
+
+  .stage {
+    min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 28px 16px 80px;
+    box-sizing: border-box;
+  }
+
+  .page {
+    width: 8.5in;
+    min-height: 14in;
+    padding: 0.45in 0.6in 0.4in;
+    background: var(--bg);
+    box-sizing: border-box;
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+  }
+  .page > * { position: relative; }
+
+  /* ─── IVY DECOR ─────────────────────────────────────────────── */
+  .vine { position: absolute; pointer-events: none; color: var(--accent); opacity: .55; z-index: 0; }
+  .vine svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .vine-tl { top: -22px;  left: -28px;  width: 280px; height: 280px; transform: rotate(-8deg);  opacity: .22; }
+  .vine-tr { top: 40px;   right: -10px; width: 150px; height: 150px; transform: scaleX(-1) rotate(18deg); opacity: .16; }
+  .vine-bl { bottom: 24%; left: -22px;  width: 130px; height: 130px; transform: rotate(35deg);  opacity: .14; }
+  .vine-br { bottom: -32px; right: -28px; width: 320px; height: 320px; transform: scale(-1,-1) rotate(12deg); opacity: .22; }
+  .vine-mid {
+    top: 38%; left: 8%; transform: rotate(-12deg);
+    width: 38%; height: 140px; opacity: .07;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────────────── */
+  .head { text-align: center; padding: 4px 0 12px; }
+  .kicker {
+    font-family: "Inter", sans-serif;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: .44em; text-transform: uppercase;
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+  }
+  .kicker .line { flex: 0 0 60px; height: 1px; background: var(--rule); opacity: .85; }
+
+  .word {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic; font-weight: 500;
+    font-size: 96px; line-height: .95;
+    color: var(--accent);
+    margin: 6px 0 6px;
+    letter-spacing: -0.012em;
+  }
+  .word .amp {
+    font-style: italic; font-weight: 400;
+    color: var(--rule);
+    padding: 0 .08em;
+  }
+  .tag {
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .ornament {
+    margin: 18px auto 0;
+    width: 46%; height: 14px; position: relative;
+  }
+  .ornament::before, .ornament::after {
+    content: ""; position: absolute; top: 50%;
+    height: 1px; background: var(--rule); opacity: .8;
+  }
+  .ornament::before { left: 0; right: calc(50% + 14px); }
+  .ornament::after  { right: 0; left:  calc(50% + 14px); }
+  .ornament .dot {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    color: var(--rule); font-size: 14px; line-height: 1;
+    font-family: "Cormorant Garamond", serif;
+  }
+
+  /* ─── PAGE NAV (between pages) ─────────────────────────── */
+  .pagenav {
+    display:flex; justify-content:center; gap: 24px;
+    margin: 10px 0 0;
+    font-family: "Inter", sans-serif;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: .38em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pagenav a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 4px 2px;
+    border-bottom: 1px solid transparent;
+  }
+  .pagenav a.active { color: var(--accent); border-bottom-color: var(--rule); }
+  .pagenav a:hover { color: var(--accent); }
+  .pagenav .sep { color: var(--rule); opacity: .7; }
+
+  /* ─── STYLES (two pizza styles) ─────────────────────────── */
+  .specialty-note {
+    text-align: center;
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 16px auto 0;
+    max-width: 5.6in;
+    text-wrap: pretty;
+  }
+  .styles {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    column-gap: 0.5in;
+    align-items: start;
+  }
+  .vrule {
+    align-self: stretch;
+    background: rgba(0,0,0,.75);
+  }
+
+  section h2 {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent);
+    font-size: 32px;
+    margin: 0 0 4px;
+    text-align: center;
+    letter-spacing: 0.005em;
+    line-height: 1;
+  }
+  section .seclabel {
+    font-family: "Inter", sans-serif;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: .38em; text-transform: uppercase;
+    color: var(--rule);
+    text-align: center;
+    margin: 4px 0 6px;
+    white-space: nowrap;
+  }
+  section .seclabel::before, section .seclabel::after {
+    content: "·"; padding: 0 8px; color: var(--rule); opacity: .8;
+  }
+
+  .pie { margin: 3px 0; break-inside: avoid; }
+  .pie .row {
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .pie .name {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    font-size: 24px;
+    color: var(--ink);
+    letter-spacing: 0.005em;
+    line-height: 1.15;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .pie .leader {
+    flex: 1 1 auto;
+    height: 1px;
+    border-bottom: 1px dotted rgba(0,0,0,.8);
+    transform: translateY(-4px);
+    min-width: 14px;
+  }
+  .pie .price {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--accent);
+    flex: 0 0 auto;
+    letter-spacing: 0.01em;
+  }
+  .pie .desc {
+    font-family: "EB Garamond", serif;
+    font-size: 16.5px;
+    line-height: 1.38;
+    color: var(--muted);
+    margin: 3px 0 0;
+    text-wrap: pretty;
+  }
+
+  /* ─── BUILD YOUR OWN ─────────────────────────────────────── */
+  .byo {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,.8);
+  }
+  .byo .crown {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .byo .crown h2 { margin-bottom: 2px; }
+  .byo .crown p.intro {
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+    margin: 8px auto 0;
+    max-width: 5.6in;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  .byo .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 0.4in;
+    margin-top: 14px;
+  }
+  .byo .col h3 {
+    font-family: "Inter", sans-serif;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: .38em; text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,0,0,.75);
+    text-align: center;
+  }
+  .byo .col h3 .step {
+    color: var(--rule);
+    margin-right: 8px;
+  }
+  .byo .col h3 .pricetag {
+    color: var(--rule);
+    margin-left: 8px;
+    letter-spacing: .22em;
+  }
+  .byo .col ul {
+    list-style: none; padding: 0; margin: 0;
+    text-align: center;
+  }
+  .byo .col li {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 500;
+    font-size: 19px;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .byo .col li .size,
+  .byo .col li .pr {
+    font-family: "Inter", sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .04em;
+    margin-left: 4px;
+  }
+  .byo .col li .pr {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .byo .row2 {
+    margin-top: 20px;
+  }
+  .byo .toppings h3 {
+    font-family: "Inter", sans-serif;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: .38em; text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,0,0,.75);
+    text-align: center;
+  }
+  .byo .toppings h3 .step { color: var(--rule); margin-right: 8px; }
+  .byo .toppings h3 .pricetag { color: var(--rule); margin-left: 8px; letter-spacing: .22em; }
+  .byo .toppings ul {
+    list-style: none; padding: 0; margin: 4px 0 0;
+    columns: 4; column-gap: 0.3in;
+    text-align: left;
+  }
+  .byo .toppings li {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 500;
+    color: var(--ink);
+    break-inside: avoid;
+    font-size: 18px;
+    line-height: 1.55;
+    white-space: nowrap;
+  }
+  .byo .toppings li::before {
+    content: "·"; color: var(--rule); margin-right: 8px;
+    font-family: "Cormorant Garamond", serif;
+  }
+
+  /* extras */
+  .extras {
+    margin: 18px 0 6px;
+    text-align: center;
+  }
+  .extras h2 {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent);
+    font-size: 26px;
+    margin: 0 0 2px;
+    text-align: center;
+    letter-spacing: 0.005em;
+    line-height: 1;
+  }
+  .extras .seclabel {
+    font-family: "Inter", sans-serif;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: .38em; text-transform: uppercase;
+    color: var(--rule);
+    text-align: center;
+    margin: 4px 0 8px;
+  }
+  .extras-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 0.5in;
+    text-align: left;
+    max-width: 5.4in;
+    margin: 0 auto;
+  }
+  .extras .pie { margin: 6px 0; }
+  .extras .pie .name {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--ink);
+    font-style: normal;
+  }
+  .extras .pie .price {
+    font-weight: 600;
+    font-size: 17px;
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────────────── */
+  .foot {
+    margin-top: auto;
+    padding-top: 10px;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    font-size: 9px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .foot .frule {
+    width: 28%; margin: 0 auto 10px; height: 1px;
+    background: var(--rule); opacity: .55;
+  }
+  .foot p { margin: 3px 0; }
+  .foot .disclaimer {
+    margin-top: 14px;
+    font-size: 8px;
+    letter-spacing: .18em;
+    line-height: 1.7;
+    max-width: 6in;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--muted);
+    opacity: .85;
+  }
+
+  /* ─── PRINT ─────────────────────────────────────────────── */
+  @media print {
+    html, body { background: var(--bg) !important; }
+    .stage { padding: 0; min-height: auto; }
+    .page { box-shadow: none; width: 8.5in; height: 13.4in; min-height: 13.4in; overflow: hidden;
+      -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .print-btn, .pagenav { display: none !important; }
+  }
+  @media (max-width: 900px) { .stage { padding: 12px; } }
+
+  .print-btn {
+    position: fixed; left: 16px; bottom: 16px; z-index: 5;
+    appearance: none; border: 1px solid rgba(245,239,225,.25);
+    background: rgba(245,239,225,.08); color: #f5efe1;
+    font-family: "Inter", sans-serif; font-size: 11px; font-weight: 500;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: 9px 16px; border-radius: 999px; cursor: pointer;
+    backdrop-filter: blur(8px);
+  }
+  .print-btn:hover { background: rgba(245,239,225,.14); }
+
+}
+
+  @media print {
+    html, body { background: var(--bg) !important; }
+    .deck { padding: 0 !important; gap: 0 !important; }
+    .menu-frame { box-shadow: none !important; page-break-after: always; break-after: page; }
+    .menu-frame:last-of-type { page-break-after: auto; break-after: auto; }
+    .print-btn { display: none !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+  .print-btn {
+    position: fixed; left: 16px; bottom: 16px; z-index: 100;
+    appearance: none; border: 1px solid rgba(245,239,225,.25);
+    background: rgba(245,239,225,.14); color: #f5efe1;
+    font-family: "Inter", sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 11px 18px; border-radius: 999px; cursor: pointer; backdrop-filter: blur(8px);
+  }
+  .print-btn:hover { background: rgba(245,239,225,.22); }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="menu-food menu-frame">
+
+
+<div class="stage">
+  <article class="page" id="menu-page">
+
+    <!-- ── INVISIBLE SVG VINE TEMPLATES ─────────────────────────── -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <symbol id="ivy-leaf" viewBox="-50 -50 100 100">
+          <path d="M 0,-46
+                   C 2,-40 14,-32 16,-22
+                   C 22,-20 32,-4 36,0
+                   C 32,4 22,20 16,28
+                   C 14,32 8,32 4,28
+                   C 2,26 1,25 0,24
+                   C -1,25 -2,26 -4,28
+                   C -8,32 -14,32 -16,28
+                   C -22,20 -32,4 -36,0
+                   C -32,-4 -22,-20 -16,-22
+                   C -14,-32 -2,-40 0,-46 Z"
+                fill="currentColor" stroke="none"/>
+          <g stroke="rgba(0,0,0,.22)" stroke-width="1" fill="none" stroke-linecap="round">
+            <path d="M 0,24 L 0,-42"/>
+            <path d="M 0,24 L -32,-2"/>
+            <path d="M 0,24 L  32,-2"/>
+          </g>
+        </symbol>
+
+        <symbol id="ivy-vine" viewBox="0 0 200 200">
+          <path d="M 8,8
+                   C 40,30 30,70 70,90
+                   C 110,110 100,140 140,150
+                   C 170,158 180,180 195,195"
+                fill="none" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+          <path d="M 70,90 C 90,70 110,72 130,55"
+                fill="none" stroke="currentColor" stroke-width="1.2"
+                stroke-linecap="round" opacity=".55"/>
+          <path d="M 30,50 C 20,65 22,80 14,95"
+                fill="none" stroke="currentColor" stroke-width="1.1"
+                stroke-linecap="round" opacity=".5"/>
+          <g>
+            <use href="#ivy-leaf" x="18"  y="18"  width="34" height="34" transform="rotate(-30 18 18)"/>
+            <use href="#ivy-leaf" x="48"  y="56"  width="28" height="28" transform="rotate(40 48 56)"/>
+            <use href="#ivy-leaf" x="80"  y="86"  width="38" height="38" transform="rotate(-15 80 86)"/>
+            <use href="#ivy-leaf" x="120" y="48"  width="26" height="26" transform="rotate(70 120 48)"/>
+            <use href="#ivy-leaf" x="118" y="118" width="32" height="32" transform="rotate(25 118 118)"/>
+            <use href="#ivy-leaf" x="150" y="148" width="36" height="36" transform="rotate(-40 150 148)"/>
+            <use href="#ivy-leaf" x="170" y="172" width="24" height="24" transform="rotate(15 170 172)"/>
+            <use href="#ivy-leaf" x="22"  y="80"  width="22" height="22" transform="rotate(-70 22 80)"/>
+          </g>
+        </symbol>
+
+        <symbol id="ivy-trail" viewBox="0 0 400 100">
+          <path d="M 0,60 C 60,30 120,80 180,50 S 300,30 400,55"
+                fill="none" stroke="currentColor" stroke-width="1.4"
+                stroke-linecap="round" opacity=".7"/>
+          <g>
+            <use href="#ivy-leaf" x="44"  y="40" width="26" height="26" transform="rotate(-20 44 40)"/>
+            <use href="#ivy-leaf" x="100" y="56" width="30" height="30" transform="rotate(45 100 56)"/>
+            <use href="#ivy-leaf" x="170" y="34" width="24" height="24" transform="rotate(-10 170 34)"/>
+            <use href="#ivy-leaf" x="240" y="52" width="28" height="28" transform="rotate(30 240 52)"/>
+            <use href="#ivy-leaf" x="320" y="36" width="26" height="26" transform="rotate(-30 320 36)"/>
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+
+    <div class="vine vine-tl" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-tr" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-bl" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-br" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-mid" aria-hidden="true"><svg viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet"><use href="#ivy-trail"/></svg></div>
+
+    <header class="head">
+      <h1 class="word">The Ivy</h1>
+      <p class="tag">Bar &amp; Kitchen</p>
+      <div class="ornament"><span class="dot">&#10070;</span></div>
+    </header>
+
+    <div class="body">
+
+      <div class="bodycol">
+        <!-- ── SMALL PLATES ── -->
+        <section class="flow">
+          <h2>Small Plates</h2>
+          <p class="seclabel">to share, or not</p>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Hummus</div>
+              <span class="leader"></span>
+              <div class="price">16</div>
+            </div>
+            <div class="desc">Whipped silky, drizzled with EVOO, sumac &amp; parsley. Served with cucumbers, red bell peppers, Greek &amp; Kalamata marinated olives, roasted chickpeas &amp; warm pita</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Pretzel Twist</div>
+              <span class="leader"></span>
+              <div class="price">14</div>
+            </div>
+            <div class="desc">Served with whole grain mustard &amp; cheese sauce</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Cheese Curds</div>
+              <span class="leader"></span>
+              <div class="price">12</div>
+            </div>
+            <div class="desc">Served with spicy ranch</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Fries</div>
+              <span class="leader"></span>
+              <div class="price">9</div>
+            </div>
+            <div class="desc" style="font-style: italic;">Go truffle, topped with parmesan &amp; parsley &mdash; +1</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Green Beans</div>
+              <span class="leader"></span>
+              <div class="price">11</div>
+            </div>
+            <div class="desc">Blistered in lemon butter, finished with grated parmesan &amp; crispy fried onions</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Brussel Sprouts</div>
+              <span class="leader"></span>
+              <div class="price">11</div>
+            </div>
+            <div class="desc">Crisped in a honey-sriracha glaze, dusted with tuxedo sesame seeds</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Crispy Wings</div>
+              <span class="leader"></span>
+              <div class="price">16</div>
+            </div>
+            <div class="opts">BBQ · Buffalo · Butter Chicken · Giardiniera Hot Honey</div>
+            <div class="desc">Served with ranch or bleu cheese</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Chicken Tenders</div>
+              <span class="leader"></span>
+              <div class="price">14</div>
+            </div>
+            <div class="opts">Ranch · Bleu Cheese · BBQ · Buffalo · Dijon Honey Mustard</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Grilled Shrimp</div>
+              <span class="leader"></span>
+              <div class="price">16</div>
+            </div>
+            <div class="desc">Cajun-garlic butter, jalape&ntilde;o coleslaw tossed in agave lime vinaigrette &amp; a side of honey sriracha, garnished with parsley</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Crispy Pork Belly Bites</div>
+              <span class="leader"></span>
+              <div class="price">16</div>
+            </div>
+            <div class="desc">Honey sriracha glaze, agave lime vinaigrette jalapeño cole slaw</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Nachos</div>
+              <span class="leader"></span>
+              <div class="price">17</div>
+            </div>
+            <div class="desc">Poblano cheese, red onions, tomatoes, lettuce, jalapeños, black beans, guacamole, sour cream &amp; chihuahua cheese</div>
+            <div class="opts">Add — Ground Beef +6 · Grilled Shrimp +8 · Steak +12 · Grilled Chicken +6 · Fried Chicken +6 · Bacon +4</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Quesadilla</div>
+              <span class="leader"></span>
+              <div class="price">15</div>
+            </div>
+            <div class="desc">Pico de gallo, sour cream, guacamole &amp; chihuahua cheese</div>
+            <div class="opts">Add — Ground Beef +6 · Grilled Shrimp +8 · Steak +12 · Grilled Chicken +6 · Fried Chicken +6 · Bacon +4 · Black Beans +4</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Mac n&rsquo; Cheese</div>
+              <span class="leader"></span>
+              <div class="price">12</div>
+            </div>
+            <div class="desc">Cavatappi swirls in a velvety cheese</div>
+            <div class="opts">Add — Ground Beef +6 · Grilled Shrimp +8 · Steak +12 · Grilled Chicken +6 · Fried Chicken +6 · Bacon +4</div>
+          </div>
+        </section>
+
+        <!-- ── ENTREES ── -->
+        <section>
+          <h2>Entrées</h2>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Pan-Seared Walleye</div>
+              <span class="leader"></span>
+              <div class="price">28</div>
+            </div>
+            <div class="desc">Lemon butter, capers &amp; parsley. Served with green beans</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Grilled Steak</div>
+              <span class="leader"></span>
+              <div class="price">30</div>
+            </div>
+            <div class="desc">Marinated Bavette, chimichurri. Served with brussels sprouts</div>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="vrule" aria-hidden="true"></div>
+
+      <div class="bodycol">
+        <!-- ── SALADS ── -->
+        <section class="flow">
+          <h2>Salads</h2>
+          <p class="seclabel">crisp, simple, generous</p>
+          <p class="upgrade-note">Add a protein &mdash; Grilled Shrimp<span class="up-price">+8</span> &middot; Steak<span class="up-price">+12</span> &middot; Grilled Chicken<span class="up-price">+6</span> &middot; Fried Chicken<span class="up-price">+6</span> &middot; Bacon<span class="up-price">+4</span></p>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Caesar</div>
+              <span class="leader"></span>
+              <div class="price">18</div>
+            </div>
+            <div class="desc">Crisp romaine, house croutons &amp; parmesan · grilled or fried chicken &mdash; buffalo on either</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">House Salad</div>
+              <span class="leader"></span>
+              <div class="price">17</div>
+            </div>
+            <div class="desc">Mixed greens, onions, grape tomatoes, shredded carrots, agave lime vinaigrette</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Crispy Chicken Chopped</div>
+              <span class="leader"></span>
+              <div class="price">21</div>
+            </div>
+            <div class="desc">Crisp romaine, avocado, bacon, tomatoes, red onions &amp; bleu cheese dressing</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Summer Salad</div>
+              <span class="leader"></span>
+              <div class="price">20</div>
+            </div>
+            <div class="desc">Mixed greens tossed with sweet strawberries, grape tomatoes &amp; red onion, crumbled feta &amp; toasted almonds in a honey-lemon vinaigrette</div>
+          </div>
+        </section>
+
+        <!-- ── HANDHELDS ── -->
+        <section>
+          <h2>Handhelds</h2>
+          <p class="seclabel">served with fries</p>
+          <p class="upgrade-note">Go truffle &mdash;<span class="up-price">+1</span> &middot; Sub brussel sprouts, green beans or a salad &mdash;<span class="up-price">+1</span> &middot; Gluten-free bun available &middot; Sub a vegetarian Beyond patty</p>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">The Original</div>
+              <span class="leader"></span>
+              <div class="price">20</div>
+            </div>
+            <div class="desc">Two smash patties, house sauce, pickles, caramelized onions &amp; white American cheese, potato bun</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Five Alarm</div>
+              <span class="leader"></span>
+              <div class="price">20</div>
+            </div>
+            <div class="desc">Two smash patties, house sauce, pickles, caramelized onions, jalapeños &amp; pepper jack, potato bun</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">The Works</div>
+              <span class="leader"></span>
+              <div class="price">20</div>
+            </div>
+            <div class="desc">Two smash patties, house sauce, pickles, onions, tomatoes, lettuce &amp; white American cheese, potato bun</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Southwest Grilled Chicken</div>
+              <span class="leader"></span>
+              <div class="price">20</div>
+            </div>
+            <div class="desc">Guacamole, lettuce, tomatoes, red onions &amp; chipotle mayo, brioche bun</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Steak Sandwich</div>
+              <span class="leader"></span>
+              <div class="price">25</div>
+            </div>
+            <div class="desc">Bavette, chimichurri, provolone, caramelized onions, ciabatta</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Caesar Wrap</div>
+              <span class="leader"></span>
+              <div class="price">20</div>
+            </div>
+            <div class="desc">Crisp romaine, house caesar, croutons &amp; parmesan &middot; grilled or fried chicken &mdash; buffalo on either</div>
+          </div>
+
+        </section>
+
+        <!-- ── DESSERT ── -->
+        <section>
+          <h2>Dessert</h2>
+          <p class="seclabel">a sweet finish</p>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Cheesecake</div>
+              <span class="leader"></span>
+              <div class="price">12</div>
+            </div>
+            <div class="desc">Raspberry &amp; blackberry compote</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Gelato</div>
+              <span class="leader"></span>
+              <div class="price">7</div>
+            </div>
+            <div class="desc">Vanilla bean, strawberry cheesecake, double dark chocolate or mango sorbet</div>
+          </div>
+
+          <div class="dish">
+            <div class="row">
+              <div class="name">Gelato Trio</div>
+              <span class="leader"></span>
+              <div class="price">15</div>
+            </div>
+            <div class="desc">Choose three &mdash; vanilla bean, strawberry cheesecake, double dark chocolate or mango sorbet</div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <footer class="foot">
+      <div class="frule"></div>
+      <p>1625 W Irving Park Rd · Chicago, IL 60613</p>
+      <p>Please notify your server of any allergies</p>
+      <p>3% credit card processing fee applied to all card transactions</p>
+      <p class="disclaimer">*Consuming raw or undercooked meats, poultry, seafood, shellfish, or eggs may increase your risk of foodborne illness, especially if you have certain medical conditions.</p>
+    </footer>
+
+  </article>
+</div>
+
+
+
+
+</div>
+<div class="menu-pizza menu-frame">
+
+
+<div class="stage">
+  <article class="page" id="menu-page">
+
+    <!-- ── INVISIBLE SVG VINE TEMPLATES ─────────────────────────── -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <symbol id="ivy-leaf" viewBox="-50 -50 100 100">
+          <!-- Boston ivy: sharp-pointed 3-lobed with cordate (heart-shaped) base -->
+          <path d="M 0,-46
+                   C 2,-40 14,-32 16,-22
+                   C 22,-20 32,-4 36,0
+                   C 32,4 22,20 16,28
+                   C 14,32 8,32 4,28
+                   C 2,26 1,25 0,24
+                   C -1,25 -2,26 -4,28
+                   C -8,32 -14,32 -16,28
+                   C -22,20 -32,4 -36,0
+                   C -32,-4 -22,-20 -16,-22
+                   C -14,-32 -2,-40 0,-46 Z"
+                fill="currentColor" stroke="none"/>
+          <g stroke="rgba(0,0,0,.22)" stroke-width="1" fill="none" stroke-linecap="round">
+            <path d="M 0,24 L 0,-42"/>
+            <path d="M 0,24 L -32,-2"/>
+            <path d="M 0,24 L  32,-2"/>
+          </g>
+        </symbol>
+
+        <symbol id="ivy-vine" viewBox="0 0 200 200">
+          <path d="M 8,8
+                   C 40,30 30,70 70,90
+                   C 110,110 100,140 140,150
+                   C 170,158 180,180 195,195"
+                fill="none" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+          <path d="M 70,90 C 90,70 110,72 130,55"
+                fill="none" stroke="currentColor" stroke-width="1.2"
+                stroke-linecap="round" opacity=".55"/>
+          <path d="M 30,50 C 20,65 22,80 14,95"
+                fill="none" stroke="currentColor" stroke-width="1.1"
+                stroke-linecap="round" opacity=".5"/>
+          <g>
+            <use href="#ivy-leaf" x="18"  y="18"  width="34" height="34" transform="rotate(-30 18 18)"/>
+            <use href="#ivy-leaf" x="48"  y="56"  width="28" height="28" transform="rotate(40 48 56)"/>
+            <use href="#ivy-leaf" x="80"  y="86"  width="38" height="38" transform="rotate(-15 80 86)"/>
+            <use href="#ivy-leaf" x="120" y="48"  width="26" height="26" transform="rotate(70 120 48)"/>
+            <use href="#ivy-leaf" x="118" y="118" width="32" height="32" transform="rotate(25 118 118)"/>
+            <use href="#ivy-leaf" x="150" y="148" width="36" height="36" transform="rotate(-40 150 148)"/>
+            <use href="#ivy-leaf" x="170" y="172" width="24" height="24" transform="rotate(15 170 172)"/>
+            <use href="#ivy-leaf" x="22"  y="80"  width="22" height="22" transform="rotate(-70 22 80)"/>
+          </g>
+        </symbol>
+
+        <symbol id="ivy-trail" viewBox="0 0 400 100">
+          <path d="M 0,60 C 60,30 120,80 180,50 S 300,30 400,55"
+                fill="none" stroke="currentColor" stroke-width="1.4"
+                stroke-linecap="round" opacity=".7"/>
+          <g>
+            <use href="#ivy-leaf" x="44"  y="40" width="26" height="26" transform="rotate(-20 44 40)"/>
+            <use href="#ivy-leaf" x="100" y="56" width="30" height="30" transform="rotate(45 100 56)"/>
+            <use href="#ivy-leaf" x="170" y="34" width="24" height="24" transform="rotate(-10 170 34)"/>
+            <use href="#ivy-leaf" x="240" y="52" width="28" height="28" transform="rotate(30 240 52)"/>
+            <use href="#ivy-leaf" x="320" y="36" width="26" height="26" transform="rotate(-30 320 36)"/>
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+
+    <!-- ── DECORATIVE VINES ─────────────────────────────────────── -->
+    <div class="vine vine-tl" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-tr" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-bl" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-br" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-mid" aria-hidden="true"><svg viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet"><use href="#ivy-trail"/></svg></div>
+
+    <header class="head">
+      <h1 class="word">The Ivy Pie</h1>
+      <div class="ornament"><span class="dot">&#10070;</span></div>
+    </header>
+
+    <!-- Extras -->
+    <section class="extras">
+      <h2>From the Oven</h2>
+      <p class="seclabel">to start</p>
+      <div class="extras-grid">
+        <div class="pie extra">
+          <div class="row">
+            <div class="name">Garlic Bread</div>
+            <span class="leader"></span>
+            <div class="price">14</div>
+          </div>
+        </div>
+        <div class="pie extra">
+          <div class="row">
+            <div class="name">Cheesy Garlic Bread</div>
+            <span class="leader"></span>
+            <div class="price">16</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two pizza styles -->
+    <p class="specialty-note">Specialty pizzas are served as listed &mdash; no additions, though feel free to leave anything off</p>
+    <div class="styles">
+
+      <section class="chicago">
+        <h2>Chicago Tavern</h2>
+        <p class="seclabel">thin, crisp &middot; 12” &times; 12”</p>
+
+        <div class="pie">
+          <div class="row">
+            <div class="name">Chi-City GOAT</div>
+            <span class="leader"></span>
+            <div class="price">28</div>
+          </div>
+          <div class="desc">Italian sausage, giardiniera</div>
+        </div>
+        <div class="pie">
+          <div class="row">
+            <div class="name">Red Ivy</div>
+            <span class="leader"></span>
+            <div class="price">27</div>
+          </div>
+          <div class="desc">Pepperoni, hot honey</div>
+        </div>
+        <div class="pie">
+          <div class="row">
+            <div class="name">Fowl Play</div>
+            <span class="leader"></span>
+            <div class="price">28</div>
+          </div>
+          <div class="desc">Chicken sausage, BBQ sauce, green pepper, caramelized onions</div>
+        </div>
+        <div class="pie">
+          <div class="row">
+            <div class="name">White Out</div>
+            <span class="leader"></span>
+            <div class="price">28</div>
+          </div>
+          <div class="desc">Olive oil, ricotta, spinach, mushrooms, green olives, garlic</div>
+        </div>
+      </section>
+
+      <div class="vrule" aria-hidden="true"></div>
+
+      <section class="detroit">
+        <h2>Detroit Pan</h2>
+        <p class="seclabel">golden crust, crisp corners &middot; 8” &times; 10”</p>
+
+        <div class="pie">
+          <div class="row">
+            <div class="name">The Standard 313</div>
+            <span class="leader"></span>
+            <div class="price">19</div>
+          </div>
+          <div class="desc">Cheese, tomato sauce</div>
+        </div>
+        <div class="pie">
+          <div class="row">
+            <div class="name">Pep In Your Step</div>
+            <span class="leader"></span>
+            <div class="price">25</div>
+          </div>
+          <div class="desc">Pepperoni and pepperoni &mdash; with some pepperoni on top</div>
+        </div>
+        <div class="pie">
+          <div class="row">
+            <div class="name">The Bad Boys 5</div>
+            <span class="leader"></span>
+            <div class="price">25</div>
+          </div>
+          <div class="desc">Italian sausage, jalape&ntilde;os, mushrooms, caramelized onions, basil</div>
+        </div>
+        <div class="pie">
+          <div class="row">
+            <div class="name">Green Assembly Line</div>
+            <span class="leader"></span>
+            <div class="price">23</div>
+          </div>
+          <div class="desc">Green peppers, mushrooms, red onions, black olives</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Build Your Own -->
+    <section class="byo">
+      <div class="crown">
+        <h2>Build Your Own</h2>
+        <p class="seclabel">draft your line-up</p>
+        <p class="intro">Pick a crust, choose a sauce, then add up to five toppings</p>
+      </div>
+
+      <div class="grid">
+        <div class="col">
+          <h3><span class="step">I</span>Crust</h3>
+          <ul>
+            <li>Tavern <span class="size">12” &times; 12”</span> <span class="pr">22</span></li>
+            <li>Detroit <span class="size">8” &times; 10”</span> <span class="pr">19</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3><span class="step">II</span>Sauce</h3>
+          <ul>
+            <li>Tomato</li>
+            <li>BBQ</li>
+            <li>Butter Chicken</li>
+            <li>Olive Oil</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3><span class="step">III</span>Meats<span class="pricetag">+5</span></h3>
+          <ul>
+            <li>Italian Sausage</li>
+            <li>Pepperoni</li>
+            <li>Chicken Sausage</li>
+            <li>Bacon</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="col toppings">
+          <h3><span class="step">IV</span>Toppings<span class="pricetag">+3</span></h3>
+          <ul>
+            <li>Green Peppers</li>
+            <li>Mushrooms</li>
+            <li>Red Onions</li>
+            <li>Caramelized Onions</li>
+            <li>Black Olives</li>
+            <li>Green Olives</li>
+            <li>Fresh Jalape&ntilde;os</li>
+            <li>Giardiniera</li>
+            <li>Spinach</li>
+            <li>Garlic</li>
+            <li>Basil</li>
+            <li>Ricotta Dollops</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="frule"></div>
+      <p>1625 W Irving Park Rd &middot; Chicago, IL 60613</p>
+      <p>Please notify your server of any allergies</p>
+      <p>3% credit card processing fee applied to all card transactions</p>
+      <p class="disclaimer">*Consuming raw or undercooked meats, poultry, seafood, shellfish, or eggs may increase your risk of foodborne illness, especially if you have certain medical conditions.</p>
+    </footer>
+
+  </article>
+</div>
+
+
+
+
+</div>
+</div>
+<button class="print-btn" onclick="window.print()">Print · Save PDF</button>
+<script>
+  (async () => {
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+    setTimeout(() => window.print(), 800);
+  })();
+</script>
+</body>
+</html>
