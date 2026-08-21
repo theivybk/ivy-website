@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Ivy — Drinks Menus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #ffffff; --ink: #000000; --accent: #000000; --rule: #111111; --muted: #111111; }
+  @page { size: legal portrait; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #c8c5bd; }
+  body { font-family: "EB Garamond", Georgia, serif; color: var(--ink);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .deck { display: flex; flex-direction: column; align-items: center; padding: 28px 16px 80px; gap: 28px; box-sizing: border-box; }
+  .menu-frame {
+    width: 8.5in; height: 14in; background: var(--bg);
+    position: relative; overflow: hidden; box-sizing: border-box;
+    box-shadow: none;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .menu-frame .stage { display: contents !important; }
+  .menu-frame .page { width: 100% !important; height: 100% !important; min-height: 100% !important; box-shadow: none !important; margin: 0 !important; }
+  .menu-frame .print-btn { display: none !important; }
+
+@scope (.menu-beer) {
+
+  
+
+  
+  html, body { background: #c8c5bd; }
+  body { margin: 0; font-family: "EB Garamond", Georgia, serif; color: var(--ink);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 28px 16px 60px;
+    box-sizing: border-box;
+  }
+
+  .page {
+    width: 8.5in;
+    min-height: 14in;
+    padding: 0.35in 0.55in 0.3in;
+    background: var(--bg);
+    box-sizing: border-box;
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* ─── IVY DECOR ─────────────────────────────────────────────── */
+  .vine { position: absolute; pointer-events: none; color: var(--accent); opacity: .55; }
+  .vine svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .vine-tl { top: -18px;  left: -8px;    width: 160px; height: 160px; transform: rotate(28deg); opacity: .16; }
+  .vine-tr { top: -28px;  right: -32px; width: 320px; height: 320px; transform: scaleX(-1) rotate(-4deg); opacity: .24; }
+  .vine-bl { bottom: -30px; left: -34px; width: 300px; height: 300px; transform: scaleY(-1) rotate(-10deg); opacity: .22; }
+  .vine-br { bottom: 38%; right: -8px;  width: 130px; height: 130px; transform: scale(-1,-1) rotate(22deg); opacity: .14; }
+  .vine-mid {
+    top: 16%; right: 6%; transform: rotate(18deg);
+    width: 32%; height: 130px; opacity: .07;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────────────── */
+  .head { text-align: center; padding: 6px 0 14px; position: relative; z-index: 2; }
+
+  .word {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic; font-weight: 500;
+    font-size: 84px; line-height: .95;
+    color: var(--accent);
+    margin: 6px 0 4px;
+    letter-spacing: -0.012em;
+  }
+
+  .tag {
+    font-family: "Inter", sans-serif;
+    font-style: normal;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .4em;
+    text-transform: uppercase;
+    color: var(--rule);
+    margin: 6px 0 0;
+    padding-left: .4em;
+  }
+
+  .ornament {
+    margin: 10px auto 0;
+    width: 46%; height: 14px;
+    position: relative;
+  }
+  .ornament::before, .ornament::after {
+    content: ""; position: absolute; top: 50%;
+    height: 1px; background: var(--rule); opacity: .8;
+  }
+  .ornament::before { left: 0; right: calc(50% + 14px); }
+  .ornament::after  { right: 0; left:  calc(50% + 14px); }
+  .ornament .dot {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    color: var(--rule); font-size: 14px; line-height: 1;
+    font-family: "Cormorant Garamond", serif;
+  }
+
+  /* ─── COLUMNS ─────────────────────────────────────────────── */
+  .body {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    column-gap: 0.5in;
+    align-items: start;
+    margin-top: 14px;
+    position: relative;
+    z-index: 2;
+  }
+  .bodycol { min-width: 0; }
+  .vrule {
+    align-self: stretch;
+    background: rgba(0,0,0,.75);
+  }
+  section {
+    break-inside: avoid;
+    margin: 0 0 12px;
+    padding: 0;
+  }
+  section.flow {
+    break-inside: auto;
+  }
+
+  section h2 {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent);
+    font-size: 31px;
+    margin: 0 0 2px;
+    text-align: center;
+    letter-spacing: 0.005em;
+    line-height: 1;
+  }
+  section .seclabel {
+    font-family: "Inter", sans-serif;
+    font-size: 8.5px; font-weight: 600;
+    letter-spacing: .34em; text-transform: uppercase;
+    color: var(--rule);
+    text-align: center;
+    margin: 3px 0 8px;
+  }
+  section + section { margin-top: 6px; }
+  section .seclabel::before, section .seclabel::after {
+    content: "·"; padding: 0 8px; color: var(--rule); opacity: .8;
+  }
+
+  .subhead {
+    font-family: "Inter", sans-serif;
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 4px 0 3px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid rgba(0,0,0,.75);
+  }
+
+  /* ─── BEER ROWS ─────────────────────────────────────────────── */
+  .brow {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 3px 0;
+  }
+  .brow .name {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink);
+    letter-spacing: 0.005em;
+    line-height: 1.15;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .brow .name em {
+    font-family: "Inter", sans-serif;
+    font-style: normal;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-left: 6px;
+  }
+  .brow .dots {
+    flex: 1 1 auto;
+    height: 1px;
+    border-bottom: 1px dotted rgba(0,0,0,.8);
+    transform: translateY(-3px);
+    min-width: 12px;
+  }
+  .brow .price {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--accent);
+    flex: 0 0 auto;
+    letter-spacing: 0.01em;
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────────────── */
+  .foot {
+    margin-top: auto;
+    padding-top: 12px;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    font-size: 8.5px;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: var(--muted);
+    position: relative; z-index: 2;
+  }
+  .foot .frule {
+    width: 28%; margin: 0 auto 10px; height: 1px;
+    background: var(--rule); opacity: .55;
+  }
+  .foot p { margin: 3px 0; }
+  .foot .disclaimer {
+    margin-top: 14px;
+    font-size: 8px;
+    letter-spacing: .18em;
+    line-height: 1.7;
+    max-width: 6in;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--muted);
+    opacity: .85;
+  }
+
+  /* ─── PRINT ─────────────────────────────────────────────── */
+  @media print {
+    html, body { background: var(--bg) !important; }
+    .stage { padding: 0; min-height: auto; }
+    .page { box-shadow: none; width: 8.5in; height: 14in; min-height: 14in; overflow: hidden;
+      -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .print-btn { display: none !important; }
+  }
+
+  /* fit-to-viewport helper for narrow screens */
+  @media (max-width: 900px) {
+    .stage { padding: 12px; }
+  }
+
+  .print-btn {
+    position: fixed; left: 16px; bottom: 16px; z-index: 5;
+    appearance: none; border: 1px solid rgba(245,239,225,.25);
+    background: rgba(245,239,225,.08); color: #f5efe1;
+    font-family: "Inter", sans-serif; font-size: 11px; font-weight: 500;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: 9px 16px; border-radius: 999px; cursor: pointer;
+    backdrop-filter: blur(8px);
+  }
+  .print-btn:hover { background: rgba(245,239,225,.14); }
+
+}
+
+
+@scope (.menu-cocktails) {
+
+  
+
+  
+  html, body { background: #c8c5bd; }
+  body { margin: 0; font-family: "EB Garamond", Georgia, serif; color: var(--ink);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 28px 16px 60px;
+    box-sizing: border-box;
+  }
+
+  .page {
+    width: 8.5in;
+    min-height: 14in;
+    padding: 0.35in 0.55in 0.3in;
+    background: var(--bg);
+    box-sizing: border-box;
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* ─── IVY DECOR ─────────────────────────────────────────────── */
+  .vine { position: absolute; pointer-events: none; color: var(--accent); opacity: .55; }
+  .vine svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .vine-tl { top: -18px;  left: -8px;    width: 160px; height: 160px; transform: rotate(28deg); opacity: .16; }
+  .vine-tr { top: -28px;  right: -32px; width: 320px; height: 320px; transform: scaleX(-1) rotate(-4deg); opacity: .24; }
+  .vine-bl { bottom: -30px; left: -34px; width: 300px; height: 300px; transform: scaleY(-1) rotate(-10deg); opacity: .22; }
+  .vine-br { bottom: 38%; right: -8px;  width: 130px; height: 130px; transform: scale(-1,-1) rotate(22deg); opacity: .14; }
+  .vine-mid {
+    top: 16%; right: 6%; transform: rotate(18deg);
+    width: 32%; height: 130px; opacity: .07;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────────────── */
+  .head { text-align: center; padding: 6px 0 14px; position: relative; z-index: 2; }
+
+  .word {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic; font-weight: 500;
+    font-size: 68px; line-height: .95;
+    color: var(--accent);
+    margin: 6px 0 4px;
+    letter-spacing: -0.012em;
+  }
+
+  .ornament {
+    margin: 10px auto 0;
+    width: 46%; height: 14px;
+    position: relative;
+  }
+  .ornament::before, .ornament::after {
+    content: ""; position: absolute; top: 50%;
+    height: 1px; background: var(--rule); opacity: .8;
+  }
+  .ornament::before { left: 0; right: calc(50% + 14px); }
+  .ornament::after  { right: 0; left:  calc(50% + 14px); }
+  .ornament .dot {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    color: var(--rule); font-size: 14px; line-height: 1;
+    font-family: "Cormorant Garamond", serif;
+  }
+
+  /* ─── COLUMNS ─────────────────────────────────────────────── */
+  .body {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    column-gap: 0.5in;
+    align-items: start;
+    margin-top: 12px;
+    position: relative;
+    z-index: 2;
+  }
+  .bodycol { min-width: 0; }
+  .vrule {
+    align-self: stretch;
+    background: rgba(0,0,0,.75);
+  }
+  section {
+    break-inside: avoid;
+    margin: 0 0 10px;
+    padding: 0;
+  }
+  section.flow {
+    break-inside: auto;
+  }
+
+  section h2 {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent);
+    font-size: 27px;
+    margin: 0 0 2px;
+    text-align: center;
+    letter-spacing: 0.005em;
+    line-height: 1;
+  }
+  section .seclabel {
+    font-family: "Inter", sans-serif;
+    font-size: 9px; font-weight: 600;
+    letter-spacing: .3em; text-transform: uppercase;
+    color: var(--rule);
+    text-align: center;
+    margin: 3px 0 9px;
+  }
+  section .seclabel::before, section .seclabel::after {
+    content: "·"; padding: 0 8px; color: var(--rule); opacity: .8;
+  }
+  section + section { margin-top: 1px; }
+
+  .subhead {
+    font-family: "Inter", sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 8px 0 4px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(0,0,0,.75);
+  }
+
+  /* ─── COCKTAIL ROWS ─────────────────────────────────────────────── */
+  .cocktail { margin: 2px 0; }
+  .cname {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .cname .label {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .cname .opts {
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--muted);
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .cname .dots {
+    flex: 1 1 auto;
+    height: 1px;
+    border-bottom: 1px dotted rgba(0,0,0,.8);
+    transform: translateY(-3px);
+    min-width: 12px;
+  }
+  .cname .cprice {
+    font-size: 16px;
+    color: var(--accent);
+    flex: 0 0 auto;
+  }
+  .desc {
+    font-family: "EB Garamond", serif;
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  /* ─── WINE ROWS ─────────────────────────────────────────────── */
+  .pricehead {
+    display: grid;
+    grid-template-columns: 1fr 48px 48px;
+    font-family: "Inter", sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(0,0,0,.7);
+  }
+  .pricehead .gl,
+  .pricehead .btl {
+    text-align: right;
+  }
+  .wine {
+    display: grid;
+    grid-template-columns: 1fr 48px 48px;
+    align-items: start;
+    margin-bottom: 5px;
+  }
+  .wine .name {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .wine .meta {
+    font-family: "EB Garamond", serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+    line-height: 1.25;
+  }
+  .wine .price {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 15px;
+    color: var(--accent);
+    text-align: right;
+    font-weight: 600;
+  }
+  .wine .price.muted {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────────────── */
+  .foot {
+    margin-top: auto;
+    padding-top: 12px;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    font-size: 8.5px;
+    letter-spacing: .26em;
+    text-transform: uppercase;
+    color: var(--muted);
+    position: relative; z-index: 2;
+  }
+  .foot .frule {
+    width: 28%; margin: 0 auto 10px; height: 1px;
+    background: var(--rule); opacity: .55;
+  }
+  .foot p { margin: 3px 0; }
+
+  /* ─── PRINT ─────────────────────────────────────────────── */
+  @media print {
+    html, body { background: var(--bg) !important; }
+    .stage { padding: 0; min-height: auto; }
+    .page { box-shadow: none; width: 8.5in; height: 14in; min-height: 14in; overflow: hidden;
+      -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .print-btn { display: none !important; }
+  }
+
+  /* fit-to-viewport helper for narrow screens */
+  @media (max-width: 900px) {
+    .stage { padding: 12px; }
+  }
+
+  .print-btn {
+    position: fixed; left: 16px; bottom: 16px; z-index: 5;
+    appearance: none; border: 1px solid rgba(245,239,225,.25);
+    background: rgba(245,239,225,.08); color: #f5efe1;
+    font-family: "Inter", sans-serif; font-size: 11px; font-weight: 500;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: 9px 16px; border-radius: 999px; cursor: pointer;
+    backdrop-filter: blur(8px);
+  }
+  .print-btn:hover { background: rgba(245,239,225,.14); }
+
+}
+
+  @media print {
+    html, body { background: var(--bg) !important; }
+    .deck { padding: 0 !important; gap: 0 !important; }
+    .menu-frame { box-shadow: none !important; page-break-after: always; break-after: page; }
+    .menu-frame:last-of-type { page-break-after: auto; break-after: auto; }
+    .print-btn { display: none !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+  .print-btn {
+    position: fixed; left: 16px; bottom: 16px; z-index: 100;
+    appearance: none; border: 1px solid rgba(245,239,225,.25);
+    background: rgba(245,239,225,.14); color: #f5efe1;
+    font-family: "Inter", sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 11px 18px; border-radius: 999px; cursor: pointer; backdrop-filter: blur(8px);
+  }
+  .print-btn:hover { background: rgba(245,239,225,.22); }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="menu-beer menu-frame">
+
+
+<div class="stage">
+  <article class="page" id="menu-page">
+
+    <!-- ── INVISIBLE SVG VINE TEMPLATES ─────────────────────────── -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <!-- Single ivy leaf — classic 5-lobed Hedera shape with pointed tips -->
+        <symbol id="ivy-leaf" viewBox="-50 -50 100 100">
+          <path d="M 0,-46
+                   C 2,-40 14,-32 16,-22
+                   C 22,-20 32,-4 36,0
+                   C 32,4 22,20 16,28
+                   C 14,32 8,32 4,28
+                   C 2,26 1,25 0,24
+                   C -1,25 -2,26 -4,28
+                   C -8,32 -14,32 -16,28
+                   C -22,20 -32,4 -36,0
+                   C -32,-4 -22,-20 -16,-22
+                   C -14,-32 -2,-40 0,-46 Z"
+                fill="currentColor" stroke="none"/>
+          <g stroke="rgba(0,0,0,.22)" stroke-width="1" fill="none" stroke-linecap="round">
+            <path d="M 0,24 L 0,-42"/>
+            <path d="M 0,24 L -32,-2"/>
+            <path d="M 0,24 L  32,-2"/>
+          </g>
+        </symbol>
+
+        <!-- A vine: curling stem + scattered leaves of varying sizes/rotations -->
+        <symbol id="ivy-vine" viewBox="0 0 200 200">
+          <!-- main curling stem -->
+          <path d="M 8,8
+                   C 40,30 30,70 70,90
+                   C 110,110 100,140 140,150
+                   C 170,158 180,180 195,195"
+                fill="none" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+          <!-- side branch -->
+          <path d="M 70,90 C 90,70 110,72 130,55"
+                fill="none" stroke="currentColor" stroke-width="1.2"
+                stroke-linecap="round" opacity=".55"/>
+          <path d="M 30,50 C 20,65 22,80 14,95"
+                fill="none" stroke="currentColor" stroke-width="1.1"
+                stroke-linecap="round" opacity=".5"/>
+          <!-- leaves along stem -->
+          <g>
+            <use href="#ivy-leaf" x="18"  y="18"  width="34" height="34" transform="rotate(-30 18 18)"/>
+            <use href="#ivy-leaf" x="48"  y="56"  width="28" height="28" transform="rotate(40 48 56)"/>
+            <use href="#ivy-leaf" x="80"  y="86"  width="38" height="38" transform="rotate(-15 80 86)"/>
+            <use href="#ivy-leaf" x="120" y="48"  width="26" height="26" transform="rotate(70 120 48)"/>
+            <use href="#ivy-leaf" x="118" y="118" width="32" height="32" transform="rotate(25 118 118)"/>
+            <use href="#ivy-leaf" x="150" y="148" width="36" height="36" transform="rotate(-40 150 148)"/>
+            <use href="#ivy-leaf" x="170" y="172" width="24" height="24" transform="rotate(15 170 172)"/>
+            <use href="#ivy-leaf" x="22"  y="80"  width="22" height="22" transform="rotate(-70 22 80)"/>
+          </g>
+        </symbol>
+
+        <!-- Horizontal trailing vine (for the watermark / column gutter) -->
+        <symbol id="ivy-trail" viewBox="0 0 400 100">
+          <path d="M 0,60 C 60,30 120,80 180,50 S 300,30 400,55"
+                fill="none" stroke="currentColor" stroke-width="1.4"
+                stroke-linecap="round" opacity=".7"/>
+          <g>
+            <use href="#ivy-leaf" x="44"  y="40" width="26" height="26" transform="rotate(-20 44 40)"/>
+            <use href="#ivy-leaf" x="100" y="56" width="30" height="30" transform="rotate(45 100 56)"/>
+            <use href="#ivy-leaf" x="170" y="34" width="24" height="24" transform="rotate(-10 170 34)"/>
+            <use href="#ivy-leaf" x="240" y="52" width="28" height="28" transform="rotate(30 240 52)"/>
+            <use href="#ivy-leaf" x="320" y="36" width="26" height="26" transform="rotate(-30 320 36)"/>
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+
+    <!-- ── DECORATIVE VINES ─────────────────────────────────────── -->
+    <div class="vine vine-tl" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-tr" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-bl" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-br" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-mid" aria-hidden="true"><svg viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet"><use href="#ivy-trail"/></svg></div>
+
+    <header class="head">
+      <h1 class="word">Beer</h1>
+      <div class="ornament"><span class="dot">&#10070;</span></div>
+    </header>
+
+    <div class="body">
+
+      <div class="bodycol">
+        <!-- ── DRAFT ── -->
+        <section class="flow">
+          <h2>Draft</h2>
+          <p class="seclabel">16 oz pour</p>
+
+          <div class="subhead">Lager &amp; Pilsner</div>
+          <div class="brow">
+            <span class="name">Krombacher Pils</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Central Waters Honey Blonde</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Miller Lite</span><span class="dots"></span><span class="price">6</span>
+          </div>
+          <div class="brow">
+            <span class="name">Modelo Especial</span><span class="dots"></span><span class="price">7</span>
+          </div>
+
+          <div class="subhead">Kölsch</div>
+          <div class="brow">
+            <span class="name">Goose Island Summertime</span><span class="dots"></span><span class="price">7</span>
+          </div>
+
+          <div class="subhead">Wheat Ale</div>
+          <div class="brow">
+            <span class="name">Bells Oberon Ale</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Cali Squeeze Blood Orange</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">93 Octane Hefeweizen</span><span class="dots"></span><span class="price">7</span>
+          </div>
+
+          <div class="subhead">West Coast IPA</div>
+          <div class="brow">
+            <span class="name">3 Floyds Zombie Dust</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Firestone Union Jack</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Goose Island River Bird</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Lagunitas A Little Sumpin' Sumpin'</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Lagunitas Trooper IPA</span><span class="dots"></span><span class="price">7</span>
+          </div>
+
+          <div class="subhead">Hazy IPA</div>
+          <div class="brow">
+            <span class="name">Half Acre Waybird</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Phase Three Rotating Hazy IPA</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Weldwerks Juicy Bits</span><span class="dots"></span><span class="price">8</span>
+          </div>
+
+          <div class="subhead">Amber</div>
+          <div class="brow">
+            <span class="name">Phase Three P3 Amber</span><span class="dots"></span><span class="price">7</span>
+          </div>
+
+          <div class="subhead">Sour</div>
+          <div class="brow">
+            <span class="name">Rev Brew Freedom Lemonade</span><span class="dots"></span><span class="price">7</span>
+          </div>
+
+          <div class="subhead">Cider</div>
+          <div class="brow">
+            <span class="name">Schilling Strawberry Rhubarb Awakening</span><span class="dots"></span><span class="price">7</span>
+          </div>
+
+          <div class="subhead">Stout</div>
+          <div class="brow">
+            <span class="name">Guinness Draught <em>20 oz</em></span><span class="dots"></span><span class="price">8</span>
+          </div>
+        </section>
+
+        <!-- ── CANS & BOTTLES ── -->
+        <section>
+          <h2>Cans &amp; Bottles</h2>
+          <p class="seclabel">domestic · import · craft</p>
+
+          <div class="brow">
+            <span class="name">Bud Light <em>Bottle</em></span><span class="dots"></span><span class="price">5</span>
+          </div>
+          <div class="brow">
+            <span class="name">Busch Light <em>Can</em></span><span class="dots"></span><span class="price">5</span>
+          </div>
+          <div class="brow">
+            <span class="name">Coors Banquet <em>Bottle</em></span><span class="dots"></span><span class="price">5</span>
+          </div>
+          <div class="brow">
+            <span class="name">Coors Light <em>Bottle</em></span><span class="dots"></span><span class="price">5</span>
+          </div>
+          <div class="brow">
+            <span class="name">Goose Island 312 <em>Can</em></span><span class="dots"></span><span class="price">5</span>
+          </div>
+          <div class="brow">
+            <span class="name">Michelob Ultra <em>Bottle</em></span><span class="dots"></span><span class="price">5</span>
+          </div>
+          <div class="brow">
+            <span class="name">Miller High Life <em>Bottle</em></span><span class="dots"></span><span class="price">5</span>
+          </div>
+          <div class="brow">
+            <span class="name">Old Style <em>Can</em></span><span class="dots"></span><span class="price">5</span>
+          </div>
+          <div class="brow">
+            <span class="name">Pacifico <em>Bottle</em></span><span class="dots"></span><span class="price">6</span>
+          </div>
+        </section>
+
+        <!-- ── GLUTEN FREE (moved to right column) ── -->
+      </div>
+
+      <div class="vrule" aria-hidden="true"></div>
+
+      <div class="bodycol">
+        <!-- ── SELTZERS ── -->
+        <section class="flow">
+          <h2>Seltzers</h2>
+          <p class="seclabel">hard seltzer · vodka soda · spiked tea</p>
+
+          <div class="brow">
+            <span class="name">CarBliss Black Raspberry</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">CarBliss Lemon Lime</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Florida Seltzer Blackberry Agave</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Florida Seltzer Orange Yuzu</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Florida Seltzer Strawberry Kiwi</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">High Noon Black Cherry</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">High Noon Grapefruit</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">High Noon Peach</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Lucky One Vodka Lemonade</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Sun Cruiser Classic Iced Tea + Vodka</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Sun Cruiser Lemonade + Iced Tea + Vodka</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Sun Cruiser Vodka Lemonade</span><span class="dots"></span><span class="price">7</span>
+          </div>
+          <div class="brow">
+            <span class="name">Sun Cruiser Vodka Pink Lemonade</span><span class="dots"></span><span class="price">7</span>
+          </div>
+        </section>
+
+        <!-- ── CIDERS ── -->
+        <section>
+          <h2>Ciders</h2>
+          <p class="seclabel">dry · fruited · sessionable</p>
+
+          <div class="brow">
+            <span class="name">Right Bee Cider Semi-Dry <em>Can</em></span><span class="dots"></span><span class="price">6</span>
+          </div>
+          <div class="brow">
+            <span class="name">Schilling Cider Moon Berries <em>Can</em></span><span class="dots"></span><span class="price">6</span>
+          </div>
+          <div class="brow">
+            <span class="name">Schilling Cider Yuzu Peach <em>Can</em></span><span class="dots"></span><span class="price">6</span>
+          </div>
+          <div class="brow">
+            <span class="name">Wölffer Estate Dry Cider Rosé <em>Bottle</em></span><span class="dots"></span><span class="price">8</span>
+          </div>
+          <div class="brow">
+            <span class="name">Wölffer Estate Watermelon Sea Salt <em>Bottle</em></span><span class="dots"></span><span class="price">8</span>
+          </div>
+        </section>
+
+        <!-- ── NON-ALCOHOLIC ── -->
+        <section>
+          <h2>Non-Alcoholic</h2>
+          <p class="seclabel">craft NA beer &amp; draught</p>
+
+          <div class="brow">
+            <span class="name">Athletic Free Wave Hazy IPA</span><span class="dots"></span><span class="price">6</span>
+          </div>
+          <div class="brow">
+            <span class="name">Athletic Run Wild IPA</span><span class="dots"></span><span class="price">6</span>
+          </div>
+          <div class="brow">
+            <span class="name">Guinness Zero Draught</span><span class="dots"></span><span class="price">8</span>
+          </div>
+          <div class="brow">
+            <span class="name">Krombacher Pilsner NA</span><span class="dots"></span><span class="price">8</span>
+          </div>
+        </section>
+
+        <!-- ── CBD / THC ── -->
+        <section>
+          <h2>CBD/THC</h2>
+          <p class="seclabel">hemp-infused sparkling</p>
+          <div class="brow">
+            <span class="name">Goodwell CBD Sparkling Water Blackberry</span><span class="dots"></span><span class="price">6</span>
+          </div>
+          <div class="brow">
+            <span class="name">Toke Cosmic Berry <em>THC 2mg</em></span><span class="dots"></span><span class="price">9</span>
+          </div>
+          <div class="brow">
+            <span class="name">Toke Star Crusher <em>THC 2mg</em></span><span class="dots"></span><span class="price">9</span>
+          </div>
+        </section>
+
+        <!-- ── GLUTEN FREE ── -->
+        <section>
+          <h2>Gluten Free</h2>
+          <p class="seclabel">dedicated gluten-free brewery</p>
+          <div class="brow">
+            <span class="name">Ghostfish Meteor Shower <em>Can</em></span><span class="dots"></span><span class="price">8</span>
+          </div>
+          <div class="brow">
+            <span class="name">Ghostfish Peak Buster <em>Can</em></span><span class="dots"></span><span class="price">10</span>
+          </div>
+          <div class="brow">
+            <span class="name">Ghostfish Shrouded Summit <em>Can</em></span><span class="dots"></span><span class="price">8</span>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <footer class="foot">
+      <div class="frule"></div>
+      <p>1625 W Irving Park Rd · Chicago, IL 60613</p>
+      <p>Please notify your server of any allergies</p>
+      <p>3% credit card processing fee applied to all card transactions</p>
+    </footer>
+
+  </article>
+</div>
+
+
+
+
+</div>
+<div class="menu-cocktails menu-frame">
+
+
+<div class="stage">
+  <article class="page" id="menu-page">
+
+    <!-- ── INVISIBLE SVG VINE TEMPLATES ─────────────────────────── -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <!-- Single ivy leaf — classic 5-lobed Hedera shape with pointed tips -->
+        <symbol id="ivy-leaf" viewBox="-50 -50 100 100">
+          <path d="M 0,-46
+                   C 2,-40 14,-32 16,-22
+                   C 22,-20 32,-4 36,0
+                   C 32,4 22,20 16,28
+                   C 14,32 8,32 4,28
+                   C 2,26 1,25 0,24
+                   C -1,25 -2,26 -4,28
+                   C -8,32 -14,32 -16,28
+                   C -22,20 -32,4 -36,0
+                   C -32,-4 -22,-20 -16,-22
+                   C -14,-32 -2,-40 0,-46 Z"
+                fill="currentColor" stroke="none"/>
+          <g stroke="rgba(0,0,0,.22)" stroke-width="1" fill="none" stroke-linecap="round">
+            <path d="M 0,24 L 0,-42"/>
+            <path d="M 0,24 L -32,-2"/>
+            <path d="M 0,24 L  32,-2"/>
+          </g>
+        </symbol>
+
+        <!-- A vine: curling stem + scattered leaves of varying sizes/rotations -->
+        <symbol id="ivy-vine" viewBox="0 0 200 200">
+          <!-- main curling stem -->
+          <path d="M 8,8
+                   C 40,30 30,70 70,90
+                   C 110,110 100,140 140,150
+                   C 170,158 180,180 195,195"
+                fill="none" stroke="currentColor" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+          <!-- side branch -->
+          <path d="M 70,90 C 90,70 110,72 130,55"
+                fill="none" stroke="currentColor" stroke-width="1.2"
+                stroke-linecap="round" opacity=".55"/>
+          <path d="M 30,50 C 20,65 22,80 14,95"
+                fill="none" stroke="currentColor" stroke-width="1.1"
+                stroke-linecap="round" opacity=".5"/>
+          <!-- leaves along stem -->
+          <g>
+            <use href="#ivy-leaf" x="18"  y="18"  width="34" height="34" transform="rotate(-30 18 18)"/>
+            <use href="#ivy-leaf" x="48"  y="56"  width="28" height="28" transform="rotate(40 48 56)"/>
+            <use href="#ivy-leaf" x="80"  y="86"  width="38" height="38" transform="rotate(-15 80 86)"/>
+            <use href="#ivy-leaf" x="120" y="48"  width="26" height="26" transform="rotate(70 120 48)"/>
+            <use href="#ivy-leaf" x="118" y="118" width="32" height="32" transform="rotate(25 118 118)"/>
+            <use href="#ivy-leaf" x="150" y="148" width="36" height="36" transform="rotate(-40 150 148)"/>
+            <use href="#ivy-leaf" x="170" y="172" width="24" height="24" transform="rotate(15 170 172)"/>
+            <use href="#ivy-leaf" x="22"  y="80"  width="22" height="22" transform="rotate(-70 22 80)"/>
+          </g>
+        </symbol>
+
+        <!-- Horizontal trailing vine (for the watermark / column gutter) -->
+        <symbol id="ivy-trail" viewBox="0 0 400 100">
+          <path d="M 0,60 C 60,30 120,80 180,50 S 300,30 400,55"
+                fill="none" stroke="currentColor" stroke-width="1.4"
+                stroke-linecap="round" opacity=".7"/>
+          <g>
+            <use href="#ivy-leaf" x="44"  y="40" width="26" height="26" transform="rotate(-20 44 40)"/>
+            <use href="#ivy-leaf" x="100" y="56" width="30" height="30" transform="rotate(45 100 56)"/>
+            <use href="#ivy-leaf" x="170" y="34" width="24" height="24" transform="rotate(-10 170 34)"/>
+            <use href="#ivy-leaf" x="240" y="52" width="28" height="28" transform="rotate(30 240 52)"/>
+            <use href="#ivy-leaf" x="320" y="36" width="26" height="26" transform="rotate(-30 320 36)"/>
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+
+    <!-- ── DECORATIVE VINES ─────────────────────────────────────── -->
+    <div class="vine vine-tl" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-tr" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-bl" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-br" aria-hidden="true"><svg><use href="#ivy-vine"/></svg></div>
+    <div class="vine vine-mid" aria-hidden="true"><svg viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet"><use href="#ivy-trail"/></svg></div>
+
+    <header class="head">
+      <h1 class="word">Cocktails &amp; Wine</h1>
+      <div class="ornament"><span class="dot">&#10070;</span></div>
+    </header>
+
+    <div class="body">
+
+      <div class="bodycol">
+        <!-- ── COCKTAILS ── -->
+        <section class="flow">
+          <h2>Cocktails</h2>
+          <p class="seclabel">classics · spritz · signatures</p>
+
+          <div class="subhead">Classics</div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Old Fashioned</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Bourbon, demerara, Angostura aromatic &amp; orange bitters, expressed orange peel, bada bing cherry</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Manhattan</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Rye whiskey, sweet vermouth, Angostura aromatic bitters, bada bing cherry</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">The Margarita</span><span class="opts">classic · mango · spicy</span><span class="dots"></span><span class="cprice">14</span>
+            </div>
+            <div class="desc">Tequila, Gran Gala orange liqueur, fresh lime juice, agave nectar</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Moscow Mule</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Vodka, fresh lime, ginger beer</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Gin Martini</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Gin, dry vermouth rinse, shaken — pimento or bleu cheese stuffed olive</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Vodka Martini</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Vodka, dry vermouth rinse, shaken — pimento or bleu cheese stuffed olive</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Whiskey Sour</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Bourbon, lemon juice, simple syrup</div>
+          </div>
+
+          <div class="subhead">Spritz</div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Sarti Spritz</span><span class="dots"></span><span class="cprice">14</span>
+            </div>
+            <div class="desc">Sarti Rosa (blood orange, mango, passion fruit), prosecco, club soda</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Aperol Spritz</span><span class="dots"></span><span class="cprice">14</span>
+            </div>
+            <div class="desc">Aperol, prosecco, club soda</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Limoncello Spritz</span><span class="dots"></span><span class="cprice">14</span>
+            </div>
+            <div class="desc">Limoncello, prosecco, club soda</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Hugo Spritz</span><span class="dots"></span><span class="cprice">14</span>
+            </div>
+            <div class="desc">Elderflower liqueur, prosecco, club soda</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Cubby Blue Spritz</span><span class="dots"></span><span class="cprice">14</span>
+            </div>
+            <div class="desc">Orange liqueur, prosecco, club soda</div>
+          </div>
+
+          <div class="subhead">Signatures</div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Mezcalita Mango</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Mezcal, mango puree, lime, Angostura aromatic bitters</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Passion Fruit Paper Plane</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Bourbon, Aperol, Amaro Montenegro, lemon juice, passion fruit syrup</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Blueberry Pineapple Sour</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Vodka, pineapple juice, lemon juice, blueberry syrup</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Toasted Coconut Jungle Bird</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">White rum, toasted coconut syrup, Campari, pineapple juice, lime juice</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Espresso Martini</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Vodka, cold brew, coffee liqueur, demerara</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Lychee Mojito</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">White rum, lychee syrup, fresh lime, muddled mint, club soda</div>
+          </div>
+
+          <div class="cocktail">
+            <div class="cname">
+              <span class="label">Lychee Martini</span><span class="dots"></span><span class="cprice">15</span>
+            </div>
+            <div class="desc">Vodka, lychee syrup, lemon juice</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="vrule" aria-hidden="true"></div>
+
+      <div class="bodycol">
+        <!-- ── SPARKLING ── -->
+        <section>
+          <h2>Sparkling</h2>
+          <p class="seclabel">prosecco &amp; bubbles</p>
+          <div class="pricehead">
+            <span>Selection</span><span class="gl">Gl</span><span class="btl">Btl</span>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Zardetto Prosecco Rosé</div>
+              <div class="meta">Veneto, Italy · 187ml split</div>
+            </div>
+            <div class="price">&nbsp;</div>
+            <div class="price">11</div>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Zardetto Brut</div>
+              <div class="meta">Veneto, Italy</div>
+            </div>
+            <div class="price">10</div>
+            <div class="price">35</div>
+          </div>
+        </section>
+
+        <!-- ── WHITE ── -->
+        <section>
+          <h2>White</h2>
+          <p class="seclabel">crisp · aromatic · round</p>
+          <div class="pricehead">
+            <span>Selection</span><span class="gl">Gl</span><span class="btl">Btl</span>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Barnard Griffin Chardonnay</div>
+              <div class="meta">Columbia Valley, WA</div>
+            </div>
+            <div class="price">10</div>
+            <div class="price">30</div>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Flora Lisa Pinot Grigio</div>
+              <div class="meta">Friuli, Italy</div>
+            </div>
+            <div class="price">10</div>
+            <div class="price">30</div>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Villa Maria Sauvignon Blanc</div>
+              <div class="meta">Private Bin · Marlborough, NZ</div>
+            </div>
+            <div class="price">10</div>
+            <div class="price">30</div>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Rombauer Sauvignon Blanc</div>
+              <div class="meta">Sonoma County, CA</div>
+            </div>
+            <div class="price">15</div>
+            <div class="price">45</div>
+          </div>
+        </section>
+
+        <!-- ── ROSÉ ── -->
+        <section>
+          <h2>Rosé</h2>
+          <p class="seclabel">bright · floral · refreshing</p>
+          <div class="pricehead">
+            <span>Selection</span><span class="gl">Gl</span><span class="btl">Btl</span>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Forever Summer by Mirabeau</div>
+              <div class="meta">Provence, France</div>
+            </div>
+            <div class="price">10</div>
+            <div class="price">30</div>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Maison Saint AIX Rosé</div>
+              <div class="meta">Provence, France</div>
+            </div>
+            <div class="price">15</div>
+            <div class="price">45</div>
+          </div>
+        </section>
+
+        <!-- ── RED ── -->
+        <section>
+          <h2>Red</h2>
+          <p class="seclabel">velvet · oak · ember</p>
+          <div class="pricehead">
+            <span>Selection</span><span class="gl">Gl</span><span class="btl">Btl</span>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Liberty School Cabernet Sauvignon</div>
+              <div class="meta">Paso Robles, CA</div>
+            </div>
+            <div class="price">10</div>
+            <div class="price">30</div>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Troublemaker Red Blend</div>
+              <div class="meta">Central Coast, CA</div>
+            </div>
+            <div class="price">10</div>
+            <div class="price">30</div>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Raeburn Pinot Noir</div>
+              <div class="meta">Sonoma County, CA</div>
+            </div>
+            <div class="price">12</div>
+            <div class="price">35</div>
+          </div>
+          <div class="wine">
+            <div>
+              <div class="name">Austin Hope Cabernet Sauvignon</div>
+              <div class="meta">Paso Robles, CA</div>
+            </div>
+            <div class="price">30</div>
+            <div class="price">120</div>
+          </div>
+        </section>
+
+        <!-- ── ZERO PROOF ── -->
+        <section>
+          <h2>Zero Proof</h2>
+          <p class="seclabel">alcohol-free</p>
+          <div class="wine" style="grid-template-columns: 1fr 48px;">
+            <div>
+              <div class="name">Wölffer Non-Alc Sparkling Blanc</div>
+              <div class="meta">Long Island, NY · 200ml split</div>
+            </div>
+            <div class="price">11</div>
+          </div>
+          <div class="wine" style="grid-template-columns: 1fr 48px;">
+            <div>
+              <div class="name">Aplos Chili Margarita</div>
+              <div class="meta">Tequila-style · agave, lime, chili heat</div>
+            </div>
+            <div class="price">9</div>
+          </div>
+          <div class="wine" style="grid-template-columns: 1fr 48px;">
+            <div>
+              <div class="name">Aplos Dragon Fruit Martini</div>
+              <div class="meta">Vodka-style · dragon fruit, citrus</div>
+            </div>
+            <div class="price">9</div>
+          </div>
+          <div class="wine" style="grid-template-columns: 1fr 48px;">
+            <div>
+              <div class="name">Aplos Kola Fashioned</div>
+              <div class="meta">Whiskey-style · kola, bitters, citrus oil</div>
+            </div>
+            <div class="price">9</div>
+          </div>
+          <div class="wine" style="grid-template-columns: 1fr 48px;">
+            <div>
+              <div class="name">Aplos Mandora Negroni</div>
+              <div class="meta">Bitter aperitif · mandarin, herbs</div>
+            </div>
+            <div class="price">9</div>
+          </div>
+          <div class="wine" style="grid-template-columns: 1fr 48px;">
+            <div>
+              <div class="name">Aplos Ume Spritz</div>
+              <div class="meta">Sparkling · ume plum, yuzu</div>
+            </div>
+            <div class="price">9</div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <footer class="foot">
+      <div class="frule"></div>
+      <p>1625 W Irving Park Rd · Chicago, IL 60613</p>
+      <p>Please notify your server of any allergies</p>
+      <p>3% credit card processing fee applied to all card transactions</p>
+    </footer>
+
+  </article>
+</div>
+
+
+
+
+</div>
+</div>
+<button class="print-btn" onclick="window.print()">Print · Save PDF</button>
+<script>
+  (async () => {
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+    setTimeout(() => window.print(), 800);
+  })();
+</script>
+</body>
+</html>
