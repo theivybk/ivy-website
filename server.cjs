@@ -13,6 +13,11 @@ const ADMIN_USER = (process.env.ADMIN_USER || '').trim();
 const ADMIN_PASS = (process.env.ADMIN_PASS || '').trim();
 const WEEKLY_REPORT_SECRET = (process.env.WEEKLY_REPORT_SECRET || '').trim();
 
+const GOOGLE_CALENDAR_CLIENT_ID = (process.env.GOOGLE_CALENDAR_CLIENT_ID || '').trim();
+const GOOGLE_CALENDAR_CLIENT_SECRET = (process.env.GOOGLE_CALENDAR_CLIENT_SECRET || '').trim();
+const GOOGLE_CALENDAR_REFRESH_TOKEN = (process.env.GOOGLE_CALENDAR_REFRESH_TOKEN || '').trim();
+const GOOGLE_CALENDAR_ID = (process.env.GOOGLE_CALENDAR_ID || 'events@theivybk.com').trim();
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Railway's free tier has no persistent disk, so this file is wiped on every
@@ -799,12 +804,7 @@ function sendWelcomeEmail(email) {
 }
 
 const RESERVATION_TO_EMAIL = 'info@theivybk.com';
-const EVENT_CALENDAR_EMAIL = 'events@theivybk.com';
 const RESERVATION_DURATION_MS = 2 * 60 * 60 * 1000;
-
-function icsEscape(s) {
-  return String(s).replace(/\\/g, '\\\\').replace(/,/g, '\\,').replace(/;/g, '\\;').replace(/\n/g, '\\n');
-}
 
 // Parses "7:30 PM" (as produced by the reservation form's time <select>) into { hour24, minute }.
 function parseTime12h(timeStr) {
@@ -815,67 +815,103 @@ function parseTime12h(timeStr) {
   return { hour24: hour, minute: parseInt(m[2], 10) };
 }
 
-// Builds a calendar-invite (.ics) for a reservation, addressed to events@theivybk.com.
-// DTSTART/DTEND use the America/Chicago VTIMEZONE (standard US DST rules since 2007)
-// so the event shows at the correct local time regardless of the recipient's own zone.
-function buildReservationICS({ uid, fullName, phone, email, date, time, partySize, notes }) {
+let cachedCalendarToken = null; // { accessToken, expiresAt }
+
+// Exchanges the events@theivybk.com refresh token for a short-lived access
+// token via OAuth (cached until ~1min before expiry) so reservations can be
+// written straight to the calendar through the Calendar API -- no email sent
+// to events@, unlike the earlier .ics-invite approach.
+function getGoogleCalendarAccessToken() {
+  if (cachedCalendarToken && cachedCalendarToken.expiresAt > Date.now() + 60000) {
+    return Promise.resolve(cachedCalendarToken.accessToken);
+  }
+  return new Promise((resolve, reject) => {
+    const body = new URLSearchParams({
+      client_id: GOOGLE_CALENDAR_CLIENT_ID,
+      client_secret: GOOGLE_CALENDAR_CLIENT_SECRET,
+      refresh_token: GOOGLE_CALENDAR_REFRESH_TOKEN,
+      grant_type: 'refresh_token',
+    }).toString();
+    const req = https.request(
+      {
+        hostname: 'oauth2.googleapis.com',
+        path: '/token',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(body) },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
+          let parsed = {};
+          try { parsed = JSON.parse(data); } catch {}
+          if (res.statusCode !== 200 || !parsed.access_token) {
+            reject(new Error(`Google token refresh failed: ${res.statusCode} ${data}`));
+            return;
+          }
+          cachedCalendarToken = { accessToken: parsed.access_token, expiresAt: Date.now() + parsed.expires_in * 1000 };
+          resolve(parsed.access_token);
+        });
+      }
+    );
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+// Creates the reservation directly on the events@theivybk.com Google Calendar
+// via the Calendar API. Requires GOOGLE_CALENDAR_CLIENT_ID/SECRET/REFRESH_TOKEN
+// to be configured; silently no-ops otherwise (reservations still work, just
+// without the calendar sync).
+async function createReservationCalendarEvent({ fullName, phone, email, date, time, partySize, notes }) {
+  if (!GOOGLE_CALENDAR_CLIENT_ID || !GOOGLE_CALENDAR_CLIENT_SECRET || !GOOGLE_CALENDAR_REFRESH_TOKEN) return;
   const parsed = parseTime12h(time);
   const [year, month, day] = (date || '').split('-').map((n) => parseInt(n, 10));
+  if (!year || !month || !day || !parsed) return;
   const pad = (n) => String(n).padStart(2, '0');
-  const validDate = year && month && day && parsed;
-  const dtStartLocal = validDate
-    ? `${year}${pad(month)}${pad(day)}T${pad(parsed.hour24)}${pad(parsed.minute)}00`
-    : null;
-  let dtEndLocal = null;
-  if (validDate) {
-    const endDate = new Date(year, month - 1, day, parsed.hour24, parsed.minute, 0);
-    endDate.setTime(endDate.getTime() + RESERVATION_DURATION_MS);
-    dtEndLocal = `${endDate.getFullYear()}${pad(endDate.getMonth() + 1)}${pad(endDate.getDate())}T${pad(endDate.getHours())}${pad(endDate.getMinutes())}00`;
-  }
-  const dtStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-  const summary = `Reservation \u2014 ${fullName} (party of ${partySize})`;
-  const descriptionParts = [`Phone: ${phone}`, `Email: ${email}`];
-  if (notes && notes !== '\u2014') descriptionParts.push(`Notes: ${notes}`);
+  const startLocal = `${year}-${pad(month)}-${pad(day)}T${pad(parsed.hour24)}:${pad(parsed.minute)}:00`;
+  const endDate = new Date(year, month - 1, day, parsed.hour24, parsed.minute, 0);
+  endDate.setTime(endDate.getTime() + RESERVATION_DURATION_MS);
+  const endLocal = `${endDate.getFullYear()}-${pad(endDate.getMonth() + 1)}-${pad(endDate.getDate())}T${pad(endDate.getHours())}:${pad(endDate.getMinutes())}:00`;
 
-  const lines = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//The Ivy Bar and Kitchen//Reservations//EN',
-    'CALSCALE:GREGORIAN',
-    'METHOD:REQUEST',
-    'BEGIN:VTIMEZONE',
-    'TZID:America/Chicago',
-    'BEGIN:DAYLIGHT',
-    'TZOFFSETFROM:-0600',
-    'TZOFFSETTO:-0500',
-    'TZNAME:CDT',
-    'DTSTART:19700308T020000',
-    'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU',
-    'END:DAYLIGHT',
-    'BEGIN:STANDARD',
-    'TZOFFSETFROM:-0500',
-    'TZOFFSETTO:-0600',
-    'TZNAME:CST',
-    'DTSTART:19701101T020000',
-    'RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU',
-    'END:STANDARD',
-    'END:VTIMEZONE',
-    'BEGIN:VEVENT',
-    `UID:${uid}@theivybk.com`,
-    `DTSTAMP:${dtStamp}`,
-    validDate ? `DTSTART;TZID=America/Chicago:${dtStartLocal}` : null,
-    validDate ? `DTEND;TZID=America/Chicago:${dtEndLocal}` : null,
-    `SUMMARY:${icsEscape(summary)}`,
-    `DESCRIPTION:${descriptionParts.map(icsEscape).join('\\n')}`,
-    'LOCATION:The Ivy Bar and Kitchen\\, 1625 W Irving Park Rd\\, Chicago\\, IL 60613',
-    'ORGANIZER;CN=The Ivy Bar and Kitchen:mailto:info@theivybk.com',
-    `ATTENDEE;CN=Events;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:mailto:${EVENT_CALENDAR_EMAIL}`,
-    'STATUS:CONFIRMED',
-    'SEQUENCE:0',
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].filter(Boolean);
-  return lines.join('\r\n');
+  const descriptionParts = [`Phone: ${phone}`, `Email: ${email}`];
+  if (notes && notes !== '—') descriptionParts.push(`Notes: ${notes}`);
+
+  const event = {
+    summary: `Reservation — ${fullName} (party of ${partySize})`,
+    description: descriptionParts.join('\n'),
+    location: 'The Ivy Bar and Kitchen, 1625 W Irving Park Rd, Chicago, IL 60613',
+    start: { dateTime: startLocal, timeZone: 'America/Chicago' },
+    end: { dateTime: endLocal, timeZone: 'America/Chicago' },
+  };
+
+  const accessToken = await getGoogleCalendarAccessToken();
+  const body = JSON.stringify(event);
+  await new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: 'www.googleapis.com',
+        path: `/calendar/v3/calendars/${encodeURIComponent(GOOGLE_CALENDAR_ID)}/events`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}`, 'Content-Length': Buffer.byteLength(body) },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
+          if (res.statusCode >= 300) {
+            reject(new Error(`Calendar insert failed: ${res.statusCode} ${data}`));
+            return;
+          }
+          resolve();
+        });
+      }
+    );
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
 }
 
 async function handleReservation(req, res) {
@@ -952,17 +988,9 @@ async function handleReservation(req, res) {
       res.end(JSON.stringify({ ok: true }));
       resendSubscribe(email).catch((err) => console.error('Reservation newsletter subscribe error:', err.message));
 
-      try {
-        const icsContent = buildReservationICS({ uid: result.body.id, fullName, phone, email, date, time, partySize, notes });
-        resendSendEmail({
-          to: EVENT_CALENDAR_EMAIL,
-          subject: `Reservation — ${fullName} — ${dayLabel(date)} at ${time}`,
-          text: `${fullName} (party of ${partySize}) — ${dayLabel(date)} at ${time}. Phone: ${phone}. Email: ${email}.${notes !== '—' ? ' Notes: ' + notes : ''}`,
-          attachments: [{ filename: 'reservation.ics', content: Buffer.from(icsContent).toString('base64') }],
-        }).catch((err) => console.error('Calendar invite email error:', err.message));
-      } catch (err) {
-        console.error('Calendar invite build error:', err.message);
-      }
+      createReservationCalendarEvent({ fullName, phone, email, date, time, partySize, notes }).catch((err) =>
+        console.error('Calendar event creation error:', err.message)
+      );
 
       // Delayed a day so it doesn't land alongside the reservation confirmation.
       // In-memory timer -- if the server restarts before it fires (e.g. a
