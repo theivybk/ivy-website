@@ -10,6 +10,7 @@ export interface Props {
   active: 'home' | 'menu' | 'events' | 'careers' | 'none';
   navCtaLabel: string;
   navCtaHref: string;
+  contactEmail?: string;
 }
 
 const {
@@ -23,6 +24,7 @@ const {
   active,
   navCtaLabel,
   navCtaHref,
+  contactEmail = 'info@theivybk.com',
 } = Astro.props;
 
 const canonicalUrl = `https://theivybk.com${canonicalPath}`;
@@ -164,7 +166,7 @@ const navLinks = [
         <h4>Visit</h4>
         <p>1625 W Irving Park Rd<br>Chicago, IL 60613</p>
         <p style="margin-top:12px;"><a href="tel:+17737998160">(773) 799-8160</a></p>
-        <p><a href="mailto:info@theivybk.com">info@theivybk.com</a></p>
+        <p><a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
       </div>
       <div>
         <h4>Explore</h4>
