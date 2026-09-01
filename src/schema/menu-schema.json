@@ -1,0 +1,3668 @@
+{
+  "@type": "Menu",
+  "name": "The Ivy Bar and Kitchen Menu",
+  "hasMenuSection": [
+    {
+      "@type": "MenuSection",
+      "name": "Food",
+      "hasMenuSection": [
+        {
+          "@type": "MenuSection",
+          "name": "Small Plates",
+          "description": "to share, or not",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Hummus",
+              "description": "Whipped silky, drizzled with EVOO, sumac & parsley. Served with cucumbers, red bell peppers, Greek & Kalamata marinated olives, roasted chickpeas & warm pita",
+              "offers": {
+                "@type": "Offer",
+                "price": "16",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Pretzel Twist",
+              "description": "Served with whole grain mustard & cheese sauce",
+              "offers": {
+                "@type": "Offer",
+                "price": "14",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Cheese Curds",
+              "description": "Served with spicy ranch",
+              "offers": {
+                "@type": "Offer",
+                "price": "12",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Fries",
+              "description": "Go truffle, topped with parmesan & parsley — +1",
+              "offers": {
+                "@type": "Offer",
+                "price": "9",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Green Beans",
+              "description": "Blistered in lemon butter, finished with grated parmesan & crispy fried onions",
+              "offers": {
+                "@type": "Offer",
+                "price": "11",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Brussel Sprouts",
+              "description": "Crisped in a honey-sriracha glaze, dusted with tuxedo sesame seeds",
+              "offers": {
+                "@type": "Offer",
+                "price": "11",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Crispy Wings",
+              "description": "BBQ, Buffalo, Butter Chicken, or Giardiniera Hot Honey. Served with ranch or bleu cheese",
+              "offers": {
+                "@type": "Offer",
+                "price": "16",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Chicken Tenders",
+              "description": "Ranch, Bleu Cheese, BBQ, Buffalo, or Dijon Honey Mustard",
+              "offers": {
+                "@type": "Offer",
+                "price": "14",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Grilled Shrimp",
+              "description": "Cajun-garlic butter, jalapeño coleslaw tossed in agave lime vinaigrette & a side of honey sriracha, garnished with parsley",
+              "offers": {
+                "@type": "Offer",
+                "price": "16",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Crispy Pork Belly Bites",
+              "description": "Honey sriracha glaze, agave lime vinaigrette jalapeño cole slaw",
+              "offers": {
+                "@type": "Offer",
+                "price": "16",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Nachos",
+              "description": "Poblano cheese, red onions, tomatoes, lettuce, jalapeños, black beans, guacamole, sour cream & chihuahua cheese. Add: Ground Beef +6, Grilled Shrimp +8, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
+              "offers": {
+                "@type": "Offer",
+                "price": "17",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Quesadilla",
+              "description": "Pico de gallo, sour cream, guacamole & chihuahua cheese. Add: Ground Beef +6, Grilled Shrimp +8, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4, Black Beans +4",
+              "offers": {
+                "@type": "Offer",
+                "price": "15",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Mac n' Cheese",
+              "description": "Cavatappi swirls in a velvety cheese. Add: Ground Beef +6, Grilled Shrimp +8, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
+              "offers": {
+                "@type": "Offer",
+                "price": "12",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Entrées",
+          "description": "from the kitchen",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Pan-Seared Walleye",
+              "description": "Lemon butter, capers & parsley. Served with green beans",
+              "offers": {
+                "@type": "Offer",
+                "price": "28",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Grilled Steak",
+              "description": "Marinated Bavette, chimichurri. Served with brussels sprouts",
+              "offers": {
+                "@type": "Offer",
+                "price": "30",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Salads",
+          "description": "crisp, simple, generous. Add: Grilled Shrimp +8, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Caesar",
+              "description": "Crisp romaine, house croutons & parmesan — grilled or fried chicken, buffalo on either",
+              "offers": {
+                "@type": "Offer",
+                "price": "18",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "House Salad",
+              "description": "Mixed greens, onions, grape tomatoes, shredded carrots, agave lime vinaigrette",
+              "offers": {
+                "@type": "Offer",
+                "price": "17",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Crispy Chicken Chopped",
+              "description": "Crisp romaine, avocado, bacon, tomatoes, red onions & bleu cheese dressing",
+              "offers": {
+                "@type": "Offer",
+                "price": "21",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Summer Salad",
+              "description": "Mixed greens tossed with sweet strawberries, grape tomatoes & red onion, crumbled feta & toasted almonds in a honey-lemon vinaigrette",
+              "offers": {
+                "@type": "Offer",
+                "price": "20",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Handhelds",
+          "description": "served with fries. Sub truffle fries, brussel sprouts, green beans or a salad — +1. Gluten-free bun available. Beyond patty available",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "The Original",
+              "description": "Two smash patties, house sauce, pickles, caramelized onions & white American cheese, potato bun",
+              "offers": {
+                "@type": "Offer",
+                "price": "20",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Five Alarm",
+              "description": "Two smash patties, house sauce, pickles, caramelized onions, jalapeños & pepper jack, potato bun",
+              "offers": {
+                "@type": "Offer",
+                "price": "20",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "The Works",
+              "description": "Two smash patties, house sauce, pickles, onions, tomatoes, lettuce & white American cheese, potato bun",
+              "offers": {
+                "@type": "Offer",
+                "price": "20",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Southwest Grilled Chicken",
+              "description": "Guacamole, lettuce, tomatoes, red onions & chipotle mayo, brioche bun",
+              "offers": {
+                "@type": "Offer",
+                "price": "20",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Steak Sandwich",
+              "description": "Bavette, chimichurri, provolone, caramelized onions, ciabatta",
+              "offers": {
+                "@type": "Offer",
+                "price": "25",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Caesar Wrap",
+              "description": "Crisp romaine, house caesar, croutons & parmesan — grilled or fried chicken, buffalo on either",
+              "offers": {
+                "@type": "Offer",
+                "price": "20",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Dessert",
+          "description": "a sweet finish",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Cheesecake",
+              "description": "Raspberry & blackberry compote",
+              "offers": {
+                "@type": "Offer",
+                "price": "12",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Gelato",
+              "description": "Vanilla bean, strawberry cheesecake, double dark chocolate or mango sorbet",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Gelato Trio",
+              "description": "Choose three — vanilla bean, strawberry cheesecake, double dark chocolate or mango sorbet",
+              "offers": {
+                "@type": "Offer",
+                "price": "15",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "MenuSection",
+      "name": "Pizza",
+      "hasMenuSection": [
+        {
+          "@type": "MenuSection",
+          "name": "From the Oven",
+          "description": "to start",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Garlic Bread",
+              "offers": {
+                "@type": "Offer",
+                "price": "14",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Cheesy Garlic Bread",
+              "offers": {
+                "@type": "Offer",
+                "price": "16",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Chicago Tavern Pizza",
+          "description": "thin, crisp, cut in squares — 12\" x 12\"",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Chi-City GOAT",
+              "description": "Italian sausage, giardiniera",
+              "offers": {
+                "@type": "Offer",
+                "price": "28",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Red Ivy",
+              "description": "Pepperoni, hot honey",
+              "offers": {
+                "@type": "Offer",
+                "price": "27",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Fowl Play",
+              "description": "Chicken sausage, BBQ sauce, green pepper, caramelized onions",
+              "offers": {
+                "@type": "Offer",
+                "price": "28",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "White Out",
+              "description": "Olive oil, ricotta, spinach, mushrooms, green olives, garlic",
+              "offers": {
+                "@type": "Offer",
+                "price": "28",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Detroit Pan Pizza",
+          "description": "golden crust, crispy corners — 8\" x 10\"",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "The Standard 313",
+              "description": "Cheese, tomato sauce",
+              "offers": {
+                "@type": "Offer",
+                "price": "19",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Pep In Your Step",
+              "description": "Pepperoni and pepperoni — with some pepperoni on top",
+              "offers": {
+                "@type": "Offer",
+                "price": "25",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "The Bad Boys 5",
+              "description": "Italian sausage, jalapeños, mushrooms, caramelized onions, basil",
+              "offers": {
+                "@type": "Offer",
+                "price": "25",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Green Assembly Line",
+              "description": "Green peppers, mushrooms, red onions, black olives",
+              "offers": {
+                "@type": "Offer",
+                "price": "23",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Build Your Own Pizza",
+          "description": "Pick a crust, choose a sauce, then add up to five toppings. Sauces (included): Tomato, BBQ, Butter Chicken, Olive Oil. Meats +5: Italian Sausage, Pepperoni, Chicken Sausage, Bacon. Toppings +3: Green Peppers, Mushrooms, Red Onions, Caramelized Onions, Black Olives, Green Olives, Fresh Jalapeños, Giardiniera, Spinach, Garlic, Basil, Ricotta Dollops",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Tavern Crust 12\" x 12\"",
+              "offers": {
+                "@type": "Offer",
+                "price": "22",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Detroit Crust 8\" x 10\"",
+              "offers": {
+                "@type": "Offer",
+                "price": "19",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "MenuSection",
+      "name": "Beer",
+      "hasMenuSection": [
+        {
+          "@type": "MenuSection",
+          "name": "Draft",
+          "description": "16 oz pour",
+          "hasMenuSection": [
+            {
+              "@type": "MenuSection",
+              "name": "Lager & Pilsner",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Krombacher Pils",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Central Waters Honey Blonde",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Miller Lite",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "6",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Modelo Especial",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Kölsch",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Goose Island Summertime",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Wheat Ale",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Bells Oberon Ale",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Cali Squeeze Blood Orange",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "93 Octane Hefeweizen",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "West Coast IPA",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "3 Floyds Zombie Dust",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Firestone Union Jack",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Goose Island River Bird",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Lagunitas A Little Sumpin' Sumpin'",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Lagunitas Trooper IPA",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Hazy IPA",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Half Acre Waybird",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Phase Three Rotating Hazy IPA",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Weldwerks Juicy Bits",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "8",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Amber",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Phase Three P3 Amber",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Sour",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Rev Brew Rotating Freedom Sour",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Cider",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Schilling Strawberry Rhubarb Awakening",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Stout",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Guinness Draught",
+                  "description": "20 oz",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "8",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Cans & Bottles",
+          "description": "domestic, import, craft",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Bud Light",
+              "description": "Bottle",
+              "offers": {
+                "@type": "Offer",
+                "price": "5",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Busch Light",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "5",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Coors Banquet",
+              "description": "Bottle",
+              "offers": {
+                "@type": "Offer",
+                "price": "5",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Coors Light",
+              "description": "Bottle",
+              "offers": {
+                "@type": "Offer",
+                "price": "5",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Goose Island 312",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "5",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Michelob Ultra",
+              "description": "Bottle",
+              "offers": {
+                "@type": "Offer",
+                "price": "5",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Miller High Life",
+              "description": "Bottle",
+              "offers": {
+                "@type": "Offer",
+                "price": "5",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Old Style",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "5",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Pacifico",
+              "description": "Bottle",
+              "offers": {
+                "@type": "Offer",
+                "price": "6",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Seltzers",
+          "description": "hard seltzer, vodka soda, spiked tea",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "CarBliss Black Raspberry",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "CarBliss Lemon Lime",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Florida Seltzer Blackberry Agave",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Florida Seltzer Orange Yuzu",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Florida Seltzer Strawberry Kiwi",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "High Noon Black Cherry",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "High Noon Grapefruit",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "High Noon Peach",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "High Noon Pineapple",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "High Noon Watermelon",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Lucky One Vodka Lemonade",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Sun Cruiser Classic Iced Tea + Vodka",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Sun Cruiser Lemonade + Iced Tea + Vodka",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Sun Cruiser Vodka Lemonade",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Sun Cruiser Vodka Pink Lemonade",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Ciders",
+          "description": "dry, fruited, sessionable",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Right Bee Cider Semi-Dry",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "6",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Schilling Cider Moon Berries",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "6",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Schilling Cider Yuzu Peach",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "6",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Wölffer Estate Dry Cider Rosé",
+              "description": "Bottle",
+              "offers": {
+                "@type": "Offer",
+                "price": "8",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Wölffer Estate Watermelon Sea Salt",
+              "description": "Bottle",
+              "offers": {
+                "@type": "Offer",
+                "price": "8",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Non-Alcoholic",
+          "description": "craft NA beer & draught",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Athletic Free Wave Hazy IPA",
+              "offers": {
+                "@type": "Offer",
+                "price": "6",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Athletic Run Wild IPA",
+              "offers": {
+                "@type": "Offer",
+                "price": "6",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Guinness Zero Draught",
+              "offers": {
+                "@type": "Offer",
+                "price": "8",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Krombacher Pilsner NA",
+              "offers": {
+                "@type": "Offer",
+                "price": "8",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "CBD/THC",
+          "description": "hemp-infused sparkling",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Goodwell CBD Sparkling Water Blackberry",
+              "offers": {
+                "@type": "Offer",
+                "price": "6",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Toke Cosmic Berry",
+              "description": "THC 2mg",
+              "offers": {
+                "@type": "Offer",
+                "price": "9",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Toke Star Crusher",
+              "description": "THC 2mg",
+              "offers": {
+                "@type": "Offer",
+                "price": "9",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Gluten Free",
+          "description": "dedicated gluten-free brewery",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Ghostfish Meteor Shower",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "8",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ghostfish Peak Buster",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "10",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ghostfish Shrouded Summit",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "8",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "MenuSection",
+      "name": "Cocktails & Wine",
+      "hasMenuSection": [
+        {
+          "@type": "MenuSection",
+          "name": "Cocktails",
+          "description": "classics, spritz, signatures",
+          "hasMenuSection": [
+            {
+              "@type": "MenuSection",
+              "name": "Classics",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Old Fashioned",
+                  "description": "Bourbon, demerara, Angostura aromatic & orange bitters, expressed orange peel, bada bing cherry",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Manhattan",
+                  "description": "Rye whiskey, sweet vermouth, Angostura aromatic bitters, bada bing cherry",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "The Margarita",
+                  "description": "Tequila, Gran Gala orange liqueur, fresh lime juice, agave nectar — classic, mango, or spicy",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "14",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Moscow Mule",
+                  "description": "Vodka, fresh lime, ginger beer",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Gin Martini",
+                  "description": "Gin, dry vermouth rinse, shaken — pimento or bleu cheese stuffed olive",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Vodka Martini",
+                  "description": "Vodka, dry vermouth rinse, shaken — pimento or bleu cheese stuffed olive",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Whiskey Sour",
+                  "description": "Bourbon, lemon juice, simple syrup",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Spritz",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Sarti Spritz",
+                  "description": "Sarti Rosa (blood orange, mango, passion fruit), prosecco, club soda",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "14",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Aperol Spritz",
+                  "description": "Aperol, prosecco, club soda",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "14",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Limoncello Spritz",
+                  "description": "Limoncello, prosecco, club soda",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "14",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Hugo Spritz",
+                  "description": "Elderflower liqueur, prosecco, club soda",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "14",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Cubby Blue Spritz",
+                  "description": "Orange liqueur, prosecco, club soda",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "14",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Signatures",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Mezcalita Mango",
+                  "description": "Mezcal, mango puree, lime, Angostura aromatic bitters",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Passion Fruit Paper Plane",
+                  "description": "Bourbon, Aperol, Amaro Montenegro, lemon juice, passion fruit syrup",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Blueberry Pineapple Sour",
+                  "description": "Vodka, pineapple juice, lemon juice, blueberry syrup",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Espresso Martini",
+                  "description": "Vodka, cold brew, coffee liqueur, demerara",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Lychee Mojito",
+                  "description": "White rum, lychee syrup, fresh lime, muddled mint, club soda",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Lychee Martini",
+                  "description": "Vodka, lychee syrup, lemon juice",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Sparkling",
+          "description": "prosecco & bubbles",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Zardetto Prosecco Rosé",
+              "description": "Veneto, Italy — 187ml split",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "11",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Zardetto Brut",
+              "description": "Veneto, Italy",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "35",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "White",
+          "description": "crisp, aromatic, round",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Barnard Griffin Chardonnay",
+              "description": "Columbia Valley, WA",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "30",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Flora Lisa Pinot Grigio",
+              "description": "Friuli, Italy",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "30",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Villa Maria Sauvignon Blanc",
+              "description": "Private Bin, Marlborough, NZ",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "30",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Rombauer Sauvignon Blanc",
+              "description": "Sonoma County, CA",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "45",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Rosé",
+          "description": "bright, floral, refreshing",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Forever Summer by Mirabeau",
+              "description": "Provence, France",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "30",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Maison Saint AIX Rosé",
+              "description": "Provence, France",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "45",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Red",
+          "description": "velvet, oak, ember",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Liberty School Cabernet Sauvignon",
+              "description": "Paso Robles, CA",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "30",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Troublemaker Red Blend",
+              "description": "Central Coast, CA",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "30",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Raeburn Pinot Noir",
+              "description": "Sonoma County, CA",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "35",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Austin Hope Cabernet Sauvignon",
+              "description": "Paso Robles, CA",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "30",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "120",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Zero Proof",
+          "description": "alcohol-free",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Aplos Chili Margarita",
+              "description": "Tequila-style — agave, lime, chili heat",
+              "offers": {
+                "@type": "Offer",
+                "price": "9",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Aplos Dragon Fruit Martini",
+              "description": "Vodka-style — dragon fruit, citrus",
+              "offers": {
+                "@type": "Offer",
+                "price": "9",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Aplos Kola Fashioned",
+              "description": "Whiskey-style — kola, bitters, citrus oil",
+              "offers": {
+                "@type": "Offer",
+                "price": "9",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Aplos Mandora Negroni",
+              "description": "Bitter aperitif — mandarin, herbs",
+              "offers": {
+                "@type": "Offer",
+                "price": "9",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Aplos Ume Spritz",
+              "description": "Sparkling — ume plum, yuzu",
+              "offers": {
+                "@type": "Offer",
+                "price": "9",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "MenuSection",
+      "name": "Spirits",
+      "hasMenuSection": [
+        {
+          "@type": "MenuSection",
+          "name": "Whiskey",
+          "description": "bourbon, rye, scotch & more. Prices listed by pour — 1.5 oz / 2 oz. 2 oz cocktail pour available as Old Fashioned, Manhattan or Whiskey Sour — add 4",
+          "hasMenuSection": [
+            {
+              "@type": "MenuSection",
+              "name": "Bourbon & American",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Old Forester 86 Proof",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Blanton's Single Barrel",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "15",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "20",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Buffalo Trace",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Eagle Rare 10 Year",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "12",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "18",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "E.H. Taylor Small Batch",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "15",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "20",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Heaven Hill 7 Year",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "12",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "17",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Jack Daniel's",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Jack Daniel's Tennessee Honey",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Jim Beam",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "7",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "12",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Knob Creek",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "10",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "15",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Maker's Mark",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "9",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "14",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Old Forester 1897",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "14",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "19",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Old Forester 1910",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "14",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "19",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Old Forester 1920",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "16",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "22",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Weller Antique 107",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "15",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "19",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Weller Special Reserve",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Wild Turkey 101",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Wild Turkey Rare Breed Bourbon",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "14",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "19",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Woodford Reserve",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "10",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "15",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Reserve",
+              "description": "1.5 oz pour only",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Weller 12 Year",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "20",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Weller C.Y.P.B.",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "30",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Weller Full Proof",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "20",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Rye",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Old Forester Rye",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Sazerac Rye",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "7",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "12",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Sazerac Rye 100 Proof",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Sazerac Rye 125 Proof",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "10",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "15",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Wild Turkey Rare Breed Rye",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "16",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "21",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Canadian",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Crown Royal",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Crown Royal Apple",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Irish",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Paddy Old Irish",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Jameson",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Tullamore Dew",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Scotch",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Ardbeg 10 Year",
+                  "description": "Islay",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "17",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "23",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Balvenie 12 Year Doublewood",
+                  "description": "Speyside",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "20",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "25",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Dewar's White Label",
+                  "description": "Blended",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Glendronach 12 Year",
+                  "description": "Highland",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "20",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "25",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Glenfiddich 12 Year",
+                  "description": "Speyside",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "11",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "16",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Lagavulin 16 Year",
+                  "description": "Islay",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "34",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "44",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Monkey Shoulder",
+                  "description": "Blended",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "8",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "13",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Oban 14 Year",
+                  "description": "Highland",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "27",
+                      "priceCurrency": "USD"
+                    },
+                    {
+                      "@type": "Offer",
+                      "name": "2 oz pour",
+                      "price": "35",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Vodka",
+          "description": "2 oz cocktail pour available as Martini, Moscow Mule or Cosmo — add 4",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Wheatley",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "7",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Grey Goose",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "9",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Helix 7",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "7",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ketel One",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ketel One Botanical Cucumber & Mint",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ketel One Botanical Grapefruit & Rose",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ketel One Botanical Peach & Orange",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ketel One Citroen",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ketel One Oranje",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Tito's",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "7",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Gin",
+          "description": "2 oz cocktail pour available as Gin Martini — add 4",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Watershed Four Peel",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Bombay Sapphire",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Hendrick's",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Tanqueray London Dry",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Tequila",
+          "description": "2 oz cocktail pour available as Margaritas & Palomas — add 4",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Corazón",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "7",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "9",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Corazón",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Corazón",
+              "description": "Añejo",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "9",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "11",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Alma del Jaguar",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "11",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "14",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Alma del Jaguar",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "17",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Alma del Jaguar",
+              "description": "Añejo",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "17",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "23",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Cazcanes No. 7",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "18",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Cazcanes No. 7",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "25",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Cazcanes No. 7",
+              "description": "Añejo",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "25",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "35",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Don Fulano",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "18",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Don Fulano",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "19",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Don Fulano",
+              "description": "Añejo",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "20",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "25",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Don Julio",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "14",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "18",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Don Julio",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "20",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Don Julio",
+              "description": "Añejo",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "17",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "22",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "G4",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "G4",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "14",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "19",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Lalo",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Lost Lore",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "14",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "19",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Lost Lore",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "16",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "21",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Lost Lore",
+              "description": "Añejo",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "22",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "28",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Mijenta",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Mijenta",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "17",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "22",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Mijenta",
+              "description": "Añejo",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "42",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "48",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Patrón",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "14",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "19",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Patrón",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "16",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "21",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Patrón",
+              "description": "Silver 100 proof",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "16",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "21",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Siete Leguas",
+              "description": "Blanco",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "11",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "16",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Siete Leguas",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "18",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Siete Leguas",
+              "description": "Añejo",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "14",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "19",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Mezcal",
+          "description": "2 oz cocktail pour available as Margaritas & Palomas — add 4",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Los Vecinos",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Banhez Joven",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ilegal",
+              "description": "Joven",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Ilegal",
+              "description": "Reposado",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "15",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Del Maguey Vida",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "18",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Rum",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Cane Run Estate",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "7",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Bacardi Superior",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Captain Morgan",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Diplomático Mantuano",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Diplomático Planas",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Diplomático Reserva Exclusiva",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "9",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "14",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Liqueurs & Cordials",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Costa del Sole Limoncello",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "7",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Fernet-Branca",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "9",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "14",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Fireball",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "7",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Jägermeister",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "7",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Jeppson's Malört",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "5",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "10",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Rumple Minze",
+              "description": "Peppermint schnapps",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Screwball",
+              "description": "Peanut butter whiskey",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "1.5 oz pour",
+                  "price": "8",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "2 oz pour",
+                  "price": "13",
+                  "priceCurrency": "USD"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "MenuSection",
+      "name": "Kids Menu",
+      "hasMenuSection": [
+        {
+          "@type": "MenuSection",
+          "name": "For the Little Ones",
+          "description": "guests twelve & under",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "The Little OG",
+              "description": "One smash patty, white American cheese — served with fries",
+              "offers": {
+                "@type": "Offer",
+                "price": "12",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Chicken Tenders",
+              "description": "Hand-breaded — served with fries",
+              "offers": {
+                "@type": "Offer",
+                "price": "12",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Cheese Pizza",
+              "description": "6\" x 12\" tavern crust, tomato sauce & Wisconsin brick cheese",
+              "offers": {
+                "@type": "Offer",
+                "price": "12",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Grilled Cheese",
+              "description": "White American cheese on buttered sourdough — served with fries",
+              "offers": {
+                "@type": "Offer",
+                "price": "11",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Cheese Quesadilla",
+              "description": "Flour tortilla, melted chihuahua cheese",
+              "offers": {
+                "@type": "Offer",
+                "price": "10",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

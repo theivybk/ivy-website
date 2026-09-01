@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import menuSchema from '../schema/menu-schema.json';
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -28,66 +29,7 @@ const jsonLd = {
     "ratingValue": "4.9",
     "reviewCount": "28"
   },
-  "hasMenu": {
-    "@type": "Menu",
-    "name": "The Ivy Bar and Kitchen Menu",
-    "hasMenuSection": [
-      {
-        "@type": "MenuSection",
-        "name": "Small Plates",
-        "hasMenuItem": [
-          { "@type": "MenuItem", "name": "Crispy Wings", "description": "BBQ, Buffalo, Butter Chicken, or Giardiniera Hot Honey, served with ranch or bleu cheese", "offers": { "@type": "Offer", "price": "16", "priceCurrency": "USD" } },
-          { "@type": "MenuItem", "name": "Nachos", "description": "Poblano cheese, red onions, tomatoes, lettuce, jalapeños, black beans, guacamole, sour cream & chihuahua cheese", "offers": { "@type": "Offer", "price": "17", "priceCurrency": "USD" } },
-          { "@type": "MenuItem", "name": "Pretzel Twist", "description": "Served with whole grain mustard & cheese sauce", "offers": { "@type": "Offer", "price": "14", "priceCurrency": "USD" } }
-        ]
-      },
-      {
-        "@type": "MenuSection",
-        "name": "Chicago Tavern Pizza",
-        "description": "Thin, crisp Chicago tavern-style pizza, 12\" x 12\"",
-        "hasMenuItem": [
-          { "@type": "MenuItem", "name": "Chi-City GOAT", "description": "Italian sausage, giardiniera", "offers": { "@type": "Offer", "price": "28", "priceCurrency": "USD" } },
-          { "@type": "MenuItem", "name": "Red Ivy", "description": "Pepperoni, hot honey", "offers": { "@type": "Offer", "price": "27", "priceCurrency": "USD" } }
-        ]
-      },
-      {
-        "@type": "MenuSection",
-        "name": "Detroit Pan Pizza",
-        "description": "Golden crust, crisp corners, 8\" x 10\"",
-        "hasMenuItem": [
-          { "@type": "MenuItem", "name": "Pep In Your Step", "description": "Pepperoni and pepperoni — with some pepperoni on top", "offers": { "@type": "Offer", "price": "25", "priceCurrency": "USD" } },
-          { "@type": "MenuItem", "name": "The Bad Boys 5", "description": "Italian sausage, jalapeños, mushrooms, caramelized onions, basil", "offers": { "@type": "Offer", "price": "25", "priceCurrency": "USD" } }
-        ]
-      },
-      {
-        "@type": "MenuSection",
-        "name": "Handhelds",
-        "description": "Smash burgers and sandwiches, served with fries",
-        "hasMenuItem": [
-          { "@type": "MenuItem", "name": "The Original", "description": "Two smash patties, house sauce, pickles, caramelized onions & white American cheese, potato bun", "offers": { "@type": "Offer", "price": "20", "priceCurrency": "USD" } },
-          { "@type": "MenuItem", "name": "Bavette Sandwich", "description": "Bavette, chimichurri, provolone, caramelized onions, ciabatta", "offers": { "@type": "Offer", "price": "25", "priceCurrency": "USD" } }
-        ]
-      },
-      {
-        "@type": "MenuSection",
-        "name": "Cocktails",
-        "hasMenuItem": [
-          { "@type": "MenuItem", "name": "Old Fashioned", "description": "Bourbon, demerara, Angostura aromatic & orange bitters, expressed orange peel, bada bing cherry", "offers": { "@type": "Offer", "price": "15", "priceCurrency": "USD" } },
-          { "@type": "MenuItem", "name": "Espresso Martini", "description": "Vodka, cold brew, coffee liqueur, demerara", "offers": { "@type": "Offer", "price": "15", "priceCurrency": "USD" } },
-          { "@type": "MenuItem", "name": "Mezcalita Mango", "description": "Mezcal, mango puree, lime, Angostura aromatic bitters", "offers": { "@type": "Offer", "price": "15", "priceCurrency": "USD" } }
-        ]
-      },
-      {
-        "@type": "MenuSection",
-        "name": "Kids Menu",
-        "description": "For guests twelve & under",
-        "hasMenuItem": [
-          { "@type": "MenuItem", "name": "Cheese Pizza", "description": "6\" x 12\" tavern crust, tomato sauce & Wisconsin brick cheese", "offers": { "@type": "Offer", "price": "12", "priceCurrency": "USD" } },
-          { "@type": "MenuItem", "name": "The Little OG", "description": "One smash patty, white American cheese, served with fries", "offers": { "@type": "Offer", "price": "12", "priceCurrency": "USD" } }
-        ]
-      }
-    ]
-  }
+  "hasMenu": menuSchema
 };
 ---
 <Layout
