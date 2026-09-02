@@ -197,7 +197,7 @@ const jsonLd = {
     <div class="section-head">
       <span class="eyebrow">Book a Table</span>
       <h2>Reserve your spot</h2>
-      <p>We hold a mix of reservations and walk-in seating. Send us your details and we'll confirm by phone or email.</p>
+      <p>We hold a mix of reservations and walk-in seating. Send us your details and we'll confirm by email.</p>
     </div>
 
     <form class="reserve-form" id="reserve-form">
@@ -256,14 +256,14 @@ const jsonLd = {
       </div>
       <div class="submit-row" id="submit-row">
         <button type="submit" class="btn btn--primary">Request Reservation</button>
-        <p class="submit-note">Requests are sent to <a href="mailto:info@theivybk.com" style="border-bottom:1px solid var(--brass);">info@theivybk.com</a> — we'll confirm by phone or email.</p>
+        <p class="submit-note">Requests are sent to <a href="mailto:info@theivybk.com" style="border-bottom:1px solid var(--brass);">info@theivybk.com</a> — we'll confirm by email.</p>
         <p class="submit-error" id="reserve-error" hidden></p>
       </div>
     </form>
 
     <div class="form-confirm" id="reserve-confirm" hidden>
       <h2>Booked.</h2>
-      <p id="reserve-confirm-text">We'll see you soon — a confirmation will follow by phone or email.</p>
+      <p id="reserve-confirm-text">We'll see you soon — a confirmation will follow by email.</p>
     </div>
   </div>
 </section>
@@ -551,6 +551,7 @@ const jsonLd = {
     sameDayNotice.hidden = !isToday;
     submitRow.hidden = isToday;
   };
+  dateInput.min = todayStr();
   dateInput.addEventListener('change', updateSameDayState);
   updateSameDayState();
 
@@ -572,7 +573,7 @@ const jsonLd = {
       const result = await res.json();
       if (res.ok && result.ok) {
         const dateVal = payload.date ? new Date(payload.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : 'you soon';
-        document.getElementById('reserve-confirm-text').textContent = `We'll see you ${dateVal}${payload.time ? ' at ' + payload.time : ''}. A confirmation will follow by phone or email.`;
+        document.getElementById('reserve-confirm-text').textContent = `We'll see you ${dateVal}${payload.time ? ' at ' + payload.time : ''}. A confirmation will follow by email.`;
         reserveForm.hidden = true;
         document.getElementById('reserve-confirm').hidden = false;
         document.getElementById('reserve-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
