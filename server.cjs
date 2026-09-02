@@ -948,6 +948,12 @@ async function handleReservation(req, res) {
     res.end(JSON.stringify({ ok: false, error: 'Please enter a valid email address.' }));
     return;
   }
+  const todayChicago = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < todayChicago) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: 'Please choose a valid, upcoming date.' }));
+    return;
+  }
 
   const subject = `Table Reservation — ${date} at ${time} — ${fullName}`;
   const text = [
