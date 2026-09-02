@@ -204,6 +204,20 @@ function isTestReservation(r) {
   return /test/i.test(r.full_name) || /@example\.com$/i.test(r.email) || /please ignore/i.test(r.notes || '');
 }
 
+// Drops accidental double-submissions (e.g. a customer double-clicking
+// "Request Reservation") that show up as two distinct Resend emails for the
+// identical booking. Expects reservations newest-first so the most complete
+// submission (often a retry with an added note) wins over the earlier one.
+function dedupeReservations(reservations) {
+  const seen = new Set();
+  return reservations.filter((r) => {
+    const key = [r.full_name, r.phone, r.email, r.date, r.time].map((v) => (v || '').toLowerCase()).join('|');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 async function readReservations() {
   if (!RESEND_API_KEY) return [];
   const matches = [];
@@ -245,7 +259,7 @@ async function readReservations() {
       console.error('Resend fetch email error:', err.message);
     }
   }
-  return reservations.filter((r) => !isTestReservation(r));
+  return dedupeReservations(reservations.filter((r) => !isTestReservation(r)));
 }
 
 async function hydrateDbFromResend() {
@@ -1483,7 +1497,7 @@ const server = http.createServer((req, res) => {
     const isTestSignup = (s) => /@example\.com$/i.test(s.email) || /^sqlite-test@/i.test(s.email);
     const isTestInquiry = (i) => /test/i.test(i.full_name) || /@example\.com$/i.test(i.email);
 
-    const realReservations = db.prepare('SELECT * FROM reservations ORDER BY id DESC').all().filter((r) => !isTestReservation(r));
+    const realReservations = dedupeReservations(db.prepare('SELECT * FROM reservations ORDER BY id DESC').all().filter((r) => !isTestReservation(r)));
     const realSignups = db.prepare('SELECT * FROM newsletter_signups ORDER BY id DESC').all().filter((s) => !isTestSignup(s));
     const realInquiries = db.prepare('SELECT * FROM event_inquiries ORDER BY id DESC').all().filter((i) => !isTestInquiry(i));
     const reservations = realReservations.slice(0, 50);
