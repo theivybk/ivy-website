@@ -526,6 +526,48 @@
             },
             {
               "@type": "MenuSection",
+              "name": "Oktoberfest",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Revolution Oktoberfest",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Bell's Octoberfest",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Paulaner Oktoberfest",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Urban Chestnut O-Katz",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
               "name": "Kölsch",
               "hasMenuItem": [
                 {
@@ -587,34 +629,7 @@
                 },
                 {
                   "@type": "MenuItem",
-                  "name": "Firestone Union Jack",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Goose Island River Bird",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
                   "name": "Lagunitas A Little Sumpin' Sumpin'",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Lagunitas Trooper IPA",
                   "offers": {
                     "@type": "Offer",
                     "price": "7",
