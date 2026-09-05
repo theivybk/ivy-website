@@ -688,21 +688,6 @@
             },
             {
               "@type": "MenuSection",
-              "name": "Sour",
-              "hasMenuItem": [
-                {
-                  "@type": "MenuItem",
-                  "name": "Rev Brew Rotating Freedom Sour",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                }
-              ]
-            },
-            {
-              "@type": "MenuSection",
               "name": "Cider",
               "hasMenuItem": [
                 {
