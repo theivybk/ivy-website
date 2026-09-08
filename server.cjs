@@ -1484,6 +1484,39 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Emails the three current print-menu PDFs to info@theivybk.com. Reads and
+  // base64-encodes the files server-side (never through an LLM context) since
+  // that's the only practical way to move ~1-2MB of binary attachment data.
+  if (req.method === 'POST' && urlPath === '/admin/send-menus') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    (async () => {
+      try {
+        const menuFiles = ['Beer-Cocktails-Menu.pdf', 'Food-Pizza-Menu.pdf', 'Spirits-Menu.pdf'];
+        const attachments = menuFiles.map((filename) => ({
+          filename,
+          content: fs.readFileSync(path.join(__dirname, 'print-menus', filename)).toString('base64'),
+        }));
+        const result = await resendSendEmail({
+          to: 'info@theivybk.com',
+          subject: 'Updated Print Menus',
+          text: 'Attached are the latest print-ready menu PDFs: Beer & Cocktails, Food & Pizza, and Spirits.',
+          attachments,
+        });
+        const ok = result.status >= 200 && result.status < 300;
+        res.writeHead(ok ? 200 : 502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok, resend: result.body }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
   if (req.method === 'GET' && urlPath === '/admin/db') {
     if (!checkBasicAuth(req)) {
       res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
