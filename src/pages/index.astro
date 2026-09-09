@@ -572,6 +572,7 @@ const jsonLd = {
       });
       const result = await res.json();
       if (res.ok && result.ok) {
+        gtag('event', 'reservation_submit', { party_size: payload.party_size });
         const dateVal = payload.date ? new Date(payload.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : 'you soon';
         document.getElementById('reserve-confirm-text').textContent = `We'll see you ${dateVal}${payload.time ? ' at ' + payload.time : ''}. A confirmation will follow by email.`;
         reserveForm.hidden = true;

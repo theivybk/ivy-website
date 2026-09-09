@@ -157,6 +157,7 @@ const jsonLd = {
       const res = await fetch('/api/apply', { method: 'POST', body: formData });
       const result = await res.json();
       if (res.ok && result.ok) {
+        gtag('event', 'apply_submit');
         applyForm.hidden = true;
         document.getElementById('apply-confirm').hidden = false;
         document.getElementById('apply-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });

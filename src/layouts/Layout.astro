@@ -241,6 +241,7 @@ const navLinks = [
       });
       const data = await res.json();
       if (res.ok && data.ok) {
+        if (!data.alreadySubscribed) gtag('event', 'newsletter_signup', { form_location: 'footer' });
         confirmEl.textContent = data.alreadySubscribed
           ? "You're already on the list!"
           : "Thanks — we'll add you to the list.";
@@ -313,6 +314,7 @@ const navLinks = [
       });
       const data = await res.json();
       if (res.ok && data.ok) {
+        if (!data.alreadySubscribed) gtag('event', 'newsletter_signup', { form_location: 'popup' });
         confirmEl.textContent = data.alreadySubscribed
           ? "You're already on the list!"
           : "Thanks — we'll add you to the list.";

@@ -292,6 +292,7 @@ const jsonLd = {
       });
       const result = await res.json();
       if (res.ok && result.ok) {
+        gtag('event', 'private_event_inquiry');
         form.hidden = true;
         document.getElementById('form-confirm').hidden = false;
         document.getElementById('form-confirm').scrollIntoView({ behavior: 'smooth', block: 'center' });
