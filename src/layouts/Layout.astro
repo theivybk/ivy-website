@@ -213,6 +213,19 @@ const navLinks = [
 </div>
 
 <script is:inline>
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (href.startsWith('tel:')) {
+      gtag('event', 'call_click', { link_url: href });
+    } else if (href.includes('order.toasttab.com/online/')) {
+      gtag('event', 'order_online_click', { link_url: href });
+    } else if (href.includes('google.com/maps')) {
+      gtag('event', 'gbp_profile_click', { link_url: href });
+    }
+  });
+
   const navToggle = document.getElementById('nav-toggle');
   const mobileMenu = document.getElementById('mobile-menu');
   navToggle.addEventListener('click', () => {
