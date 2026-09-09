@@ -1,7 +1,10 @@
 /* ============================================================
    The Ivy — Color & Type Tokens
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400;1,8..60,500&family=Outfit:wght@400;500;600;700&display=swap');
+/* Google Fonts are loaded via <link> tags in Layout.astro's <head>,
+   not @import here -- @import is invisible to the browser's preload
+   scanner and adds a full extra round-trip before font loading even
+   starts, which shows up as a mobile flash-of-unstyled-text/reflow. */
 
 :root {
   --ivy-deep:    #16301F;
