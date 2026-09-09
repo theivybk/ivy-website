@@ -1440,6 +1440,17 @@ function rejectRateLimited(res) {
 }
 
 const server = http.createServer((req, res) => {
+  // Railway's default *.up.railway.app subdomain stays live alongside the
+  // custom domain and serves identical content -- redirect it (and any other
+  // stray host) to the canonical domain so it's never crawled/indexed as a
+  // duplicate. www already gets redirected upstream at Railway's edge.
+  const host = (req.headers.host || '').split(':')[0].toLowerCase();
+  if (host && host !== 'theivybk.com' && host !== 'www.theivybk.com') {
+    res.writeHead(301, { Location: `https://theivybk.com${req.url}` });
+    res.end();
+    return;
+  }
+
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
 
   res.setHeader('X-Content-Type-Options', 'nosniff');
