@@ -662,10 +662,10 @@
                 },
                 {
                   "@type": "MenuItem",
-                  "name": "Weldwerks Juicy Bits",
+                  "name": "Sierra Nevada Hazy Little Thing IPA",
                   "offers": {
                     "@type": "Offer",
-                    "price": "8",
+                    "price": "7",
                     "priceCurrency": "USD"
                   }
                 }
