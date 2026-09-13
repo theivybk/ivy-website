@@ -41,7 +41,7 @@
   .page {
     width: 8.5in;
     min-height: 14in;
-    padding: 0.32in 0.45in 0.26in;
+    padding: 0.32in 0.5in 0.26in;
     background: var(--bg);
     box-sizing: border-box;
     box-shadow: none;
@@ -108,8 +108,8 @@
   /* ─── COLUMNS ─────────────────────────────────────────────── */
   .body {
     display: grid;
-    grid-template-columns: 1fr 1px 1fr 1px 1fr;
-    column-gap: 0.28in;
+    grid-template-columns: 1fr 1px 1fr;
+    column-gap: 0.42in;
     align-items: start;
     margin-top: 6px;
     position: relative;
@@ -178,8 +178,7 @@
   .brow {
     display: flex;
     align-items: baseline;
-    flex-wrap: wrap;
-    gap: 3px;
+    gap: 5px;
     margin: 1.5px 0;
   }
   .brow .name {
@@ -189,7 +188,8 @@
     color: var(--ink);
     letter-spacing: 0.002em;
     line-height: 1.1;
-    flex: 0 1 auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
   .brow .name em {
     font-family: "Inter", sans-serif;
@@ -361,17 +361,13 @@
           <div class="brow"><span class="name">Sazerac Rye 100 Proof</span><span class="dots"></span><span class="price">8/13</span></div>
           <div class="brow"><span class="name">Sazerac Rye 125 Proof</span><span class="dots"></span><span class="price">10/15</span></div>
           <div class="brow"><span class="name">Wild Turkey Rare Breed Rye</span><span class="dots"></span><span class="price">16/21</span></div>
+        </section>
 
+        <section class="flow">
           <div class="subhead">Canadian</div>
           <div class="brow"><span class="name">Crown Royal</span><span class="dots"></span><span class="price">8/13</span></div>
           <div class="brow"><span class="name">Crown Royal Apple</span><span class="dots"></span><span class="price">8/13</span></div>
-        </section>
-      </div>
 
-      <div class="vrule" aria-hidden="true"></div>
-
-      <div class="bodycol">
-        <section class="flow">
           <div class="subhead">Irish</div>
           <div class="brow"><span class="name">Paddy Old Irish</span><span class="dots"></span><span class="price">8/13</span></div>
           <div class="brow"><span class="name">Jameson</span><span class="dots"></span><span class="price">8/13</span></div>
@@ -402,7 +398,11 @@
           <div class="brow"><span class="name">Ketel One Oranje</span><span class="dots"></span><span class="price">8/13</span></div>
           <div class="brow"><span class="name">Tito's</span><span class="dots"></span><span class="price">7/12</span></div>
         </section>
+      </div>
 
+      <div class="vrule" aria-hidden="true"></div>
+
+      <div class="bodycol">
         <section class="flow">
           <h2>Tequila</h2>
           <p class="pour-note">2 oz cocktail pour available as Margaritas &amp; Palomas — add 4</p>
@@ -421,14 +421,6 @@
           <div class="brow"><span class="name">Don Julio <em>blanco</em></span><span class="dots"></span><span class="price">14/18</span></div>
           <div class="brow"><span class="name">Don Julio <em>reposado</em></span><span class="dots"></span><span class="price">15/20</span></div>
           <div class="brow"><span class="name">Don Julio <em>añejo</em></span><span class="dots"></span><span class="price">17/22</span></div>
-        </section>
-      </div>
-
-      <div class="vrule" aria-hidden="true"></div>
-
-      <div class="bodycol">
-        <section class="flow">
-          <div class="subhead">Tequila, cont'd</div>
           <div class="brow"><span class="name">G4 <em>blanco</em></span><span class="dots"></span><span class="price">10/15</span></div>
           <div class="brow"><span class="name">G4 <em>reposado</em></span><span class="dots"></span><span class="price">14/19</span></div>
           <div class="brow"><span class="name">Lalo <em>blanco</em></span><span class="dots"></span><span class="price">10/15</span></div>
