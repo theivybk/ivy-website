@@ -2015,6 +2015,90 @@
               "hasMenuItem": [
                 {
                   "@type": "MenuItem",
+                  "name": "Blanton's Gold",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "30",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Blanton's Straight From The Barrel",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "30",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "E.H. Taylor Barrel Proof",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "30",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "E.H. Taylor Cured Oak",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "35",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "E.H. Taylor Rye",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "20",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Elmer T. Lee",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "25",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Hancock Reserve",
+                  "offers": [
+                    {
+                      "@type": "Offer",
+                      "name": "1.5 oz pour",
+                      "price": "15",
+                      "priceCurrency": "USD"
+                    }
+                  ]
+                },
+                {
+                  "@type": "MenuItem",
                   "name": "Weller 12 Year",
                   "offers": [
                     {
