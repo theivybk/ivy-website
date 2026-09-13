@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #ffffff; --ink: #000000; --accent: #000000; --rule: #111111; --muted: #111111; }
+  :root { --bg: #ffffff; --ink: #000000; --accent: #000000; --rule: #000000; --muted: #000000; }
   @page { size: legal portrait; margin: 0; }
   html, body { margin: 0; padding: 0; background: #c8c5bd; }
   body { font-family: "EB Garamond", Georgia, serif; color: var(--ink);
@@ -23,7 +23,7 @@
   .menu-frame .page { width: 100% !important; height: 100% !important; min-height: 100% !important; box-shadow: none !important; margin: 0 !important; }
   .menu-frame .print-btn { display: none !important; }
 
-@scope (.menu-spirits-1, .menu-spirits-2) {
+@scope (.menu-spirits-1) {
 
   html, body { background: #c8c5bd; }
   body { margin: 0; font-family: "EB Garamond", Georgia, serif; color: var(--ink);
@@ -41,7 +41,7 @@
   .page {
     width: 8.5in;
     min-height: 14in;
-    padding: 0.35in 0.55in 0.3in;
+    padding: 0.32in 0.45in 0.26in;
     background: var(--bg);
     box-sizing: border-box;
     box-shadow: none;
@@ -66,52 +66,52 @@
   }
 
   /* ─── HEADER ─────────────────────────────────────────────── */
-  .head { text-align: center; padding: 6px 0 8px; position: relative; z-index: 2; }
+  .head { text-align: center; padding: 2px 0 4px; position: relative; z-index: 2; }
 
   .word {
     font-family: "Cormorant Garamond", serif;
     font-style: italic; font-weight: 500;
-    font-size: 76px; line-height: .95;
+    font-size: 56px; line-height: .95;
     color: var(--accent);
-    margin: 6px 0 4px;
-    letter-spacing: -0.012em;
+    margin: 2px 0 10px;
+    letter-spacing: -0.01em;
   }
 
   .headnote {
     font-family: "Inter", sans-serif;
-    font-size: 9.5px;
+    font-size: 8.5px;
     font-weight: 600;
-    letter-spacing: .3em;
+    letter-spacing: .28em;
     text-transform: uppercase;
     color: var(--rule);
     text-align: center;
-    margin: -2px 0 0;
+    margin: 0;
   }
 
   .ornament {
-    margin: 10px auto 0;
-    width: 46%; height: 14px;
+    margin: 6px auto 0;
+    width: 42%; height: 12px;
     position: relative;
   }
   .ornament::before, .ornament::after {
     content: ""; position: absolute; top: 50%;
     height: 1px; background: var(--rule); opacity: .9;
   }
-  .ornament::before { left: 0; right: calc(50% + 14px); }
-  .ornament::after  { right: 0; left:  calc(50% + 14px); }
+  .ornament::before { left: 0; right: calc(50% + 12px); }
+  .ornament::after  { right: 0; left:  calc(50% + 12px); }
   .ornament .dot {
     position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-    color: var(--rule); font-size: 14px; line-height: 1;
+    color: var(--rule); font-size: 12px; line-height: 1;
     font-family: "Cormorant Garamond", serif;
   }
 
   /* ─── COLUMNS ─────────────────────────────────────────────── */
   .body {
     display: grid;
-    grid-template-columns: 1fr 1px 1fr;
-    column-gap: 0.5in;
+    grid-template-columns: 1fr 1px 1fr 1px 1fr;
+    column-gap: 0.28in;
     align-items: start;
-    margin-top: 10px;
+    margin-top: 6px;
     position: relative;
     z-index: 2;
   }
@@ -122,7 +122,7 @@
   }
   section {
     break-inside: avoid;
-    margin: 0 0 10px;
+    margin: 0 0 6px;
     padding: 0;
   }
   section.flow {
@@ -134,43 +134,43 @@
     font-style: italic;
     font-weight: 500;
     color: var(--accent);
-    font-size: 26px;
-    margin: 0 0 2px;
+    font-size: 18px;
+    margin: 0 0 1px;
     text-align: center;
     letter-spacing: 0.005em;
     line-height: 1;
   }
   section .seclabel {
     font-family: "Inter", sans-serif;
-    font-size: 9px; font-weight: 600;
-    letter-spacing: .28em; text-transform: uppercase;
+    font-size: 7px; font-weight: 600;
+    letter-spacing: .16em; text-transform: uppercase;
     color: var(--rule);
     text-align: center;
-    margin: 3px 0 4px;
+    margin: 2px 0 3px;
   }
   section .seclabel::before, section .seclabel::after {
-    content: "·"; padding: 0 8px; color: var(--rule); opacity: .9;
+    content: "·"; padding: 0 6px; color: var(--rule); opacity: .9;
   }
-  section + section { margin-top: 4px; }
+  section + section { margin-top: 3px; }
 
   .pour-note {
     font-family: "EB Garamond", serif;
     font-style: italic;
-    font-size: 10.5px;
+    font-size: 8px;
     color: var(--muted);
     text-align: center;
-    margin: 0 0 6px;
+    margin: 0 0 4px;
   }
 
   .subhead {
     font-family: "Inter", sans-serif;
-    font-size: 9.5px;
+    font-size: 7.5px;
     font-weight: 600;
-    letter-spacing: .24em;
+    letter-spacing: .14em;
     text-transform: uppercase;
     color: var(--accent);
-    margin: 6px 0 3px;
-    padding-bottom: 2px;
+    margin: 4px 0 2px;
+    padding-bottom: 1px;
     border-bottom: 1px solid rgba(0,0,0,.9);
   }
 
@@ -178,40 +178,40 @@
   .brow {
     display: flex;
     align-items: baseline;
-    gap: 6px;
-    margin: 2px 0;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin: 1.5px 0;
   }
   .brow .name {
     font-family: "Cormorant Garamond", serif;
     font-weight: 600;
-    font-size: 15.5px;
+    font-size: 11.5px;
     color: var(--ink);
-    letter-spacing: 0.005em;
-    line-height: 1.15;
-    flex: 0 0 auto;
-    white-space: nowrap;
+    letter-spacing: 0.002em;
+    line-height: 1.1;
+    flex: 0 1 auto;
   }
   .brow .name em {
     font-family: "Inter", sans-serif;
     font-style: normal;
-    font-size: 10.5px;
+    font-size: 8px;
     font-weight: 500;
     color: var(--muted);
-    letter-spacing: .06em;
+    letter-spacing: .05em;
     text-transform: uppercase;
-    margin-left: 6px;
+    margin-left: 3px;
   }
   .brow .dots {
-    flex: 1 1 auto;
+    flex: 1 1 8px;
     height: 1px;
     border-bottom: 1px dotted rgba(0,0,0,.9);
-    transform: translateY(-3px);
-    min-width: 12px;
+    transform: translateY(-2px);
+    min-width: 6px;
   }
   .brow .price {
     font-family: "Cormorant Garamond", serif;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 12px;
     color: var(--accent);
     flex: 0 0 auto;
     letter-spacing: 0.01em;
@@ -220,20 +220,20 @@
   /* ─── FOOTER ─────────────────────────────────────────────── */
   .foot {
     margin-top: auto;
-    padding-top: 12px;
+    padding-top: 8px;
     text-align: center;
     font-family: "Inter", sans-serif;
-    font-size: 9px;
-    letter-spacing: .26em;
+    font-size: 7.5px;
+    letter-spacing: .2em;
     text-transform: uppercase;
     color: var(--muted);
     position: relative; z-index: 2;
   }
   .foot .frule {
-    width: 28%; margin: 0 auto 10px; height: 1px;
+    width: 28%; margin: 0 auto 6px; height: 1px;
     background: var(--rule); opacity: .55;
   }
-  .foot p { margin: 3px 0; }
+  .foot p { margin: 2px 0; }
 
   /* ─── PRINT ─────────────────────────────────────────────── */
   @media print {
@@ -361,6 +361,10 @@
           <div class="brow"><span class="name">Sazerac Rye 100 Proof</span><span class="dots"></span><span class="price">8/13</span></div>
           <div class="brow"><span class="name">Sazerac Rye 125 Proof</span><span class="dots"></span><span class="price">10/15</span></div>
           <div class="brow"><span class="name">Wild Turkey Rare Breed Rye</span><span class="dots"></span><span class="price">16/21</span></div>
+
+          <div class="subhead">Canadian</div>
+          <div class="brow"><span class="name">Crown Royal</span><span class="dots"></span><span class="price">8/13</span></div>
+          <div class="brow"><span class="name">Crown Royal Apple</span><span class="dots"></span><span class="price">8/13</span></div>
         </section>
       </div>
 
@@ -368,10 +372,6 @@
 
       <div class="bodycol">
         <section class="flow">
-          <div class="subhead">Canadian</div>
-          <div class="brow"><span class="name">Crown Royal</span><span class="dots"></span><span class="price">8/13</span></div>
-          <div class="brow"><span class="name">Crown Royal Apple</span><span class="dots"></span><span class="price">8/13</span></div>
-
           <div class="subhead">Irish</div>
           <div class="brow"><span class="name">Paddy Old Irish</span><span class="dots"></span><span class="price">8/13</span></div>
           <div class="brow"><span class="name">Jameson</span><span class="dots"></span><span class="price">8/13</span></div>
@@ -402,39 +402,7 @@
           <div class="brow"><span class="name">Ketel One Oranje</span><span class="dots"></span><span class="price">8/13</span></div>
           <div class="brow"><span class="name">Tito's</span><span class="dots"></span><span class="price">7/12</span></div>
         </section>
-      </div>
 
-    </div>
-
-    <footer class="foot">
-      <div class="frule"></div>
-      <p>1625 W Irving Park Rd · Chicago, IL 60613</p>
-      <p>Please notify your server of any allergies</p>
-      <p>3% credit card processing fee applied to all card transactions</p>
-    </footer>
-
-  </article>
-</div>
-</div>
-
-<div class="menu-spirits-2 menu-frame">
-<div class="stage">
-  <article class="page">
-
-    <div class="vine vine-tl"><svg viewBox="0 0 200 200"><use href="#ivy-vine"/></svg></div>
-    <div class="vine vine-tr"><svg viewBox="0 0 200 200"><use href="#ivy-vine"/></svg></div>
-    <div class="vine vine-bl"><svg viewBox="0 0 200 200"><use href="#ivy-vine"/></svg></div>
-    <div class="vine vine-br"><svg viewBox="0 0 200 200"><use href="#ivy-vine"/></svg></div>
-
-    <header class="head">
-      <h1 class="word">Spirits</h1>
-      <p class="headnote">Priced by the pour — 1.5 oz / 2 oz</p>
-      <div class="ornament"><span class="dot">&#10070;</span></div>
-    </header>
-
-    <div class="body">
-
-      <div class="bodycol">
         <section class="flow">
           <h2>Tequila</h2>
           <p class="pour-note">2 oz cocktail pour available as Margaritas &amp; Palomas — add 4</p>
@@ -453,6 +421,14 @@
           <div class="brow"><span class="name">Don Julio <em>blanco</em></span><span class="dots"></span><span class="price">14/18</span></div>
           <div class="brow"><span class="name">Don Julio <em>reposado</em></span><span class="dots"></span><span class="price">15/20</span></div>
           <div class="brow"><span class="name">Don Julio <em>añejo</em></span><span class="dots"></span><span class="price">17/22</span></div>
+        </section>
+      </div>
+
+      <div class="vrule" aria-hidden="true"></div>
+
+      <div class="bodycol">
+        <section class="flow">
+          <div class="subhead">Tequila, cont'd</div>
           <div class="brow"><span class="name">G4 <em>blanco</em></span><span class="dots"></span><span class="price">10/15</span></div>
           <div class="brow"><span class="name">G4 <em>reposado</em></span><span class="dots"></span><span class="price">14/19</span></div>
           <div class="brow"><span class="name">Lalo <em>blanco</em></span><span class="dots"></span><span class="price">10/15</span></div>
@@ -469,12 +445,8 @@
           <div class="brow"><span class="name">Siete Leguas <em>reposado</em></span><span class="dots"></span><span class="price">12/18</span></div>
           <div class="brow"><span class="name">Siete Leguas <em>añejo</em></span><span class="dots"></span><span class="price">14/19</span></div>
         </section>
-      </div>
 
-      <div class="vrule" aria-hidden="true"></div>
-
-      <div class="bodycol">
-        <section class="flow">
+        <section>
           <h2>Gin</h2>
           <p class="pour-note">2 oz cocktail pour available as Gin Martini — add 4</p>
           <div class="brow"><span class="name">Watershed Four Peel</span><span class="dots"></span><span class="price">8/13</span></div>
