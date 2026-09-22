@@ -5,7 +5,7 @@ const restaurantLd = {
   "@type": ["Restaurant", "BarOrPub"],
   "name": "The Ivy Bar and Kitchen",
   "alternateName": "The Ivy",
-  "description": "A neighborhood bar & restaurant in Lakeview, Chicago, three blocks from Wrigley Field, serving Chicago Tavern & Detroit Pan pizza, smash burgers, and craft cocktails, with rooftop and private event space. A go-to spot before Cubs games and Wrigley Field concerts, with TVs throughout the bar, dining room, and rooftop.",
+  "description": "A neighborhood sports bar in Lakeview, Chicago, three blocks from Wrigley Field, serving tavern-style and Detroit-style pizza, double-smashed burgers, and craft cocktails, with rooftop and private event space. A go-to spot before Cubs games and Wrigley Field concerts, with TVs throughout the bar, dining room, and rooftop.",
   "image": [
     "https://theivybk.com/assets/img/gallery/DSC_1103.webp",
     "https://theivybk.com/assets/img/gallery/DSC_0785.webp",
@@ -14,7 +14,7 @@ const restaurantLd = {
   "url": "https://theivybk.com/",
   "telephone": "+17737998160",
   "priceRange": "$$",
-  "servesCuisine": ["American", "Pizza", "Bar Food"],
+  "servesCuisine": ["American", "Pizza", "Hamburger", "Bar Food"],
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "1625 W Irving Park Rd",
@@ -81,7 +81,15 @@ const faqLd = {
       "name": "What kind of pizza do you have?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Two styles, made fresh to order — Chicago Tavern (thin, crisp, cut in squares) and Detroit Pan (golden crust, crispy corners) — plus a build-your-own option where you pick the crust, sauce, and toppings."
+        "text": "Two styles, made fresh to order — Chicago Tavern (thin, crisp, tavern-style, cut in squares) and Detroit Pan (Detroit-style, golden crust, crispy corners) — plus a build-your-own option where you pick the crust, sauce, and toppings."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What kind of burgers do you have?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Double-smashed burgers, cooked to order on a potato bun — The Original (house sauce, pickles, caramelized onions, white American), Five Alarm (jalapeños, pepper jack) and The Works (onion, tomato, lettuce, white American). A Beyond patty and gluten-free bun are available on any of them."
       }
     },
     {
@@ -166,7 +174,7 @@ const jsonLd = {
 ---
 <Layout
   title="The Ivy Bar and Kitchen | Restaurant in Lakeview, Chicago"
-  description="Neighborhood bar & restaurant in Lakeview, Chicago, three blocks from Wrigley Field — Chicago Tavern & Detroit Pan pizza, craft cocktails."
+  description="Neighborhood sports bar in Lakeview, Chicago, three blocks from Wrigley Field — Chicago Tavern & Detroit Pan pizza, smash burgers, cocktails."
   ogImage="https://theivybk.com/assets/img/gallery/DSC_1105.webp"
   canonicalPath="/"
   jsonLd={jsonLd}
@@ -298,8 +306,8 @@ const jsonLd = {
         <p>Chicago Tavern and Detroit Pan, by the pie or built your own — pick a crust, a sauce, and go.</p>
       </div>
       <div class="feature-card">
-        <h3>Delicious Bites</h3>
-        <p>Smash burgers, hand-breaded tenders, and the kind of sandwiches that make game day.</p>
+        <h3>Smash Burgers</h3>
+        <p>Double-smashed patties, hand-breaded tenders, and the kind of sandwiches that make game day.</p>
       </div>
     </div>
   </div>
@@ -510,7 +518,11 @@ const jsonLd = {
       </details>
       <details class="faq-item">
         <summary>What kind of pizza do you have?</summary>
-        <p>Two styles, made fresh to order — Chicago Tavern (thin, crisp, cut in squares) and Detroit Pan (golden crust, crispy corners) — plus a build-your-own option where you pick the crust, sauce, and toppings.</p>
+        <p>Two styles, made fresh to order — Chicago Tavern (thin, crisp, tavern-style, cut in squares) and Detroit Pan (Detroit-style, golden crust, crispy corners) — plus a build-your-own option where you pick the crust, sauce, and toppings.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What kind of burgers do you have?</summary>
+        <p>Double-smashed burgers, cooked to order on a potato bun — The Original (house sauce, pickles, caramelized onions, white American), Five Alarm (jalapeños, pepper jack) and The Works (onion, tomato, lettuce, white American). A Beyond patty and gluten-free bun are available on any of them.</p>
       </details>
       <details class="faq-item">
         <summary>Is The Ivy a good spot before a Cubs game or a Wrigley Field concert?</summary>
