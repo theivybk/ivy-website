@@ -942,66 +942,6 @@ async function createReservationCalendarEvent({ fullName, phone, email, date, ti
   });
 }
 
-// Lists events on the reservations calendar in a time range (used for
-// one-off cleanup of test bookings created while developing against the
-// live calendar -- see /admin/calendar-cleanup-test-events). No server-side
-// text filter -- Google's `q` search was unreliable for this, so callers
-// filter the returned list themselves.
-async function listCalendarEvents({ timeMin, timeMax }) {
-  const accessToken = await getGoogleCalendarAccessToken();
-  const params = new URLSearchParams({ timeMin, timeMax, maxResults: '250', singleEvents: 'true' });
-  return new Promise((resolve, reject) => {
-    const req = https.request(
-      {
-        hostname: 'www.googleapis.com',
-        path: `/calendar/v3/calendars/${encodeURIComponent(GOOGLE_CALENDAR_ID)}/events?${params}`,
-        method: 'GET',
-        headers: { Authorization: `Bearer ${accessToken}` },
-      },
-      (res) => {
-        let data = '';
-        res.on('data', (chunk) => (data += chunk));
-        res.on('end', () => {
-          if (res.statusCode >= 300) {
-            reject(new Error(`Calendar list failed: ${res.statusCode} ${data}`));
-            return;
-          }
-          resolve(JSON.parse(data).items || []);
-        });
-      }
-    );
-    req.on('error', reject);
-    req.end();
-  });
-}
-
-async function deleteCalendarEvent(eventId) {
-  const accessToken = await getGoogleCalendarAccessToken();
-  return new Promise((resolve, reject) => {
-    const req = https.request(
-      {
-        hostname: 'www.googleapis.com',
-        path: `/calendar/v3/calendars/${encodeURIComponent(GOOGLE_CALENDAR_ID)}/events/${encodeURIComponent(eventId)}`,
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${accessToken}` },
-      },
-      (res) => {
-        let data = '';
-        res.on('data', (chunk) => (data += chunk));
-        res.on('end', () => {
-          if (res.statusCode >= 300 && res.statusCode !== 410) {
-            reject(new Error(`Calendar delete failed: ${res.statusCode} ${data}`));
-            return;
-          }
-          resolve();
-        });
-      }
-    );
-    req.on('error', reject);
-    req.end();
-  });
-}
-
 async function handleReservation(req, res) {
   if (!RESEND_API_KEY) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
@@ -1605,37 +1545,6 @@ const server = http.createServer((req, res) => {
         const ok = result.status >= 200 && result.status < 300;
         res.writeHead(ok ? 200 : 502, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok, resend: result.body }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: false, error: err.message }));
-      }
-    })();
-    return;
-  }
-
-  // One-off cleanup for the "Hours Test" calendar events created while
-  // developing the reservation-hours validation. Remove this route once used.
-  if (req.method === 'POST' && urlPath === '/admin/calendar-cleanup-test-events') {
-    if (!checkBasicAuth(req)) {
-      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
-      res.end('Unauthorized');
-      return;
-    }
-    (async () => {
-      try {
-        const now = Date.now();
-        const timeMin = new Date(now - 24 * 60 * 60 * 1000).toISOString();
-        const timeMax = new Date(now + 90 * 24 * 60 * 60 * 1000).toISOString();
-        const events = await listCalendarEvents({ timeMin, timeMax });
-        const toDelete = events.filter((e) => /hours test/i.test(e.summary || ''));
-        for (const e of toDelete) await deleteCalendarEvent(e.id);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          ok: true,
-          totalEventsInRange: events.length,
-          allEvents: events.map((e) => ({ id: e.id, summary: e.summary, start: e.start })),
-          deleted: toDelete.map((e) => ({ id: e.id, summary: e.summary, start: e.start })),
-        }, null, 2));
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: false, error: err.message }));
