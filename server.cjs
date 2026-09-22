@@ -1553,43 +1553,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // One-off: sends the Infatuation name-correction email. Remove after use.
-  if (req.method === 'POST' && urlPath === '/admin/send-infatuation-correction') {
-    if (!checkBasicAuth(req)) {
-      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
-      res.end('Unauthorized');
-      return;
-    }
-    (async () => {
-      try {
-        const text = [
-          `Hi there,`,
-          ``,
-          `I run The Ivy in Lakeview (1625 W Irving Park Rd). Thanks for the review and for including us in a few of your guides (Lakeview restaurants, Chicago sports bars, Detroit-style pizza, the Hit List). We really appreciate the coverage.`,
-          ``,
-          `One correction, though: our name is listed as "The Ivy Bar & Grill" on your site, but our actual name is The Ivy Bar and Kitchen. It's on our review page (theinfatuation.com/chicago/reviews/the-ivy-bar-and-grill), and it looks like every guide that mentions us pulls the name from there.`,
-          ``,
-          `Could you update it to "The Ivy Bar and Kitchen"? Happy to answer any questions, you can reach us at info@theivybk.com or (773) 799-8160.`,
-          ``,
-          `Thanks,`,
-          `The Ivy Bar and Kitchen`,
-        ].join('\n');
-        const result = await resendSendEmail({
-          to: 'support@theinfatuation.com',
-          subject: "Correction request — business name on The Ivy's Chicago listing",
-          text,
-        });
-        const ok = result.status >= 200 && result.status < 300;
-        res.writeHead(ok ? 200 : 502, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok, resend: result.body }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: false, error: err.message }));
-      }
-    })();
-    return;
-  }
-
   if (req.method === 'GET' && urlPath === '/admin/db') {
     if (!checkBasicAuth(req)) {
       res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
