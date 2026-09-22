@@ -330,7 +330,7 @@ const jsonLd = {
     <div class="section-head">
       <span class="eyebrow">Every Week</span>
       <h2>The Ivy specials</h2>
-      <p>Four nights, four reasons to come back — plus happy hour all week long.</p>
+      <p>Four nights, four reasons to come back — plus happy hour all week and late-night cocktails Friday &amp; Saturday.</p>
     </div>
     <div class="specials-grid">
       <div class="specials-card">
@@ -364,6 +364,13 @@ const jsonLd = {
         <h3>Monday – Thursday <span class="hh-time">· 3pm – 5pm</span></h3>
       </div>
       <p>$1 off draft, cans &amp; bottles &nbsp;·&nbsp; $2 off wine &nbsp;·&nbsp; $3 off cocktails</p>
+    </div>
+    <div class="happy-hour-bar">
+      <div>
+        <span class="eyebrow" style="color:var(--brass-light)">Night Caps</span>
+        <h3>Friday – Saturday <span class="hh-time">· 10pm – 12am</span></h3>
+      </div>
+      <p>$10 signature cocktails</p>
     </div>
     <p class="specials-footnote">Add-ons subject to extra charge</p>
   </div>
@@ -693,6 +700,7 @@ const jsonLd = {
     display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); flex-wrap: wrap;
     background: var(--ivy); color: var(--cream); border-radius: var(--r-sm); padding: var(--sp-7) var(--sp-8);
   }
+  .happy-hour-bar + .happy-hour-bar { margin-top: var(--sp-4); }
   .happy-hour-bar h3 { color: var(--cream); font-style: italic; font-size: var(--fs-2xl); margin: 4px 0 0; }
   .happy-hour-bar h3 .hh-time { white-space: nowrap; }
   .happy-hour-bar p { color: rgba(245,239,227,.85); margin: 0; font-family: var(--font-ui); font-size: var(--fs-sm); }
