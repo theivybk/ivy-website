@@ -820,6 +820,20 @@ function sendWelcomeEmail(email) {
 const RESERVATION_TO_EMAIL = 'info@theivybk.com';
 const RESERVATION_DURATION_MS = 2 * 60 * 60 * 1000;
 
+// Open/close (minutes since midnight) by JS day-of-week (0=Sun..6=Sat).
+// Mirrors the hours shown on the homepage (index.astro's
+// openingHoursSpecification and hours table) -- keep both in sync if hours
+// change. `close` runs past 24:00 for nights that close after midnight.
+const RESERVATION_HOURS = {
+  0: { open: 11 * 60, close: 24 * 60 }, // Sunday    11am - 12am
+  1: { open: 15 * 60, close: 24 * 60 }, // Monday     3pm - 12am
+  2: { open: 15 * 60, close: 24 * 60 }, // Tuesday    3pm - 12am
+  3: { open: 15 * 60, close: 24 * 60 }, // Wednesday  3pm - 12am
+  4: { open: 11 * 60, close: 24 * 60 }, // Thursday  11am - 12am
+  5: { open: 11 * 60, close: 25 * 60 }, // Friday    11am - 1am (next day)
+  6: { open: 11 * 60, close: 25 * 60 }, // Saturday  11am - 1am (next day)
+};
+
 // Parses "7:30 PM" (as produced by the reservation form's time <select>) into { hour24, minute }.
 function parseTime12h(timeStr) {
   const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec((timeStr || '').trim());
@@ -966,6 +980,17 @@ async function handleReservation(req, res) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < todayChicago) {
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ ok: false, error: 'Please choose a valid, upcoming date.' }));
+    return;
+  }
+
+  const parsedTime = parseTime12h(time);
+  const [resYear, resMonth, resDay] = date.split('-').map((n) => parseInt(n, 10));
+  const dayOfWeek = new Date(Date.UTC(resYear, resMonth - 1, resDay)).getUTCDay();
+  const hours = RESERVATION_HOURS[dayOfWeek];
+  const requestedMinutes = parsedTime ? parsedTime.hour24 * 60 + parsedTime.minute : null;
+  if (!parsedTime || requestedMinutes < hours.open || requestedMinutes >= hours.close) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: false, error: "That time is outside our hours — please pick a time we're open." }));
     return;
   }
 

@@ -555,6 +555,37 @@ const jsonLd = {
   dateInput.addEventListener('change', updateSameDayState);
   updateSameDayState();
 
+  // Opening hour (24h) by day-of-week, 0=Sun..6=Sat -- mirrors the hours
+  // table above and server.cjs's RESERVATION_HOURS. Only the opening bound
+  // matters here since the time <select> below never offers a slot past
+  // 10:00 PM, well before every day's closing time.
+  const timeSelect = document.getElementById('r-time');
+  const OPEN_HOUR_BY_DAY = { 0: 11, 1: 15, 2: 15, 3: 15, 4: 11, 5: 11, 6: 11 };
+  const timeOptionMinutes = (optionEl) => {
+    const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(optionEl.textContent.trim());
+    if (!m) return null;
+    let hour = parseInt(m[1], 10) % 12;
+    if (/PM/i.test(m[3])) hour += 12;
+    return hour * 60 + parseInt(m[2], 10);
+  };
+  const updateTimeOptions = () => {
+    if (!dateInput.value) return;
+    const [y, mo, d] = dateInput.value.split('-').map(Number);
+    const dayOfWeek = new Date(Date.UTC(y, mo - 1, d)).getUTCDay();
+    const openMinutes = OPEN_HOUR_BY_DAY[dayOfWeek] * 60;
+    let selectedNowInvalid = false;
+    for (const opt of timeSelect.options) {
+      if (!opt.value) continue; // "Select" placeholder
+      const mins = timeOptionMinutes(opt);
+      const disabled = mins !== null && mins < openMinutes;
+      opt.disabled = disabled;
+      if (disabled && opt.selected) selectedNowInvalid = true;
+    }
+    if (selectedNowInvalid) timeSelect.value = '';
+  };
+  dateInput.addEventListener('change', updateTimeOptions);
+  updateTimeOptions();
+
   reserveForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const data = new FormData(reserveForm);
