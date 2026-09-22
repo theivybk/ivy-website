@@ -219,8 +219,8 @@
         },
         {
           "@type": "MenuSection",
-          "name": "Handhelds",
-          "description": "served with fries. Sub truffle fries, brussel sprouts, green beans or a salad — +1. Gluten-free bun available. Beyond patty available",
+          "name": "Smash Burgers",
+          "description": "double-smashed, served with fries. Sub truffle fries, brussel sprouts, green beans or a salad — +1. Gluten-free bun available. Beyond patty available",
           "hasMenuItem": [
             {
               "@type": "MenuItem",
@@ -251,7 +251,14 @@
                 "price": "20",
                 "priceCurrency": "USD"
               }
-            },
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
+          "name": "Sandwiches & Wraps",
+          "description": "served with fries",
+          "hasMenuItem": [
             {
               "@type": "MenuItem",
               "name": "Southwest Grilled Chicken",
