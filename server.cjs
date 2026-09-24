@@ -1601,51 +1601,33 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // TEMPORARY: reads back (and optionally deletes) the calendar event created by
-  // a test agreement signing. Removed right after it has been used once.
-  if (req.method === 'POST' && urlPath === '/admin/calendar-test-cleanup') {
+  // TEMPORARY: emails the attorney review packet once, then this route and the
+  // PDF are removed.
+  if (req.method === 'POST' && urlPath === '/admin/send-counsel-packet') {
     if (!checkBasicAuth(req)) {
       res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
       res.end('Unauthorized');
       return;
     }
-    const wantDelete = new URL(req.url, 'http://localhost').searchParams.get('delete') === '1';
-    const gcal = (method, pathAndQuery, accessToken) => new Promise((resolve, reject) => {
-      const r = https.request(
-        { hostname: 'www.googleapis.com', path: pathAndQuery, method, headers: { Authorization: `Bearer ${accessToken}` } },
-        (resp) => {
-          let data = '';
-          resp.on('data', (chunk) => (data += chunk));
-          resp.on('end', () => {
-            let parsed = {};
-            try { parsed = JSON.parse(data); } catch {}
-            resolve({ status: resp.statusCode, body: parsed });
-          });
-        }
-      );
-      r.on('error', reject);
-      r.end();
-    });
     (async () => {
       try {
-        const accessToken = await getGoogleCalendarAccessToken();
-        const calId = encodeURIComponent(GOOGLE_CALENDAR_ID);
-        const list = await gcal('GET', `/calendar/v3/calendars/${calId}/events?timeMin=${encodeURIComponent('2026-11-13T00:00:00Z')}&timeMax=${encodeURIComponent('2026-11-16T00:00:00Z')}&singleEvents=true&maxResults=100`, accessToken);
-        const matches = (list.body.items || []).filter((e) => (e.summary || '').startsWith('Private Event: Test Agreement Please Ignore'));
-        const deleted = [];
-        if (wantDelete) {
-          for (const e of matches) {
-            const d = await gcal('DELETE', `/calendar/v3/calendars/${calId}/events/${encodeURIComponent(e.id)}`, accessToken);
-            deleted.push({ id: e.id, status: d.status });
-          }
-        }
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          listStatus: list.status,
-          totalInWindow: (list.body.items || []).length,
-          matches: matches.map((e) => ({ id: e.id, summary: e.summary, start: e.start, end: e.end, colorId: e.colorId, location: e.location, extendedProperties: e.extendedProperties, description: e.description })),
-          deleted,
-        }, null, 2));
+        const filename = 'Ivy-Event-Agreement-for-Attorney.pdf';
+        const content = fs.readFileSync(path.join(__dirname, 'counsel', filename)).toString('base64');
+        const result = await resendSendEmail({
+          to: 'info@consumelz.com',
+          subject: 'Private event agreement for attorney review: The Ivy Bar & Kitchen',
+          text: [
+            'Attached is the private event space agreement for The Ivy Bar & Kitchen (Thirsty Angus LLC), for attorney review.',
+            '',
+            'Pages 1 and 2 summarize the business terms the owner chose and list the questions for counsel. The full agreement follows, shown with sample client data as a client would sign it.',
+            '',
+            'Clients receive a link, review the terms online, and sign by typing their name. The signed copy is emailed to both parties.',
+          ].join('\n'),
+          attachments: [{ filename, content }],
+        });
+        const ok = result.status >= 200 && result.status < 300;
+        res.writeHead(ok ? 200 : 502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok, resend: result.body }));
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: false, error: err.message }));
