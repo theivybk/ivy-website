@@ -177,6 +177,7 @@ const TERMS_VERSIONS = {
 
     const pricingNotes = `
       <p>Pricing excludes applicable taxes and a required <strong>20% service charge</strong>, which are added to the final bill. The service charge is calculated on food and beverage before tax. Any additional gratuity for our team beyond the 20% is always at the Client's discretion.</p>
+      <p>Credit card payments are subject to a 3% surcharge (see Booking, Deposit &amp; Payment).</p>
       <p>No separate room rental, setup, or service fees apply except as described in this agreement.</p>
       <p>If the Client's total food and beverage charges (before tax and service charge) come to less than the <strong>Food &amp; Beverage Minimum</strong>, the difference is added to the final bill.</p>`;
 
@@ -188,9 +189,9 @@ const TERMS_VERSIONS = {
         <p>A <strong>20% deposit</strong> is required to secure the event date. The event is not confirmed until The Ivy has received the deposit, and The Ivy will confirm by email once it has. The Ivy accepts this agreement by confirming the date, so no separate signature from The Ivy is required.</p>
         <p>The Ivy is holding the date for the Client through <strong>${esc(fmtDateShort(c.exp))}</strong>. If The Ivy has not received the signed agreement and the deposit by then, The Ivy may release the date.</p>
         <p>After the agreement is signed, The Ivy will contact the Client to collect the deposit by credit card. Please do not email or text card numbers.</p>
-        <p>The deposit is credited toward the Client's final bill.</p>
+        <p>The deposit is credited toward the Client's final bill. Payments made by credit card, including the deposit and the final payment, carry a <strong>3% credit card surcharge</strong>, which is added to the amount charged and is not credited toward the bill.</p>
         <p>The remaining balance is due <strong>on the day of the event</strong>. Final payment must be made using <strong>one credit card</strong>; the balance cannot be split across cards. Drinks that guests buy on their own individual tabs are separate from the Client's final bill.</p>
-        <p>By signing, the Client authorizes The Ivy to charge the credit card the Client provides for any amount owed under this agreement, including the remaining balance and any damage fees. The Ivy will let the Client know before charging for damage fees.</p>`,
+        <p>By signing, the Client authorizes The Ivy to charge the credit card the Client provides for any amount owed under this agreement (plus the 3% credit card surcharge), including the remaining balance and any damage fees. The Ivy will let the Client know before charging for damage fees.</p>`,
     });
 
     sections.push({
@@ -504,7 +505,7 @@ function documentHtml(c, signed) {
       <h2><span class="n">2</span>Selections &amp; Pricing</h2>
       ${linesHtml}
       <table class="tbl sum"><tbody>${sumRows}</tbody></table>
-      <div class="callout">Estimated 20% service charge on the amount above: <strong>${esc(fmtMoney(t.service))}</strong></div>
+      <div class="callout">Estimated 20% service charge on the amount above: <strong>${esc(fmtMoney(t.service))}</strong><br>A 3% surcharge applies to all credit card payments, including the deposit.</div>
       ${extra.join('')}
       ${terms.pricingNotes}
 
@@ -535,7 +536,7 @@ function signFormHtml(c, token) {
       <label class="check"><input type="checkbox" name="consent" required><span>I agree to sign electronically and to receive this agreement and related notices by email.</span></label>
       <p class="err" id="sign-err" role="alert" hidden></p>
       <button type="submit" class="btn" id="sign-btn">Sign Agreement</button>
-      <p class="fine">After you sign, The Ivy will contact you to collect the ${esc(fmtMoney(t.deposit))} deposit. Your date is held through ${esc(fmtDateShort(c.exp))}. Questions? Call ${esc(VENUE.phone)} or email ${esc(VENUE.eventsEmail)}.</p>
+      <p class="fine">After you sign, The Ivy will contact you to collect the ${esc(fmtMoney(t.deposit))} deposit (credit card payments carry a 3% surcharge). Your date is held through ${esc(fmtDateShort(c.exp))}. Questions? Call ${esc(VENUE.phone)} or email ${esc(VENUE.eventsEmail)}.</p>
     </form>`;
 }
 
