@@ -1142,7 +1142,18 @@ function createContractHandlers(deps) {
       }),
       replyTo: VENUE.eventsEmail,
       attachments: [attachment],
-    }).catch((err) => console.error('Agreement client copy email error:', err.message));
+    }).then((result) => {
+      if (result.status < 200 || result.status >= 300) {
+        throw new Error(`Resend status ${result.status}${result.body && result.body.message ? `: ${result.body.message}` : ''}`);
+      }
+    }).catch((err) => {
+      console.error('Agreement client copy email error:', err.message);
+      resendSendEmail({
+        to: VENUE.notifyTo,
+        subject: `Signed copy did NOT reach the client: ${c.name} (${refOf(c)})`,
+        text: `${c.name} signed the agreement, but the signed copy could not be emailed to ${signedData.cl.email}. The address may be mistyped.\n\nPlease contact them at ${signedData.cl.phone} and send them this link:\n${signedLink}\n\nReason: ${err.message}`,
+      }).catch((mailErr) => console.error('Agreement client copy alert email error:', mailErr.message));
+    });
   }
 
   // Builds the events-calendar entry for a signed agreement. `conf` is null
@@ -1399,10 +1410,12 @@ function createContractHandlers(deps) {
         }),
         replyTo: VENUE.eventsEmail,
       });
-      if (mail.status < 200 || mail.status >= 300) throw new Error(`Resend status ${mail.status}`);
+      if (mail.status < 200 || mail.status >= 300) {
+        throw new Error(`Resend status ${mail.status}${mail.body && mail.body.message ? `: ${mail.body.message}` : ''}`);
+      }
     } catch (err) {
       console.error('Deposit confirmation email failed:', err.message);
-      return sendJson(res, 502, { ok: false, error: 'The confirmation email to the client did not send, so nothing was changed. Please try again.' });
+      return sendJson(res, 502, { ok: false, error: `The confirmation email to ${data.cl.email} did not send, so nothing was changed. Check that the address is correct. (${err.message})` });
     }
     confirmedIds.add(c.id);
 
