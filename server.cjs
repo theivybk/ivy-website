@@ -942,6 +942,46 @@ async function createReservationCalendarEvent({ fullName, phone, email, date, ti
   });
 }
 
+// Generic Calendar API insert, used by private event agreements. Returns null
+// when the calendar isn't configured. Callers pass a fixed event id, so a 409
+// means that event is already on the calendar (for example an agreement that
+// was signed twice) and counts as success.
+async function insertCalendarEvent(event) {
+  if (!GOOGLE_CALENDAR_CLIENT_ID || !GOOGLE_CALENDAR_CLIENT_SECRET || !GOOGLE_CALENDAR_REFRESH_TOKEN) return null;
+  const accessToken = await getGoogleCalendarAccessToken();
+  const body = JSON.stringify(event);
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: 'www.googleapis.com',
+        path: `/calendar/v3/calendars/${encodeURIComponent(GOOGLE_CALENDAR_ID)}/events`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}`, 'Content-Length': Buffer.byteLength(body) },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
+          if (res.statusCode === 409) {
+            resolve({ duplicate: true });
+            return;
+          }
+          if (res.statusCode >= 300) {
+            reject(new Error(`Calendar insert failed: ${res.statusCode} ${data}`));
+            return;
+          }
+          let parsed = {};
+          try { parsed = JSON.parse(data); } catch {}
+          resolve(parsed);
+        });
+      }
+    );
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
 async function handleReservation(req, res) {
   if (!RESEND_API_KEY) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
@@ -1473,6 +1513,7 @@ const contracts = require('./contract.cjs').createContractHandlers({
   checkBasicAuth,
   readJsonBody,
   getClientIp,
+  createCalendarEvent: insertCalendarEvent,
   secret: (process.env.CONTRACT_SECRET || '').trim() || ADMIN_PASS,
   hasResend: () => !!RESEND_API_KEY,
 });

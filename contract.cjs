@@ -170,59 +170,61 @@ function computeTotals(c) {
 // from the agreement data. Everything from section 3 on is the text below.
 const TERMS_VERSIONS = {
   1: function termsV1(c) {
+    const t = computeTotals(c);
     const hasRoof = /roof|bundle|buyout/i.test(c.space);
     const hasGathering = /gathering/i.test(c.space);
     const hasFood = c.lines.some((l) => l[3] === 'food');
     const hasBev = c.lines.some((l) => l[3] === 'bev');
 
     const pricingNotes = `
-      <p>Pricing excludes applicable taxes and a required <strong>20% service charge</strong>, which are added to the final bill. The service charge is calculated on food and beverage before tax. Any additional gratuity for our team beyond the 20% is always at the Client's discretion.</p>
-      <p>Credit card payments are subject to a 3% surcharge (see Booking, Deposit &amp; Payment).</p>
-      <p>No separate room rental, setup, or service fees apply except as described in this agreement.</p>
-      <p>If the Client's total food and beverage charges (before tax and service charge) come to less than the <strong>Food &amp; Beverage Minimum</strong>, the difference is added to the final bill.</p>`;
+      <p><strong>Service charge and taxes.</strong> Pricing excludes applicable taxes and a required <strong>20% service charge</strong>, which are added to the final bill. The service charge is calculated on the food and beverage total before tax${t.min > 0 ? ' (or on the Food &amp; Beverage Minimum, if greater)' : ''}. Any additional gratuity for our team beyond the 20% is at the Client's discretion.</p>
+      <p><strong>Credit card surcharge.</strong> Credit card payments, including the deposit and the final payment, are subject to a 3% surcharge (see Booking, Deposit &amp; Payment).</p>
+      ${t.min > 0 ? '<p><strong>Food &amp; Beverage Minimum.</strong> If the Client\'s food and beverage charges (before tax, service charge, and surcharge) are less than the Food &amp; Beverage Minimum, the difference is added to the final bill.</p>' : ''}
+      <p><strong>Other fees.</strong> No separate room rental, setup, or service fees apply except as described in this agreement.</p>`;
 
     const sections = [];
 
     sections.push({
       title: 'Booking, Deposit & Payment',
       html: `
-        <p>A <strong>20% deposit</strong> is required to secure the event date. The event is not confirmed until The Ivy has received the deposit, and The Ivy will confirm by email once it has. The Ivy accepts this agreement by confirming the date, so no separate signature from The Ivy is required.</p>
-        <p>The Ivy is holding the date for the Client through <strong>${esc(fmtDateShort(c.exp))}</strong>. If The Ivy has not received the signed agreement and the deposit by then, The Ivy may release the date.</p>
-        <p>After the agreement is signed, The Ivy will contact the Client to collect the deposit by credit card. Please do not email or text card numbers.</p>
-        <p>The deposit is credited toward the Client's final bill. Payments made by credit card, including the deposit and the final payment, carry a <strong>3% credit card surcharge</strong>, which is added to the amount charged and is not credited toward the bill.</p>
-        <p>The remaining balance is due <strong>on the day of the event</strong>. Final payment must be made using <strong>one credit card</strong>; the balance cannot be split across cards. Drinks that guests buy on their own individual tabs are separate from the Client's final bill.</p>
-        <p>By signing, the Client authorizes The Ivy to charge the credit card the Client provides for any amount owed under this agreement (plus the 3% credit card surcharge), including the remaining balance and any damage fees. The Ivy will let the Client know before charging for damage fees.</p>`,
+        <p><strong>Deposit and effective date.</strong> A deposit of <strong>${esc(fmtMoney(t.deposit))}</strong> is required to secure the Event Date. The event is not confirmed until The Ivy has received the deposit. This agreement takes effect when The Ivy confirms the Event Date by email after receiving the deposit. That confirmation is The Ivy's acceptance, so no separate signature from The Ivy is required. If The Ivy is unable to confirm the date, any payment the Client has made will be refunded in full.</p>
+        <p><strong>Date hold.</strong> The Ivy is holding the Event Date for the Client through <strong>${esc(fmtDateShort(c.exp))}</strong>. If The Ivy has not received the signed agreement and the deposit by then, The Ivy may release the date and this offer expires.</p>
+        <p><strong>How to pay.</strong> After the agreement is signed, The Ivy will contact the Client to collect the deposit by credit card. Please do not email or text card numbers.</p>
+        <p><strong>Credit card surcharge.</strong> Payments made by credit card, including the deposit and the final payment, carry a <strong>3% surcharge</strong>, which is added to the amount charged. The surcharge is not part of the deposit credit described below.</p>
+        <p><strong>Deposit credit.</strong> The deposit is credited toward the Client's final bill.</p>
+        <p><strong>Final payment.</strong> The remaining balance is due <strong>on the day of the event</strong>. Final payment must be made using <strong>one credit card</strong>; the balance cannot be split across cards. Drinks that guests buy on their own individual tabs are separate from the Client's final bill.</p>
+        <p><strong>Card authorization.</strong> By signing, the Client authorizes The Ivy to charge the credit card the Client provides, plus the 3% surcharge, for any amount owed under this agreement, including the remaining balance and any damage fees, and confirms they are the cardholder or an authorized user of that card. The Ivy will let the Client know before charging for damage fees. If a payment is declined, disputed, or reversed, the Client remains responsible for the amount owed.</p>`,
     });
 
     sections.push({
       title: 'Guest Count',
       html: `
-        <p>The guest count listed in this agreement is an estimate. The Client must provide the <strong>final guaranteed guest count</strong>, along with final menu selections, dietary needs, and the number of beverage-package wristbands, <strong>7 days before the event</strong>.</p>
-        <p>The guaranteed guest count is the minimum number of guests the Client will be billed for. Billing is based on the <strong>guaranteed guest count or actual attendance, whichever is greater</strong>.</p>
+        <p>The guest count in this agreement is an estimate. The Client must provide the <strong>final guaranteed guest count</strong>, final menu selections, dietary needs, and the number of beverage-package wristbands <strong>7 days before the Event Date</strong>. If the Client does not, the estimated guest count becomes the guaranteed guest count. After that deadline the guaranteed guest count may be increased if The Ivy can accommodate it, but it may not be reduced.</p>
+        <p>For per-guest food packages, the Client is billed for the <strong>guaranteed guest count or actual attendance, whichever is greater</strong>, with attendance as counted by The Ivy. Beverage packages are billed per wristband ordered.</p>
         <p>The Ivy may limit attendance to the legal capacity of the space.</p>`,
     });
 
     sections.push({
       title: 'Setup & Event Time',
       html: `
-        <p>A <strong>30-minute setup window</strong> is provided immediately before the Event Start Time. Additional setup time may be arranged in advance, based on availability, and may be subject to additional charges.</p>
-        <p>The event must end at the agreed End Time unless The Ivy approves an extension, which may be subject to additional charges. The End Time does not move if the event starts late. The Client's decorations, gifts, and belongings must be removed by the End Time, and The Ivy is not responsible for items left behind.</p>
+        <p>A <strong>30-minute setup window</strong> is provided immediately before the Event Start Time. Additional setup time may be arranged in advance, based on availability, and may be subject to additional charges, which The Ivy will tell the Client before agreeing.</p>
+        <p>The event must end at the Event End Time unless The Ivy approves an extension in advance, which may be subject to additional charges. The Event End Time does not move if the event starts late. The Client's decorations, gifts, and belongings must be removed by the Event End Time, and The Ivy is not responsible for items left behind.</p>
         ${hasGathering ? '<p>The Gathering Room is a semi-private space within our dining room. The Ivy remains open to the public, and other guests may be nearby.</p>' : ''}`,
     });
 
     const foodBevParts = [];
     if (hasFood) {
-      foodBevParts.push(`<p><strong>Classic Buffet.</strong> A 2-hour buffet that includes up to three pizza varieties (cheese, pepperoni, sausage, veggie), crispy chicken wings with one sauce (Buffalo, BBQ, Butter Chicken, or Giardiniera Hot Honey), french fries, hummus with veggies, and a choice of salad (Caesar, house, or crispy chicken chopped). Menu selections are due with the final guest count.</p>`);
+      foodBevParts.push(`<p><strong>Classic Buffet.</strong> A 2-hour buffet, served beginning at a time set with The Ivy, that includes up to three pizza varieties (cheese, pepperoni, sausage, veggie), crispy chicken wings with one sauce (Buffalo, BBQ, Butter Chicken, or Giardiniera Hot Honey), french fries, hummus with veggies, and a choice of salad (Caesar, house, or crispy chicken chopped). Menu selections are due with the final guest count.</p>`);
     }
     if (hasBev) {
-      foodBevParts.push(`<p><strong>Beverage packages.</strong> Packages are open bar for the selected duration. Each guest on a package receives a wristband, wristbands are not transferable, and service begins at the Event Start Time. Packages include unlimited beverages within the selected offering for the duration of service. Shots are excluded from all packages. When a package ends, guests may continue purchasing beverages on individual tabs. The Classic covers beer, wine, and seltzers. The Signature covers call spirits, classic cocktails, and standard pours. The Premium covers premium spirits and signature cocktails. Brands may be substituted with comparable products if something is unavailable.</p>`);
+      foodBevParts.push(`<p><strong>Beverage packages.</strong> Packages are open bar for the selected duration. Each guest on a package receives a wristband, and wristbands are not transferable. Service begins at the Event Start Time, and the package time runs from then even if guests arrive later. Packages include unlimited beverages within the selected offering for the duration of service. Shots are excluded from all packages. When a package ends, guests may continue purchasing beverages on individual tabs. The Classic covers beer, wine, and seltzers. The Signature covers call spirits, classic cocktails, and standard pours. The Premium covers premium spirits and signature cocktails. Brands may be substituted with comparable products if something is unavailable.</p>`);
     }
     sections.push({
       title: 'Food, Beverage & Alcohol',
       html: `
         ${foodBevParts.join('')}
         <p>All food and beverage must be provided by The Ivy. Outside food and beverage may not be brought in without The Ivy's prior written approval (for example, a celebration cake).</p>
-        <p>Alcohol is served only by The Ivy's staff, and outside alcohol is not permitted. Anyone consuming alcohol must show a valid government-issued photo ID showing they are 21 or older. The Ivy will not serve anyone who is under 21 or who appears intoxicated, and may stop service at any time to comply with Illinois and Chicago law, without refund.${hasRoof ? ' The rooftop is 21+ only.' : ''}</p>
+        <p>Alcohol is served only by The Ivy's staff, and outside alcohol is not permitted. Alcohol may not be taken off the premises. Anyone consuming alcohol must show a valid government-issued photo ID showing they are 21 or older. The Ivy will not serve anyone who is under 21 or who appears intoxicated, and may stop service at any time to comply with Illinois and Chicago law, without refund.${hasRoof ? ' The rooftop is 21+ only.' : ''}</p>
         <p>Please share allergies and dietary needs with the final guest count. Our kitchen handles common allergens, and The Ivy cannot guarantee that any item is free of them. If an item becomes unavailable, The Ivy may substitute a comparable item.</p>`,
     });
 
@@ -235,33 +237,34 @@ const TERMS_VERSIONS = {
           <li>Tape, staples, nails, or other materials that may damage walls, furniture, or fixtures</li>
           <li>Confetti, glitter, or similar materials that are difficult to remove</li>
           <li>Open flames, candles, sparklers, or other flame-producing items</li>
+          <li>Anything that blocks an exit, aisle, or fire equipment</li>
           <li>Any decoration or installation deemed unsafe or potentially damaging to the property</li>
         </ul>
         <p>Outside vendors hired by the Client (DJs, photographers, decorators, and similar) must be approved by The Ivy in advance and must follow these guidelines. The Client is responsible for them.</p>
-        <p>A <strong>$200 damage fee</strong> will be charged for damage to the space or property, or for violations of the decoration and facility guidelines. If damage or cleanup costs more than $200, the Client is responsible for the actual cost. The Client is responsible for damage caused by the Client, the Client's guests, and the Client's vendors.</p>`,
+        <p>A <strong>$200 damage fee</strong> will be charged for damage to the space or property, or for violations of the decoration and facility guidelines. If the actual cost of repair or cleanup is more than $200, the Client is responsible for the actual cost. The parties agree that the $200 fee is a reasonable estimate of The Ivy's costs and not a penalty. The Client is responsible for damage caused by the Client, the Client's guests, and the Client's vendors.</p>`,
     });
 
     sections.push({
       title: 'Cancellation',
       html: `
-        <p>Cancellations must be made <strong>in writing</strong> (email ${esc(VENUE.eventsEmail)}).</p>
-        <p>All deposits are <strong>non-refundable</strong> and are forfeited upon cancellation. If the event is cancelled less than 7 days before the event date, or the Client does not show up, the result is the same: the deposit is forfeited and the Client owes no further charges for the cancellation.</p>
+        <p>Cancellations must be made <strong>in writing</strong> (email ${esc(VENUE.eventsEmail)}) and take effect on the day The Ivy receives them.</p>
+        <p>The deposit, including any credit card surcharge paid with it, is <strong>non-refundable</strong> and is forfeited upon cancellation. If the event is cancelled less than 7 days before the Event Date, or the Client does not show up, the result is the same: the deposit is forfeited and the Client owes no further charges for the cancellation.</p>
         <p>If The Ivy cancels the event, see <em>Weather &amp; Events Beyond Our Control</em>.</p>`,
     });
 
     sections.push({
       title: 'Date Changes',
       html: `
-        <p>Requests to change the event date may be accommodated based on availability. Date-change requests must be made at least <strong>7 days before the original event date</strong>; later requests are treated as cancellations.</p>
-        <p>If approved, the original deposit may be transferred to the new event date. If the new date carries a different Food &amp; Beverage Minimum, The Ivy will confirm the updated terms in writing.</p>
+        <p>Requests to change the Event Date may be accommodated based on availability. Date-change requests must be made at least <strong>7 days before the original Event Date</strong>; later requests are treated as cancellations.</p>
+        <p>If approved, the original deposit may be transferred to the new date, and the change is not a cancellation. If the new date carries a different Food &amp; Beverage Minimum, The Ivy will confirm the updated terms in writing.</p>
         <p>Date changes are subject to availability and confirmation by The Ivy.</p>`,
     });
 
     sections.push({
       title: 'Weather & Events Beyond Our Control',
       html: `
-        ${hasRoof ? '<p>Rooftop events are weather dependent. If weather makes the rooftop unsafe or unusable, The Ivy will offer another available space or work with the Client on a new date. Weather alone is not grounds for cancellation under the Cancellation terms.</p>' : ''}
-        <p>If The Ivy cannot host the event as agreed, including because of a closure, fire, utility failure, government order, or other circumstances beyond its reasonable control, The Ivy will offer to move the event to a new date and transfer the deposit, or will refund the deposit in full. In that case The Ivy has no further liability to the Client.</p>`,
+        ${hasRoof ? '<p>Rooftop events are weather dependent. If weather makes the rooftop unsafe or unusable, The Ivy will offer another available space or work with the Client on a new date. Weather alone does not entitle the Client to a refund of the deposit.</p>' : ''}
+        <p>If The Ivy cannot host the event as agreed, including because of a closure, fire, utility failure, government order, or other circumstances beyond its reasonable control, the Client may choose to move the event to a new date, with the deposit transferred, or to receive a full refund of all amounts paid, including any credit card surcharge. That choice is the Client's only remedy, and The Ivy has no further liability to the Client, including for costs the Client incurred with others, such as vendors or travel.</p>`,
     });
 
     sections.push({
@@ -272,7 +275,8 @@ const TERMS_VERSIONS = {
           <li>The Ivy may remove any guest whose behavior is unsafe, disorderly, or harassing, and may end the event if necessary for safety or legal reasons, without refund.</li>
           <li>Music, DJs, live entertainment, and AV equipment brought in by the Client must be approved by The Ivy in advance and kept at a volume that complies with the law and respects our neighbors. The Ivy is not responsible for outside equipment.</li>
           <li>The Ivy is not responsible for lost, stolen, or damaged personal property or decorations left in the space before, during, or after the event.</li>
-          <li>The Client is responsible for injuries and losses caused by the Client, the Client's guests, and the Client's vendors. The Ivy is not liable for injuries or losses at the event except to the extent caused by The Ivy's own negligence.</li>
+          <li>The Client will indemnify and hold harmless The Ivy, its owners, and its employees from claims, losses, and costs, including reasonable attorneys' fees, arising from the acts or omissions of the Client, the Client's guests, or the Client's vendors, except to the extent caused by The Ivy's negligence or willful misconduct.</li>
+          <li>The Ivy is not liable for injuries or losses at the event except to the extent caused by The Ivy's negligence or willful misconduct. Otherwise, The Ivy's total liability under this agreement is limited to the amounts the Client has paid to The Ivy, and The Ivy is not liable for indirect or consequential damages.</li>
         </ul>`,
     });
 
@@ -280,12 +284,13 @@ const TERMS_VERSIONS = {
       title: 'General Terms',
       html: `
         <ul>
-          <li>This agreement is the entire agreement between the Client and The Ivy about the event. It can be changed only in writing agreed to by both parties; an email from ${esc(VENUE.eventsEmail)} counts as writing.</li>
-          <li>If the Client is signing for a company or organization, the Client confirms they are authorized to sign for it, and it is bound by this agreement.</li>
-          <li>The Client may not transfer this agreement to anyone else without The Ivy's written consent.</li>
-          <li>Illinois law governs this agreement. Any dispute will be handled in the state or federal courts located in Cook County, Illinois.</li>
-          <li>If any part of this agreement is found unenforceable, the rest stays in effect.</li>
-          <li><strong>Electronic signature.</strong> Typing a name and clicking Sign is a legally binding electronic signature with the same effect as a handwritten signature. The Client consents to receive this agreement and related notices electronically at the email address provided, and may request a paper copy at any time by contacting ${esc(VENUE.eventsEmail)}.</li>
+          <li><strong>Entire agreement.</strong> This agreement, including the selections, pricing, and notes above, is the entire agreement between the Client and The Ivy about the event. If it conflicts with any menu, brochure, guidelines sheet, or earlier communication, this agreement controls. It can be changed only in writing agreed to by both parties, and email is sufficient.</li>
+          <li><strong>Authority.</strong> The person signing confirms they are at least 18 years old and, if signing for a company or organization, that they are authorized to sign for it and that it is bound by this agreement.</li>
+          <li><strong>Transfer.</strong> The Client may not transfer this agreement to anyone else without The Ivy's written consent.</li>
+          <li><strong>Governing law.</strong> Illinois law governs this agreement. Any dispute must be brought in the state or federal courts located in Cook County, Illinois, and each party consents to those courts.</li>
+          <li><strong>If a term fails.</strong> If any part of this agreement is found unenforceable, the rest stays in effect. If The Ivy does not enforce a term, that is not a waiver of it.</li>
+          <li><strong>Notices.</strong> Notices to The Ivy go to ${esc(VENUE.eventsEmail)}. Notices to the Client go to the email address in this agreement.</li>
+          <li><strong>Electronic signature.</strong> Typing a name and clicking Sign is a legally binding electronic signature with the same effect as a handwritten signature. The Client consents to receive this agreement and related notices electronically at the email address provided, and may request a paper copy or withdraw this consent at any time by contacting ${esc(VENUE.eventsEmail)}.</li>
         </ul>`,
     });
 
@@ -432,7 +437,6 @@ function documentHtml(c, signed) {
   const email = cl.email || c.email;
   const company = signed ? cl.company : c.company;
 
-  const timeRange = `${fmtTime(c.start)} &ndash; ${fmtTime(c.end)}`;
   const dayOf = signed ? (cl.dayName || 'Same as Client') : 'To be provided at signing';
   const dayOfPhone = signed ? (cl.dayPhone || phone) : '';
 
@@ -443,7 +447,8 @@ function documentHtml(c, signed) {
     factRow('Email', esc(email)),
     factRow('Event Date', esc(fmtDate(c.date))),
     factRow('Event Type', esc(c.type)),
-    factRow('Event Time', timeRange, '30-minute setup window immediately before the start time'),
+    factRow('Event Start Time', esc(fmtTime(c.start)), '30-minute setup window immediately before this time'),
+    factRow('Event End Time', esc(fmtTime(c.end))),
     factRow('Guest Arrival Time', c.arrive ? esc(fmtTime(c.arrive)) : ''),
     factRow('Estimated Guest Count', esc(c.guests), 'The final guaranteed count is due 7 days before the event'),
     factRow('Event Space', esc(c.space)),
@@ -460,7 +465,7 @@ function documentHtml(c, signed) {
   const sumRows = [
     c.lines.length ? `<tr><td>Estimated Food &amp; Beverage Total</td><td>${esc(fmtMoney(t.est))}</td></tr>` : '',
     t.min > 0 ? `<tr><td>Food &amp; Beverage Minimum</td><td>${esc(fmtMoney(t.min))}</td></tr>` : '',
-    `<tr class="strong"><td>20% Deposit Due to Secure the Date<span class="hint">20% of the food &amp; beverage amount above; credited toward the final bill</span></td><td>${esc(fmtMoney(t.deposit))}</td></tr>`,
+    `<tr class="strong"><td>Deposit Due to Secure the Date<span class="hint">${t.deposit === r2(t.base * DEPOSIT_RATE) ? '20% of the food &amp; beverage amount above; ' : ''}credited toward the final bill</span></td><td>${esc(fmtMoney(t.deposit))}</td></tr>`,
     `<tr><td>Estimated Remaining Balance<span class="hint">Before tax and service charge; due on the day of the event</span></td><td>${esc(fmtMoney(t.remaining))}</td></tr>`,
   ].join('');
 
@@ -497,7 +502,7 @@ function documentHtml(c, signed) {
     <div class="doc">
       <span class="eyebrow">Agreement ${esc(refOf(c))} &middot; Issued ${esc(issuedOn)}</span>
       <h1>Private Event Space Agreement</h1>
-      <p class="lede">Thank you for choosing The Ivy for your upcoming event. This agreement outlines the event details, payment terms, cancellation policy, and guidelines for use of our private event space. In this agreement, &ldquo;The Ivy&rdquo; means ${esc(VENUE.legalName)}, ${esc(VENUE.address)}, and &ldquo;Client&rdquo; means the person or organization named below.</p>
+      <p class="lede">Thank you for choosing The Ivy for your upcoming event. This agreement outlines the event details, payment terms, cancellation policy, and guidelines for use of our private event space. In this agreement, &ldquo;The Ivy&rdquo; means ${esc(VENUE.legalName)}, ${esc(VENUE.address)}; &ldquo;Client&rdquo; means the person or organization named below; and &ldquo;event&rdquo; means the event described below. Capitalized terms such as Event Date, Event Start Time, and Event End Time refer to the details listed in Event Information.</p>
 
       <h2><span class="n">1</span>Event Information</h2>
       <table class="facts">${facts}</table>
@@ -902,7 +907,7 @@ function adminPageHtml() {
 // ------------------------------------------------------- tokens & handlers
 
 function createContractHandlers(deps) {
-  const { resendSendEmail, emailTemplate, checkBasicAuth, readJsonBody, getClientIp, secret, hasResend } = deps;
+  const { resendSendEmail, emailTemplate, checkBasicAuth, readJsonBody, getClientIp, createCalendarEvent, secret, hasResend } = deps;
 
   // In-memory only (resets on deploy): maps an agreement id to its signed
   // link so a repeat visit or double-click doesn't produce a second signature.
@@ -1061,6 +1066,8 @@ function createContractHandlers(deps) {
     signedById.set(c.id, signedToken);
     sendJson(res, 200, { ok: true, signedUrl: `/contract/${signedToken}?signed=1` });
 
+    addToCalendar(c, signedData.cl, signedLink);
+
     resendSendEmail({
       to: signedData.cl.email,
       subject: 'Your signed agreement | The Ivy Bar and Kitchen',
@@ -1072,6 +1079,60 @@ function createContractHandlers(deps) {
       replyTo: VENUE.eventsEmail,
       attachments: [attachment],
     }).catch((err) => console.error('Agreement client copy email error:', err.message));
+  }
+
+  // Puts the signed party on the events calendar. The event id is derived from
+  // the agreement id, so signing twice can never create a duplicate. It is
+  // titled "deposit pending" because the date is not confirmed until the
+  // deposit arrives. A calendar failure never affects the signature; it just
+  // emails the events team so they can add the party by hand.
+  async function addToCalendar(c, cl, signedLink) {
+    if (!createCalendarEvent) return;
+    try {
+      const t = computeTotals(c);
+      const nextDay = (ymd) => new Date(Date.parse(ymd + 'T12:00:00Z') + 86400000).toISOString().slice(0, 10);
+      const endDay = c.end <= c.start ? nextDay(c.date) : c.date;
+      const description = [
+        `${c.type}, about ${c.guests} guests`,
+        `Space: ${c.space}`,
+        `Setup: 30 minutes before ${fmtTime(c.start)}`,
+        '',
+        `Client: ${c.name}${cl.company ? ` (${cl.company})` : ''}`,
+        `Phone: ${cl.phone}`,
+        `Email: ${cl.email}`,
+        cl.dayName ? `Day-of contact: ${cl.dayName}${cl.dayPhone ? ` ${cl.dayPhone}` : ''}` : null,
+        '',
+        `Deposit: ${fmtMoney(t.deposit)}, PENDING until received (date held through ${fmtDateShort(c.exp)})`,
+        `Estimated food & beverage: ${fmtMoney(t.est)}${t.min > 0 ? `, minimum ${fmtMoney(t.min)}` : ''}`,
+        ...c.lines.map((l) => `- ${l[1]} x ${l[0]}`),
+        c.sel ? `Menu: ${c.sel}` : null,
+        c.notes ? `Notes: ${c.notes}` : null,
+        '',
+        `Signed agreement: ${signedLink}`,
+        `Agreement ${refOf(c)}`,
+      ].filter((line) => line !== null).join('\n');
+
+      await createCalendarEvent({
+        id: 'agr' + c.id,
+        summary: `Private Event: ${c.name} (${c.guests} guests) [deposit pending]`,
+        description,
+        location: `${VENUE.name}, ${VENUE.address} (${c.space})`,
+        colorId: '5',
+        start: { dateTime: `${c.date}T${c.start}:00`, timeZone: 'America/Chicago' },
+        end: { dateTime: `${endDay}T${c.end}:00`, timeZone: 'America/Chicago' },
+      });
+    } catch (err) {
+      console.error('Agreement calendar event error:', err.message);
+      try {
+        await resendSendEmail({
+          to: VENUE.notifyTo,
+          subject: `Add to calendar by hand: ${c.name}, ${c.date} (${refOf(c)})`,
+          text: `${c.name} signed the private event agreement, but the party could not be added to the events calendar automatically.\n\nPlease add it by hand:\n${c.type}, about ${c.guests} guests\n${c.space}\n${fmtDate(c.date)}, ${fmtTime(c.start)} to ${fmtTime(c.end)}\n\nSigned agreement: ${signedLink}\n\nError: ${err.message}`,
+        });
+      } catch (mailErr) {
+        console.error('Agreement calendar alert email error:', mailErr.message);
+      }
+    }
   }
 
   // ---- admin
