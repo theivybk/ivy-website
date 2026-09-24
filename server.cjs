@@ -337,6 +337,19 @@ function checkContractAuth(req) {
   });
 }
 
+// Where the database lives, so the admin page can show whether it is on a
+// persistent volume (survives deploys) or on the disk that is wiped each time.
+function dbFileInfo() {
+  const info = { path: DB_PATH, persistent: !path.resolve(DB_PATH).startsWith(path.resolve(__dirname)) };
+  try {
+    const st = fs.statSync(DB_PATH);
+    info.sizeBytes = st.size;
+    const born = st.birthtime && st.birthtime.getTime() > 0 ? st.birthtime : st.mtime;
+    info.createdAt = born.toISOString();
+  } catch {}
+  return info;
+}
+
 function checkBasicAuth(req) {
   if (!ADMIN_USER || !ADMIN_PASS) return false;
   const header = req.headers['authorization'] || '';
@@ -1796,13 +1809,14 @@ const server = http.createServer((req, res) => {
     const reservations = realReservations.slice(0, 50);
     const signups = realSignups.slice(0, 50);
     const inquiries = realInquiries.slice(0, 50);
+    const dbInfo = dbFileInfo();
     const reservationCount = realReservations.length;
     const signupCount = realSignups.length;
     const inquiryCount = realInquiries.length;
 
     if (query.get('format') === 'json') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ reservationCount, signupCount, inquiryCount, reservations, signups, inquiries }, null, 2));
+      res.end(JSON.stringify({ database: dbFileInfo(), reservationCount, signupCount, inquiryCount, reservations, signups, inquiries }, null, 2));
       return;
     }
 
@@ -1886,6 +1900,7 @@ const server = http.createServer((req, res) => {
   <div class="wrap">
     <h1>The Ivy — Database</h1>
     <p class="muted">Rebuilt from Resend on every server restart — nothing here can be lost.</p>
+    <p class="muted small" style="white-space:normal">Database file: ${escapeHtml(dbInfo.path)}${dbInfo.sizeBytes != null ? ` (${Math.round(dbInfo.sizeBytes / 1024)} KB)` : ''}${dbInfo.createdAt ? `, created ${escapeHtml(dbInfo.createdAt)}` : ''}${dbInfo.persistent ? ' &middot; on a persistent volume' : ' &middot; not on a volume, so it is wiped on every deploy'}</p>
     <div class="stats">
       <div class="stat"><div class="n">${reservationCount}</div><div class="label">Reservations</div></div>
       <div class="stat"><div class="n">${signupCount}</div><div class="label">Newsletter Signups</div></div>
