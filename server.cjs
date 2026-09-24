@@ -3,6 +3,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const crypto = require('crypto');
 const { DatabaseSync } = require('node:sqlite');
 
 const PORT = process.env.PORT || 3000;
@@ -297,6 +298,43 @@ async function hydrateDbFromResend() {
   } catch (err) {
     console.error('DB hydration (event inquiries) error:', err.message);
   }
+}
+
+// Extra logins that can use ONLY the private event agreement pages (issuing
+// agreements and confirming deposits), never reservations or the other admin
+// tools. Set CONTRACT_USERS="maria:her-password,dan:his-password" in Railway
+// (passwords cannot contain commas). The main admin login also works there.
+const CONTRACT_USERS = (process.env.CONTRACT_USERS || '')
+  .split(',')
+  .map((pair) => pair.trim())
+  .filter(Boolean)
+  .map((pair) => {
+    const i = pair.indexOf(':');
+    return i > 0 ? [pair.slice(0, i), pair.slice(i + 1)] : null;
+  })
+  .filter((entry) => entry && entry[0] && entry[1]);
+
+function safeEqual(a, b) {
+  const ha = crypto.createHash('sha256').update(String(a)).digest();
+  const hb = crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
+
+function checkContractAuth(req) {
+  if (checkBasicAuth(req)) return true;
+  if (!CONTRACT_USERS.length) return false;
+  const match = (req.headers['authorization'] || '').match(/^Basic (.+)$/);
+  if (!match) return false;
+  const decoded = Buffer.from(match[1], 'base64').toString('utf8');
+  const sepIdx = decoded.indexOf(':');
+  if (sepIdx === -1) return false;
+  const user = decoded.slice(0, sepIdx);
+  const pass = decoded.slice(sepIdx + 1);
+  return CONTRACT_USERS.some(([u, p]) => {
+    const userOk = safeEqual(u, user);
+    const passOk = safeEqual(p, pass);
+    return userOk && passOk;
+  });
 }
 
 function checkBasicAuth(req) {
@@ -1555,7 +1593,7 @@ function rejectRateLimited(res) {
 const contracts = require('./contract.cjs').createContractHandlers({
   resendSendEmail,
   emailTemplate,
-  checkBasicAuth,
+  checkBasicAuth: checkContractAuth,
   readJsonBody,
   getClientIp,
   createCalendarEvent: insertCalendarEvent,
