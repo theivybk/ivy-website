@@ -705,7 +705,7 @@ function resendSendEmail({ to, subject, text, html, replyTo, attachments, header
   return new Promise((resolve, reject) => {
     const payload = {
       from: 'The Ivy Bar and Kitchen <info@theivybk.com>',
-      to: [to],
+      to: Array.isArray(to) ? to : [to],
       subject,
       text,
     };
@@ -1446,7 +1446,7 @@ function getClientIp(req) {
   return req.socket.remoteAddress || 'unknown';
 }
 
-function checkRateLimit(req, routeGroup) {
+function checkRateLimit(req, routeGroup, max = RATE_LIMIT_MAX) {
   const key = `${routeGroup}:${getClientIp(req)}`;
   const now = Date.now();
   const bucket = rateLimitBuckets.get(key);
@@ -1454,7 +1454,7 @@ function checkRateLimit(req, routeGroup) {
     rateLimitBuckets.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
     return true;
   }
-  if (bucket.count >= RATE_LIMIT_MAX) return false;
+  if (bucket.count >= max) return false;
   bucket.count++;
   return true;
 }
@@ -1463,6 +1463,19 @@ function rejectRateLimited(res) {
   res.writeHead(429, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ ok: false, error: 'Too many requests. Please try again in a few minutes.' }));
 }
+
+// Private event agreements: issued from /admin/contracts, signed by the client
+// at /contract/<token>. See contract.cjs for how they are stored (inside the
+// link itself, since the local database does not survive a redeploy).
+const contracts = require('./contract.cjs').createContractHandlers({
+  resendSendEmail,
+  emailTemplate,
+  checkBasicAuth,
+  readJsonBody,
+  getClientIp,
+  secret: (process.env.CONTRACT_SECRET || '').trim() || ADMIN_PASS,
+  hasResend: () => !!RESEND_API_KEY,
+});
 
 const server = http.createServer((req, res) => {
   // Railway's default *.up.railway.app subdomain stays live alongside the
@@ -1517,6 +1530,33 @@ const server = http.createServer((req, res) => {
   if (req.method === 'POST' && urlPath === '/api/private-event') {
     if (!checkRateLimit(req, 'private-event')) return rejectRateLimited(res);
     handleEventInquiry(req, res);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath.startsWith('/contract/')) {
+    if (!checkRateLimit(req, 'contract-view', 60)) return rejectRateLimited(res);
+    contracts.handleView(req, res, urlPath.slice('/contract/'.length).replace(/\/+$/, ''));
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/contract/sign') {
+    if (!checkRateLimit(req, 'contract-sign', 10)) return rejectRateLimited(res);
+    contracts.handleSign(req, res);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/admin/contracts') {
+    contracts.handleAdminPage(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/admin/contracts') {
+    contracts.handleAdminCreate(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/admin/contracts/email') {
+    contracts.handleAdminEmail(req, res);
     return;
   }
 
