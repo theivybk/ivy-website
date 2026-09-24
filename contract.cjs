@@ -1066,7 +1066,7 @@ function createContractHandlers(deps) {
     signedById.set(c.id, signedToken);
     sendJson(res, 200, { ok: true, signedUrl: `/contract/${signedToken}?signed=1` });
 
-    addToCalendar(c, signedData.cl, signedLink);
+    addToCalendar(c, signedData, signedLink);
 
     resendSendEmail({
       to: signedData.cl.email,
@@ -1086,30 +1086,55 @@ function createContractHandlers(deps) {
   // titled "deposit pending" because the date is not confirmed until the
   // deposit arrives. A calendar failure never affects the signature; it just
   // emails the events team so they can add the party by hand.
-  async function addToCalendar(c, cl, signedLink) {
+  async function addToCalendar(c, signedData, signedLink) {
     if (!createCalendarEvent) return;
+    const cl = signedData.cl;
     try {
       const t = computeTotals(c);
       const nextDay = (ymd) => new Date(Date.parse(ymd + 'T12:00:00Z') + 86400000).toISOString().slice(0, 10);
       const endDay = c.end <= c.start ? nextDay(c.date) : c.date;
+      const [sh, sm] = c.start.split(':').map((n) => parseInt(n, 10));
+      const setupMins = (sh * 60 + sm - 30 + 1440) % 1440;
+      const setupTime = fmtTime(`${String(Math.floor(setupMins / 60)).padStart(2, '0')}:${String(setupMins % 60).padStart(2, '0')}`);
+
       const description = [
-        `${c.type}, about ${c.guests} guests`,
-        `Space: ${c.space}`,
-        `Setup: 30 minutes before ${fmtTime(c.start)}`,
+        `DEPOSIT PENDING: the date is not confirmed until the ${fmtMoney(t.deposit)} deposit is received (held through ${fmtDateShort(c.exp)}).`,
         '',
-        `Client: ${c.name}${cl.company ? ` (${cl.company})` : ''}`,
+        'EVENT',
+        `${c.type}`,
+        `${fmtDate(c.date)}`,
+        `Setup: ${setupTime}  |  Start: ${fmtTime(c.start)}  |  End: ${fmtTime(c.end)}`,
+        c.arrive ? `Guest arrival: ${fmtTime(c.arrive)}` : null,
+        `Space: ${c.space}`,
+        `Estimated guests: ${c.guests} (final guaranteed count due 7 days before)`,
+        '',
+        'CLIENT',
+        `${c.name}${cl.company ? ` (${cl.company})` : ''}`,
         `Phone: ${cl.phone}`,
         `Email: ${cl.email}`,
-        cl.dayName ? `Day-of contact: ${cl.dayName}${cl.dayPhone ? ` ${cl.dayPhone}` : ''}` : null,
+        `Day-of contact: ${cl.dayName ? `${cl.dayName}${cl.dayPhone ? `, ${cl.dayPhone}` : ''}` : `same as client${cl.dayPhone ? `, ${cl.dayPhone}` : ''}`}`,
         '',
-        `Deposit: ${fmtMoney(t.deposit)}, PENDING until received (date held through ${fmtDateShort(c.exp)})`,
-        `Estimated food & beverage: ${fmtMoney(t.est)}${t.min > 0 ? `, minimum ${fmtMoney(t.min)}` : ''}`,
-        ...c.lines.map((l) => `- ${l[1]} x ${l[0]}`),
-        c.sel ? `Menu: ${c.sel}` : null,
-        c.notes ? `Notes: ${c.notes}` : null,
+        'SELECTIONS',
+        ...(c.lines.length
+          ? c.lines.map((l) => `- ${l[1]} x ${l[0]} @ ${fmtMoney(l[2])} = ${fmtMoney(l[1] * l[2])}`)
+          : ['- To be confirmed with the final guest count']),
+        c.sel ? `Menu selections: ${c.sel}` : null,
         '',
+        'PRICING',
+        `Estimated food & beverage: ${fmtMoney(t.est)}`,
+        t.min > 0 ? `Food & beverage minimum: ${fmtMoney(t.min)}` : null,
+        `Deposit: ${fmtMoney(t.deposit)} (pending)`,
+        `Estimated remaining balance: ${fmtMoney(t.remaining)} (before tax and service charge)`,
+        `Estimated 20% service charge: ${fmtMoney(t.service)}`,
+        'Tax and the 3% credit card surcharge are extra.',
+        c.notes ? '' : null,
+        c.notes ? 'NOTES & SPECIAL ARRANGEMENTS' : null,
+        c.notes ? c.notes : null,
+        '',
+        'AGREEMENT',
+        `${refOf(c)}, signed by ${signedData.sig.name} on ${fmtStamp(signedData.sig.at)}`,
+        `Issued by: ${c.rep}`,
         `Signed agreement: ${signedLink}`,
-        `Agreement ${refOf(c)}`,
       ].filter((line) => line !== null).join('\n');
 
       await createCalendarEvent({
@@ -1120,6 +1145,7 @@ function createContractHandlers(deps) {
         colorId: '5',
         start: { dateTime: `${c.date}T${c.start}:00`, timeZone: 'America/Chicago' },
         end: { dateTime: `${endDay}T${c.end}:00`, timeZone: 'America/Chicago' },
+        extendedProperties: { private: { agreementRef: refOf(c), agreementId: c.id, status: 'deposit-pending' } },
       });
     } catch (err) {
       console.error('Agreement calendar event error:', err.message);
