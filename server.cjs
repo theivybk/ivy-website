@@ -1063,6 +1063,38 @@ async function patchCalendarEvent(eventId, patch) {
   });
 }
 
+// Lists events on the events calendar for a prepared query string (used by the
+// agreements list). Returns [] when the calendar is not configured.
+async function listCalendarEvents(queryString) {
+  if (!GOOGLE_CALENDAR_CLIENT_ID || !GOOGLE_CALENDAR_CLIENT_SECRET || !GOOGLE_CALENDAR_REFRESH_TOKEN) return [];
+  const accessToken = await getGoogleCalendarAccessToken();
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: 'www.googleapis.com',
+        path: `/calendar/v3/calendars/${encodeURIComponent(GOOGLE_CALENDAR_ID)}/events?${queryString}`,
+        method: 'GET',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
+          if (res.statusCode >= 300) {
+            reject(new Error(`Calendar list failed: ${res.statusCode} ${data}`));
+            return;
+          }
+          let parsed = {};
+          try { parsed = JSON.parse(data); } catch {}
+          resolve(parsed.items || []);
+        });
+      }
+    );
+    req.on('error', reject);
+    req.end();
+  });
+}
+
 async function handleReservation(req, res) {
   if (!RESEND_API_KEY) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
@@ -1598,6 +1630,8 @@ const contracts = require('./contract.cjs').createContractHandlers({
   getClientIp,
   createCalendarEvent: insertCalendarEvent,
   updateCalendarEvent: patchCalendarEvent,
+  listCalendarEvents,
+  resendGet,
   secret: (process.env.CONTRACT_SECRET || '').trim() || ADMIN_PASS,
   hasResend: () => !!RESEND_API_KEY,
 });
@@ -1687,6 +1721,21 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'POST' && urlPath === '/admin/contracts/confirm-deposit') {
     contracts.handleAdminConfirmDeposit(req, res);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/admin/agreements') {
+    contracts.handleAdminAgreementsPage(req, res);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/admin/agreements/data') {
+    contracts.handleAdminAgreementsData(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/admin/contracts/cancel') {
+    contracts.handleAdminCancel(req, res);
     return;
   }
 

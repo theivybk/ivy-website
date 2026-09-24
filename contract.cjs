@@ -875,7 +875,7 @@ function adminPageHtml() {
     <div class="wrap">
       <span class="eyebrow">Private Events</span>
       <h1>New event agreement</h1>
-      <p class="lede">Fill this in, create the agreement, then send the link to the client. The client reviews the terms and signs on their phone or computer. A signed copy goes to the client and to the events team.</p>
+      <p class="lede">Fill this in, create the agreement, then send the link to the client. The client reviews the terms and signs on their phone or computer. A signed copy goes to the client and to the events team. <a href="/admin/agreements" style="color:var(--ivy);font-weight:600">See all agreements</a></p>
       <form id="f" novalidate>
         <fieldset>
           <legend>Client</legend>
@@ -970,10 +970,312 @@ function adminPageHtml() {
   return shell({ title: 'New Event Agreement | The Ivy', body, script }).replace('</style>', () => `${ADMIN_CSS}</style>`);
 }
 
+// ------------------------------------------------------------ agreements page
+
+const AGREEMENTS_CSS = `
+.sheet { max-width:1120px; }
+.wrap { max-width:none; }
+.topbar { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin:0 0 14px; }
+.topbar input[type=search] { flex:1 1 240px; min-width:0; padding:10px 12px; font:inherit; font-size:15px; background:#fff; color:var(--ink); border:1px solid var(--border); border-radius:2px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
+.chip { font:500 13px 'Outfit',sans-serif; padding:7px 13px; border:1px solid var(--border); background:var(--cream-pure); color:var(--ink-soft); border-radius:2px; cursor:pointer; }
+.chip[aria-pressed="true"] { background:var(--ivy); color:var(--cream); border-color:var(--ivy); }
+.chip .n { margin-left:6px; opacity:.8; font-variant-numeric:tabular-nums; }
+.group { margin:28px 0 0; }
+.group h2 { margin-top:0; }
+.tablewrap { overflow-x:auto; border:1px solid var(--border); border-radius:4px; background:var(--cream-pure); }
+table.ag { width:100%; border-collapse:collapse; min-width:820px; }
+table.ag th { text-align:left; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--brass-deep); font-weight:600; padding:10px 12px; border-bottom:1px solid var(--border); }
+table.ag td { vertical-align:top; padding:12px; border-bottom:1px solid var(--border); font-size:14px; }
+table.ag tr:last-child td { border-bottom:0; }
+table.ag .sub { display:block; font-size:12px; color:var(--ink-mute); margin-top:2px; }
+table.ag .who { font-weight:600; color:var(--ivy); }
+.pill { display:inline-block; padding:2px 9px; border-radius:2px; font-size:12px; font-weight:600; letter-spacing:.03em; }
+.pill.awaiting { background:#E3E9F2; color:#2C4468; }
+.pill.pending { background:#F3E6BF; color:#6B5316; }
+.pill.confirmed { background:#DCEBDD; color:#1F5A34; }
+.pill.cancelled, .pill.expired { background:#E7E5E0; color:#555; }
+.acts { display:flex; flex-wrap:wrap; gap:6px; }
+.acts .b { font:600 12px 'Outfit',sans-serif; letter-spacing:.03em; padding:7px 11px; border-radius:2px; border:1px solid var(--ivy); background:transparent; color:var(--ivy); cursor:pointer; text-decoration:none; white-space:nowrap; }
+.acts .b.main { background:var(--ivy); color:var(--cream); }
+.acts .b.danger { border-color:var(--brick); color:var(--brick); }
+.acts .b[disabled] { opacity:.55; cursor:default; }
+tr.detail td { background:var(--cream); }
+.detail .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px 14px; align-items:end; }
+.detail label { display:block; font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--ivy); font-weight:600; margin-bottom:4px; }
+.detail input, .detail select { width:100%; padding:8px 10px; font:inherit; font-size:14px; background:#fff; border:1px solid var(--border); border-radius:2px; }
+.detail .row2 { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
+.msg { margin:0 0 14px; padding:10px 14px; border:1px solid var(--border); border-left:3px solid var(--ok); background:var(--cream-pure); border-radius:2px; font-size:14px; }
+.msg.bad { border-left-color:var(--brick); color:var(--brick); }
+.empty { padding:22px; text-align:center; color:var(--ink-mute); font-style:italic; }
+@media (max-width:760px) { .detail .grid { grid-template-columns:1fr 1fr; } }
+`;
+
+const AGREEMENTS_SCRIPT = `
+(function () {
+  var rows = [], today = '', filter = 'all', query = '', openId = null, openMode = null;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function money(n) {
+    n = Math.round((Number(n) || 0) * 100) / 100;
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  }
+  function fmtDate(ymd) {
+    return new Date(ymd + 'T12:00:00Z').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  }
+  function fmtTime(hhmm) {
+    var m = /^(\\d{1,2}):(\\d{2})$/.exec(hhmm || '');
+    if (!m) return '';
+    var h = parseInt(m[1], 10);
+    return (h % 12 === 0 ? 12 : h % 12) + ':' + m[2] + ' ' + (h >= 12 ? 'PM' : 'AM');
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function tokenOf(link) {
+    var m = /\\/contract\\/([A-Za-z0-9_-]+)/.exec(link || '');
+    return m ? m[1] : '';
+  }
+  function say(text, bad) {
+    var m = $('msg');
+    m.textContent = text;
+    m.className = bad ? 'msg bad' : 'msg';
+    m.hidden = false;
+  }
+  function post(url, body) {
+    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok && d.ok, d: d }; }); });
+  }
+
+  var STATUS = {
+    awaiting: 'Awaiting signature', pending: 'Deposit pending', confirmed: 'Confirmed', cancelled: 'Cancelled', expired: 'Expired, not signed'
+  };
+  function inFilter(r) {
+    if (filter === 'all') return true;
+    if (filter === 'closed') return r.status === 'cancelled' || r.status === 'expired';
+    return r.status === filter;
+  }
+  function matches(r) {
+    if (!query) return true;
+    var hay = [r.name, r.email, r.phone, r.space, r.ref, r.date, fmtDate(r.date)].join(' ').toLowerCase();
+    return hay.indexOf(query) !== -1;
+  }
+
+  function load() {
+    $('refresh').disabled = true;
+    fetch('/admin/agreements/data')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        $('refresh').disabled = false;
+        if (!d.ok) { say(d.error || 'Could not load agreements.', true); return; }
+        rows = d.rows; today = d.today;
+        var w = $('warn');
+        w.textContent = (d.warnings || []).join(' ');
+        w.hidden = !(d.warnings && d.warnings.length);
+        render();
+      })
+      .catch(function () { $('refresh').disabled = false; say('Network error. Please try again.', true); });
+  }
+
+  function count(status) {
+    return rows.filter(function (r) {
+      if (status === 'all') return true;
+      if (status === 'closed') return r.status === 'cancelled' || r.status === 'expired';
+      return r.status === status;
+    }).length;
+  }
+
+  function buildChips() {
+    var defs = [['all', 'All'], ['awaiting', 'Awaiting signature'], ['pending', 'Deposit pending'], ['confirmed', 'Confirmed'], ['closed', 'Cancelled or expired']];
+    var box = $('chips');
+    box.textContent = '';
+    defs.forEach(function (d) {
+      var b = el('button', 'chip', d[1]);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', filter === d[0] ? 'true' : 'false');
+      var n = el('span', 'n', String(count(d[0])));
+      b.appendChild(n);
+      b.addEventListener('click', function () { filter = d[0]; render(); });
+      box.appendChild(b);
+    });
+  }
+
+  function actionButton(label, cls, fn) {
+    var b = el('button', 'b ' + (cls || ''), label);
+    b.type = 'button';
+    b.addEventListener('click', fn);
+    return b;
+  }
+
+  function detailRow(r, cols) {
+    var tr = el('tr', 'detail');
+    var td = el('td');
+    td.colSpan = cols;
+    if (openMode === 'confirm') {
+      var dep = parseFloat(String(r.deposit).replace(/[^0-9.]/g, '')) || 0;
+      var grid = el('div', 'grid');
+      function field(labelText, node) { var d = el('div'); var l = el('label', null, labelText); d.appendChild(l); d.appendChild(node); grid.appendChild(d); return node; }
+      var amount = el('input'); amount.type = 'number'; amount.step = '0.01'; amount.min = '0';
+      var when = el('input'); when.type = 'date'; when.value = today;
+      var method = el('select');
+      ['Credit card', 'Cash', 'Check', 'Other'].forEach(function (m) { var o = el('option', null, m); method.appendChild(o); });
+      var note = el('input'); note.type = 'text'; note.placeholder = 'Optional, internal';
+      var touched = false;
+      function suggest() { if (!touched) amount.value = (Math.round(dep * (method.value === 'Credit card' ? 1.03 : 1) * 100) / 100).toFixed(2); }
+      amount.addEventListener('input', function () { touched = true; });
+      method.addEventListener('change', suggest);
+      suggest();
+      field('Amount received ($)', amount); field('Date received', when); field('Paid by', method); field('Note', note);
+      td.appendChild(grid);
+      var row2 = el('div', 'row2');
+      var go = actionButton('Deposit received: confirm the date', 'main', function () {
+        if (!window.confirm('Mark the deposit received and email ' + (r.email || 'the client') + ' that the date is confirmed?')) return;
+        go.disabled = true; go.textContent = 'Confirming...';
+        post('/admin/contracts/confirm-deposit', { link: r.link, amount: parseFloat(amount.value), receivedOn: when.value, method: method.value, note: note.value })
+          .then(function (res) {
+            if (res.ok) { say('Confirmed. Emailed ' + res.d.emailed + '. Calendar: ' + res.d.calendar + '.'); openId = null; load(); }
+            else { go.disabled = false; go.textContent = 'Deposit received: confirm the date'; say(res.d.error || 'Could not confirm the deposit.', true); }
+          })
+          .catch(function () { go.disabled = false; go.textContent = 'Deposit received: confirm the date'; say('Network error. Please try again.', true); });
+      });
+      row2.appendChild(go);
+      row2.appendChild(actionButton('Close', '', function () { openId = null; render(); }));
+      td.appendChild(row2);
+    } else if (openMode === 'cancel') {
+      var p = el('p', null, 'Mark this event cancelled? The calendar entry turns gray and reads CANCELLED, and the events team gets a record. Any deposit paid is forfeited and nothing more is owed.');
+      p.style.margin = '0 0 10px';
+      td.appendChild(p);
+      var why = el('input'); why.type = 'text'; why.placeholder = 'Reason (optional, internal)'; why.style.maxWidth = '420px';
+      td.appendChild(why);
+      var row3 = el('div', 'row2');
+      var yes = actionButton('Yes, mark cancelled', 'danger', function () {
+        yes.disabled = true; yes.textContent = 'Cancelling...';
+        post('/admin/contracts/cancel', { link: r.link, note: why.value })
+          .then(function (res) {
+            if (res.ok) { say('Marked cancelled. Calendar: ' + res.d.calendar + '.'); openId = null; load(); }
+            else { yes.disabled = false; yes.textContent = 'Yes, mark cancelled'; say(res.d.error || 'Could not cancel.', true); }
+          })
+          .catch(function () { yes.disabled = false; yes.textContent = 'Yes, mark cancelled'; say('Network error. Please try again.', true); });
+      });
+      row3.appendChild(yes);
+      row3.appendChild(actionButton('Keep it', '', function () { openId = null; render(); }));
+      td.appendChild(row3);
+    }
+    tr.appendChild(td);
+    return tr;
+  }
+
+  function buildTable(list) {
+    var wrap = el('div', 'tablewrap');
+    var t = el('table', 'ag');
+    var head = el('tr');
+    ['Event', 'Client', 'Status', 'Deposit', ''].forEach(function (h) { head.appendChild(el('th', null, h)); });
+    var thead = el('thead'); thead.appendChild(head); t.appendChild(thead);
+    var tb = el('tbody');
+    list.forEach(function (r) {
+      var tr = el('tr');
+      var c1 = el('td');
+      c1.appendChild(el('span', 'who', fmtDate(r.date)));
+      var times = fmtTime(r.start) + (r.end ? ' to ' + fmtTime(r.end) : '');
+      c1.appendChild(el('span', 'sub', times));
+      c1.appendChild(el('span', 'sub', r.space));
+      var c2 = el('td');
+      c2.appendChild(el('span', 'who', r.name));
+      c2.appendChild(el('span', 'sub', [r.phone, r.email].filter(Boolean).join(' / ')));
+      c2.appendChild(el('span', 'sub', (r.guests != null ? r.guests + ' guests. ' : '') + r.ref));
+      var c3 = el('td');
+      c3.appendChild(el('span', 'pill ' + r.status, STATUS[r.status] || r.status));
+      if (r.status === 'awaiting') c3.appendChild(el('span', 'sub', 'Hold through ' + r.holdThrough));
+      if (r.status === 'pending') c3.appendChild(el('span', 'sub', 'Hold through ' + r.holdThrough));
+      if (r.status === 'expired') c3.appendChild(el('span', 'sub', 'Hold ended ' + r.holdThrough));
+      var c4 = el('td', null, r.deposit || '');
+      var c5 = el('td');
+      var acts = el('div', 'acts');
+      var link = r.link;
+      if (link) {
+        var a = el('a', 'b', r.status === 'awaiting' || r.status === 'expired' ? 'Open link' : 'Open agreement');
+        a.href = link; a.target = '_blank'; a.rel = 'noopener';
+        acts.appendChild(a);
+      }
+      if (r.status === 'awaiting') {
+        acts.appendChild(actionButton('Copy link', '', function () {
+          try { navigator.clipboard.writeText(link); say('Link copied.'); } catch (e) { say('Copy failed. Use Open link and copy from the address bar.', true); }
+        }));
+        acts.appendChild(actionButton('Email link again', 'main', function () {
+          if (!window.confirm('Email the agreement link to ' + (r.email || 'the client') + ' again?')) return;
+          post('/admin/contracts/email', { token: tokenOf(link) }).then(function (res) {
+            if (res.ok) say('Sent to ' + r.email + '.'); else say(res.d.error || 'Could not send the email.', true);
+          }).catch(function () { say('Network error. Please try again.', true); });
+        }));
+      }
+      if (r.status === 'pending') {
+        acts.appendChild(actionButton('Confirm deposit', 'main', function () { openId = r.ref; openMode = 'confirm'; render(); }));
+      }
+      if (r.status === 'pending' || r.status === 'confirmed') {
+        acts.appendChild(actionButton('Cancel', 'danger', function () { openId = r.ref; openMode = 'cancel'; render(); }));
+      }
+      c5.appendChild(acts);
+      [c1, c2, c3, c4, c5].forEach(function (c) { tr.appendChild(c); });
+      tb.appendChild(tr);
+      if (openId === r.ref) tb.appendChild(detailRow(r, 5));
+    });
+    t.appendChild(tb);
+    wrap.appendChild(t);
+    return wrap;
+  }
+
+  function render() {
+    buildChips();
+    var box = $('list');
+    box.textContent = '';
+    var list = rows.filter(function (r) { return inFilter(r) && matches(r); });
+    if (!list.length) {
+      box.appendChild(el('p', 'empty', rows.length ? 'Nothing matches that filter.' : 'No agreements yet. Create one to get started.'));
+      return;
+    }
+    var upcoming = list.filter(function (r) { return r.date >= today; }).sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+    var past = list.filter(function (r) { return r.date < today; }).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+    [['Upcoming events', upcoming], ['Past events', past]].forEach(function (g) {
+      if (!g[1].length) return;
+      var section = el('div', 'group');
+      section.appendChild(el('h2', null, g[0]));
+      section.appendChild(buildTable(g[1]));
+      box.appendChild(section);
+    });
+  }
+
+  $('q').addEventListener('input', function () { query = $('q').value.trim().toLowerCase(); render(); });
+  $('refresh').addEventListener('click', load);
+  load();
+})();
+`;
+
+function agreementsPageHtml() {
+  const body = `
+    <div class="wrap">
+      <span class="eyebrow">Private Events</span>
+      <h1>Agreements</h1>
+      <p class="lede">Every agreement that has gone out, and where each one stands. <a href="/admin/contracts" style="color:var(--ivy);font-weight:600">Create a new agreement</a></p>
+      <div class="topbar">
+        <input type="search" id="q" placeholder="Search by name, email, phone, date, or reference" aria-label="Search agreements">
+        <button type="button" class="chip" id="refresh">Refresh</button>
+      </div>
+      <div class="chips" id="chips"></div>
+      <p class="msg" id="msg" hidden></p>
+      <p class="msg bad" id="warn" hidden></p>
+      <div id="list"><p class="empty">Loading agreements...</p></div>
+    </div>`;
+  return shell({ title: 'Agreements | The Ivy', body, script: AGREEMENTS_SCRIPT })
+    .replace('</style>', () => `${ADMIN_CSS}${AGREEMENTS_CSS}</style>`);
+}
+
 // ------------------------------------------------------- tokens & handlers
 
 function createContractHandlers(deps) {
-  const { resendSendEmail, emailTemplate, checkBasicAuth, readJsonBody, getClientIp, createCalendarEvent, updateCalendarEvent, secret, hasResend } = deps;
+  const { resendSendEmail, emailTemplate, checkBasicAuth, readJsonBody, getClientIp, createCalendarEvent, updateCalendarEvent, listCalendarEvents, resendGet, secret, hasResend } = deps;
   const sendEmail = (opts) => resendSendEmail({ from: VENUE.from, ...opts });
 
   // In-memory only (resets on deploy): maps an agreement id to its signed
@@ -1160,9 +1462,12 @@ function createContractHandlers(deps) {
   }
 
   // Builds the events-calendar entry for a signed agreement. `conf` is null
-  // while the deposit is pending, and { amount, receivedOn, method } once it
-  // has been received, which turns the entry green and titled CONFIRMED.
+  // while the deposit is pending, { amount, receivedOn, method } once it has
+  // been received (green, CONFIRMED), or { cancelledOn, note } when the event
+  // is cancelled (gray, CANCELLED).
   function buildCalendarEvent(c, signedData, signedLink, conf) {
+    const cancelled = !!(conf && conf.cancelledOn);
+    const confirmed = !!(conf && !cancelled);
     const cl = signedData.cl;
     const t = computeTotals(c);
     const nextDay = (ymd) => new Date(Date.parse(ymd + 'T12:00:00Z') + 86400000).toISOString().slice(0, 10);
@@ -1171,9 +1476,11 @@ function createContractHandlers(deps) {
     const setupMins = (sh * 60 + sm - 30 + 1440) % 1440;
     const setupTime = fmtTime(`${String(Math.floor(setupMins / 60)).padStart(2, '0')}:${String(setupMins % 60).padStart(2, '0')}`);
 
-    const statusLine = conf
-      ? `CONFIRMED: deposit received ${fmtDateShort(conf.receivedOn)} (${fmtMoney(conf.amount)} by ${conf.method.toLowerCase()}). The agreement is in effect.`
-      : `DEPOSIT PENDING: the date is not confirmed until the ${fmtMoney(t.deposit)} deposit is received (held through ${fmtDateShort(c.exp)}).`;
+    const statusLine = cancelled
+      ? `CANCELLED ${fmtDateShort(conf.cancelledOn)}: any deposit paid is forfeited and nothing further is owed under the agreement.${conf.note ? ` Note: ${conf.note}` : ''}`
+      : confirmed
+        ? `CONFIRMED: deposit received ${fmtDateShort(conf.receivedOn)} (${fmtMoney(conf.amount)} by ${conf.method.toLowerCase()}). The agreement is in effect.`
+        : `DEPOSIT PENDING: the date is not confirmed until the ${fmtMoney(t.deposit)} deposit is received (held through ${fmtDateShort(c.exp)}).`;
 
     const description = [
       statusLine,
@@ -1201,7 +1508,7 @@ function createContractHandlers(deps) {
       'PRICING',
       `Estimated food & beverage: ${fmtMoney(t.est)}`,
       t.min > 0 ? `Food & beverage minimum: ${fmtMoney(t.min)}` : null,
-      `Deposit: ${fmtMoney(t.deposit)} (${conf ? `received ${fmtDateShort(conf.receivedOn)}` : 'pending'})`,
+      `Deposit: ${fmtMoney(t.deposit)} (${cancelled ? 'cancelled' : confirmed ? `received ${fmtDateShort(conf.receivedOn)}` : 'pending'})`,
       `Estimated remaining balance: ${fmtMoney(t.remaining)} (before tax and service charge)`,
       `Estimated 20% service charge: ${fmtMoney(t.service)}`,
       'Tax and the 3% credit card surcharge are extra.',
@@ -1216,13 +1523,13 @@ function createContractHandlers(deps) {
     ].filter((line) => line !== null).join('\n');
 
     return {
-      summary: `Private Event: ${c.name} (${c.guests} guests) [${conf ? 'CONFIRMED' : 'deposit pending'}]`,
+      summary: `Private Event: ${c.name} (${c.guests} guests) [${cancelled ? 'CANCELLED' : confirmed ? 'CONFIRMED' : 'deposit pending'}]`,
       description,
       location: `${VENUE.name}, ${VENUE.address} (${c.space})`,
-      colorId: conf ? '10' : '5',
+      colorId: cancelled ? '8' : confirmed ? '10' : '5',
       start: { dateTime: `${c.date}T${c.start}:00`, timeZone: 'America/Chicago' },
       end: { dateTime: `${endDay}T${c.end}:00`, timeZone: 'America/Chicago' },
-      extendedProperties: { private: { agreementRef: refOf(c), agreementId: c.id, status: conf ? 'confirmed' : 'deposit-pending' } },
+      extendedProperties: { private: { agreementRef: refOf(c), agreementId: c.id, status: cancelled ? 'cancelled' : confirmed ? 'confirmed' : 'deposit-pending' } },
     };
   }
 
@@ -1455,6 +1762,201 @@ function createContractHandlers(deps) {
     sendJson(res, 200, { ok: true, emailed: data.cl.email, calendar });
   }
 
+  // ---- agreements list (admin)
+  //
+  // Signed agreements are read from the events calendar (permanent, and it
+  // holds the current status). Agreements that went out but are not signed yet
+  // are read from the "Agreement Created" record emails, so they stay listed
+  // for as long as Resend keeps email history. Test agreements (name contains
+  // "please ignore") are left out.
+
+  const issuedCache = new Map(); // resend email id -> parsed row (emails never change)
+  let issuedListCache = { at: 0, items: [] };
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function resendGetRetry(pathAndQuery) {
+    let r = await resendGet(pathAndQuery);
+    if (r.status === 429) {
+      await sleep(1200);
+      r = await resendGet(pathAndQuery);
+    }
+    return r;
+  }
+
+  function to24(t) {
+    const m = /^(\d{1,2}):(\d{2}) ([AP]M)$/.exec(t || '');
+    if (!m) return '';
+    let h = parseInt(m[1], 10) % 12;
+    if (m[3] === 'PM') h += 12;
+    return `${String(h).padStart(2, '0')}:${m[2]}`;
+  }
+
+  function parseCalendarAgreement(e) {
+    const p = (e.extendedProperties && e.extendedProperties.private) || {};
+    if (!p.agreementRef || !e.start || !e.start.dateTime) return null;
+    const desc = e.description || '';
+    const pick = (re) => { const m = re.exec(desc); return m ? m[1].trim() : ''; };
+    const sm = /^Private Event: (.+) \((\d+) guests\) \[/.exec(e.summary || '');
+    const hold = /held through ([A-Za-z]+ \d{1,2}, \d{4})/.exec((desc.split('\n')[0]) || '');
+    return {
+      source: 'calendar',
+      ref: p.agreementRef,
+      status: p.status === 'confirmed' ? 'confirmed' : p.status === 'cancelled' ? 'cancelled' : 'pending',
+      name: sm ? sm[1] : (e.summary || ''),
+      guests: sm ? parseInt(sm[2], 10) : null,
+      space: (e.location || '').replace(/^.*?\d{5} \(/, '').replace(/\)$/, ''),
+      date: e.start.dateTime.slice(0, 10),
+      start: e.start.dateTime.slice(11, 16),
+      end: e.end && e.end.dateTime ? e.end.dateTime.slice(11, 16) : '',
+      email: pick(/^Email: (.+)$/m),
+      phone: pick(/^Phone: (.+)$/m),
+      deposit: pick(/^Deposit: (\$[\d,.]+)/m),
+      holdThrough: hold ? hold[1] : '',
+      link: pick(/^Signed agreement: (\S+)/m),
+    };
+  }
+
+  function parseCreatedEmail(item, text) {
+    const sm = /^Agreement Created: (.+), (\d{4}-\d{2}-\d{2}) \((IVY-[A-Z0-9]+)\)$/.exec(item.subject || '');
+    if (!sm) return null;
+    const pick = (re) => { const m = re.exec(text || ''); return m ? m[1].trim() : ''; };
+    const times = /(\d{1,2}:\d{2} [AP]M) to (\d{1,2}:\d{2} [AP]M)/.exec(pick(/^Event: (.+)$/m));
+    const contact = pick(/^Contact: (.+)$/m).split(' / ');
+    const guests = /about (\d+) guests/.exec(pick(/^Space: (.+)$/m));
+    const dep = /deposit (\$[\d,.]+)/.exec(text || '');
+    const hold = pick(/^Date held through: (.+)$/m);
+    const holdDate = new Date(`${hold} 12:00:00 UTC`);
+    return {
+      source: 'email',
+      ref: sm[3],
+      name: sm[1],
+      date: sm[2],
+      start: times ? to24(times[1]) : '',
+      end: times ? to24(times[2]) : '',
+      guests: guests ? parseInt(guests[1], 10) : null,
+      space: pick(/^Space: (.+), about \d+ guests$/m),
+      phone: contact[0] || '',
+      email: contact[1] || '',
+      deposit: dep ? dep[1] : '',
+      holdThrough: hold,
+      holdISO: isNaN(holdDate.getTime()) ? '' : holdDate.toISOString().slice(0, 10),
+      link: pick(/^Client link:\s*\n(\S+)/m),
+    };
+  }
+
+  async function loadIssuedAgreements(signedRefs) {
+    if (!resendGet) return [];
+    if (Date.now() - issuedListCache.at > 60000) {
+      const found = [];
+      let after;
+      for (let page = 0; page < 5; page++) {
+        const r = await resendGetRetry(`/emails?limit=100${after ? `&after=${encodeURIComponent(after)}` : ''}`);
+        if (r.status >= 300) break;
+        const items = r.body.data || [];
+        for (const it of items) {
+          if (typeof it.subject === 'string' && it.subject.startsWith('Agreement Created: ')) found.push({ id: it.id, subject: it.subject });
+        }
+        if (!r.body.has_more || !items.length) break;
+        after = items[items.length - 1].id;
+        await sleep(400);
+      }
+      issuedListCache = { at: Date.now(), items: found };
+    }
+    const rows = [];
+    for (const it of issuedListCache.items) {
+      const refM = /\((IVY-[A-Z0-9]+)\)$/.exec(it.subject);
+      if (refM && signedRefs.has(refM[1])) continue; // already signed: the calendar row covers it
+      let row = issuedCache.get(it.id);
+      if (!row) {
+        await sleep(600);
+        const r = await resendGetRetry(`/emails/${encodeURIComponent(it.id)}`);
+        if (r.status >= 300 || !r.body || !r.body.text) continue;
+        row = parseCreatedEmail(it, r.body.text);
+        if (!row) continue;
+        issuedCache.set(it.id, row);
+      }
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function handleAdminAgreementsPage(req, res) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    sendHtml(res, 200, agreementsPageHtml());
+  }
+
+  async function handleAdminAgreementsData(req, res) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    const warnings = [];
+    const signedRows = [];
+    if (listCalendarEvents) {
+      try {
+        for (const status of ['deposit-pending', 'confirmed', 'cancelled']) {
+          const items = await listCalendarEvents(`privateExtendedProperty=${encodeURIComponent(`status=${status}`)}&singleEvents=true&orderBy=startTime&maxResults=250`);
+          for (const e of items) {
+            const row = parseCalendarAgreement(e);
+            if (row) signedRows.push(row);
+          }
+        }
+      } catch (err) {
+        console.error('Agreements list calendar error:', err.message);
+        warnings.push('Could not read the events calendar, so signed agreements are missing from this list.');
+      }
+    }
+    let unsignedRows = [];
+    try {
+      unsignedRows = await loadIssuedAgreements(new Set(signedRows.map((r) => r.ref)));
+    } catch (err) {
+      console.error('Agreements list history error:', err.message);
+      warnings.push('Could not read the sent-agreement history, so agreements awaiting signature may be missing.');
+    }
+    const today = chicagoToday();
+    const rows = signedRows
+      .concat(unsignedRows.map((r) => ({ ...r, status: r.holdISO && r.holdISO < today ? 'expired' : 'awaiting' })))
+      .filter((r) => !/please ignore/i.test(r.name));
+    sendJson(res, 200, { ok: true, today, rows, warnings });
+  }
+
+  async function handleAdminCancel(req, res) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    let body;
+    try { body = await readJsonBody(req); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+    const token = tokenFromLink(body.link);
+    const data = open(token);
+    if (!data || data.k !== 'signed') return sendJson(res, 400, { ok: false, error: 'Only a signed agreement can be marked cancelled.' });
+    const c = data.c;
+    const conf = { cancelledOn: chicagoToday(), note: cleanText(body.note, 300) };
+    const signedLink = urlFor(token);
+
+    let calendar = 'not configured';
+    if (createCalendarEvent) {
+      try {
+        const event = buildCalendarEvent(c, data, signedLink, conf);
+        const patched = updateCalendarEvent ? await updateCalendarEvent('agr' + c.id, event) : null;
+        if (patched && patched.missing) {
+          await createCalendarEvent(patched.missing === 404 ? { id: 'agr' + c.id, ...event } : event);
+          calendar = 'created as cancelled (no entry was found)';
+        } else {
+          calendar = 'updated to CANCELLED';
+        }
+      } catch (err) {
+        console.error('Cancel calendar update error:', err.message);
+        return sendJson(res, 502, { ok: false, error: `The calendar entry could not be updated, so nothing was changed. (${err.message.slice(0, 120)})` });
+      }
+    }
+
+    try {
+      await sendEmail({
+        to: VENUE.notifyTo,
+        subject: `Agreement Cancelled: ${c.name}, ${c.date} (${refOf(c)})`,
+        text: `${c.name} (${refOf(c)}) was marked cancelled on ${fmtDateShort(conf.cancelledOn)}.\n\n${c.type}, ${fmtDate(c.date)}, ${fmtTime(c.start)} to ${fmtTime(c.end)}\n${c.space}, about ${c.guests} guests\n\nAny deposit paid is forfeited and nothing further is owed under the agreement.\n${conf.note ? `\nNote: ${conf.note}\n` : ''}\nCalendar: ${calendar}\nSigned agreement: ${signedLink}`,
+      });
+    } catch (err) {
+      console.error('Cancel record email error:', err.message);
+    }
+    sendJson(res, 200, { ok: true, calendar });
+  }
+
   function cleanLine(v, max) {
     return typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, max) : '';
   }
@@ -1543,11 +2045,11 @@ function createContractHandlers(deps) {
     };
   }
 
-  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit };
+  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, _buildCalendarEvent: buildCalendarEvent };
 }
 
 module.exports = {
   createContractHandlers,
   // Exposed so the rendering can be exercised without a server.
-  _test: { documentHtml, offerPage, signedPage, adminPageHtml, computeTotals, termsFor, standaloneSignedHtml },
+  _test: { documentHtml, offerPage, signedPage, adminPageHtml, agreementsPageHtml, computeTotals, termsFor, standaloneSignedHtml },
 };
