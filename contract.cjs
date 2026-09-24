@@ -1275,8 +1275,62 @@ function agreementsPageHtml() {
 // ------------------------------------------------------- tokens & handlers
 
 function createContractHandlers(deps) {
-  const { resendSendEmail, emailTemplate, checkBasicAuth, readJsonBody, getClientIp, createCalendarEvent, updateCalendarEvent, listCalendarEvents, resendGet, secret, hasResend } = deps;
+  const { resendSendEmail, emailTemplate, checkBasicAuth, readJsonBody, getClientIp, createCalendarEvent, updateCalendarEvent, listCalendarEvents, db, secret, hasResend } = deps;
   const sendEmail = (opts) => resendSendEmail({ from: VENUE.from, ...opts });
+
+  // ---- agreements database
+  //
+  // Every agreement is saved here when it is created, and updated as it is
+  // emailed, signed, paid and cancelled. The database lives on the Railway
+  // volume, so it survives deploys.
+  if (db) {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS agreements (
+        id TEXT PRIMARY KEY,
+        ref TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'awaiting',
+        name TEXT, company TEXT, phone TEXT, email TEXT,
+        event_date TEXT, start_time TEXT, end_time TEXT, event_type TEXT, space TEXT, guests INTEGER,
+        deposit REAL, est_total REAL, fb_min REAL,
+        hold_through TEXT,
+        issued_by TEXT, issued_at TEXT,
+        link TEXT, emailed_at TEXT,
+        signed_at TEXT, signed_by TEXT, signed_link TEXT,
+        day_of_name TEXT, day_of_phone TEXT,
+        deposit_received REAL, deposit_received_on TEXT, deposit_method TEXT, deposit_note TEXT, confirmed_at TEXT,
+        cancelled_at TEXT, cancel_note TEXT,
+        updated_at TEXT
+      );
+      CREATE INDEX IF NOT EXISTS agreements_event_date ON agreements (event_date);
+    `);
+  }
+  const AGREEMENT_COLUMNS = new Set([
+    'status', 'company', 'phone', 'email', 'link', 'emailed_at', 'signed_at', 'signed_by', 'signed_link',
+    'day_of_name', 'day_of_phone', 'deposit_received', 'deposit_received_on', 'deposit_method', 'deposit_note',
+    'confirmed_at', 'cancelled_at', 'cancel_note',
+  ]);
+
+  // Makes sure the agreement has a row (built from the agreement data itself,
+  // so an agreement issued before the database existed is added on first use),
+  // then applies the changes. A database problem never breaks the request.
+  function saveAgreement(c, patch) {
+    if (!db) return;
+    try {
+      const t = computeTotals(c);
+      db.prepare(
+        `INSERT OR IGNORE INTO agreements (id, ref, status, name, company, phone, email, event_date, start_time, end_time, event_type, space, guests, deposit, est_total, fb_min, hold_through, issued_by, issued_at)
+         VALUES (?, ?, 'awaiting', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).run(c.id, refOf(c), c.name, c.company || '', c.phone, c.email, c.date, c.start, c.end, c.type, c.space, c.guests, t.deposit, t.est, t.min, c.exp, c.rep, c.iat);
+      const keys = Object.keys(patch || {}).filter((k) => AGREEMENT_COLUMNS.has(k));
+      if (keys.length) {
+        db.prepare(`UPDATE agreements SET ${keys.map((k) => `${k} = ?`).join(', ')}, updated_at = ? WHERE id = ?`)
+          .run(...keys.map((k) => (patch[k] === undefined ? null : patch[k])), new Date().toISOString(), c.id);
+      }
+    } catch (err) {
+      console.error('Agreement database error:', err.message);
+    }
+  }
+
 
   // In-memory only (resets on deploy): maps an agreement id to its signed
   // link so a repeat visit or double-click doesn't produce a second signature.
@@ -1433,6 +1487,17 @@ function createContractHandlers(deps) {
     }
 
     signedById.set(c.id, signedToken);
+    saveAgreement(c, {
+      status: 'pending',
+      signed_at: signedData.sig.at,
+      signed_by: signedData.sig.name,
+      signed_link: signedLink,
+      company: signedData.cl.company || '',
+      phone: signedData.cl.phone,
+      email: signedData.cl.email,
+      day_of_name: signedData.cl.dayName || null,
+      day_of_phone: signedData.cl.dayPhone || null,
+    });
     sendJson(res, 200, { ok: true, signedUrl: `/contract/${signedToken}?signed=1` });
 
     addToCalendar(c, signedData, signedLink);
@@ -1602,6 +1667,7 @@ function createContractHandlers(deps) {
       console.error('Agreement record email error:', err.message);
       recorded = false;
     }
+    saveAgreement(c, { status: 'awaiting', link: url });
     sendJson(res, 200, { ok: true, token, url, recorded });
   }
 
@@ -1625,6 +1691,7 @@ function createContractHandlers(deps) {
         replyTo: VENUE.eventsEmail,
       });
       if (result.status < 200 || result.status >= 300) return sendJson(res, 502, { ok: false, error: 'The email service rejected the message.' });
+      saveAgreement(c, { emailed_at: new Date().toISOString() });
       sendJson(res, 200, { ok: true });
     } catch (err) {
       console.error('Agreement client email error:', err.message);
@@ -1728,6 +1795,15 @@ function createContractHandlers(deps) {
       return sendJson(res, 502, { ok: false, error: `The confirmation email to ${data.cl.email} did not send, so nothing was changed. Check that the address is correct. (${err.message})` });
     }
     confirmedIds.add(c.id);
+    saveAgreement(c, {
+      status: 'confirmed',
+      signed_link: signedLink,
+      deposit_received: amount,
+      deposit_received_on: receivedOn,
+      deposit_method: method,
+      deposit_note: note || null,
+      confirmed_at: new Date().toISOString(),
+    });
 
     // Calendar: update the pending entry; if it is missing, create the
     // confirmed one. Never fails the request, but reports what happened.
@@ -1764,32 +1840,9 @@ function createContractHandlers(deps) {
 
   // ---- agreements list (admin)
   //
-  // Signed agreements are read from the events calendar (permanent, and it
-  // holds the current status). Agreements that went out but are not signed yet
-  // are read from the "Agreement Created" record emails, so they stay listed
-  // for as long as Resend keeps email history. Test agreements (name contains
-  // "please ignore") are left out.
-
-  const issuedCache = new Map(); // resend email id -> parsed row (emails never change)
-  let issuedListCache = { at: 0, items: [] };
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  async function resendGetRetry(pathAndQuery) {
-    let r = await resendGet(pathAndQuery);
-    if (r.status === 429) {
-      await sleep(1200);
-      r = await resendGet(pathAndQuery);
-    }
-    return r;
-  }
-
-  function to24(t) {
-    const m = /^(\d{1,2}):(\d{2}) ([AP]M)$/.exec(t || '');
-    if (!m) return '';
-    let h = parseInt(m[1], 10) % 12;
-    if (m[3] === 'PM') h += 12;
-    return `${String(h).padStart(2, '0')}:${m[2]}`;
-  }
+  // The list is read from the agreements database. Signed parties that are on
+  // the events calendar but missing from the database are added to it. Test
+  // agreements (name contains "please ignore") are left out.
 
   function parseCalendarAgreement(e) {
     const p = (e.extendedProperties && e.extendedProperties.private) || {};
@@ -1816,70 +1869,6 @@ function createContractHandlers(deps) {
     };
   }
 
-  function parseCreatedEmail(item, text) {
-    const sm = /^Agreement Created: (.+), (\d{4}-\d{2}-\d{2}) \((IVY-[A-Z0-9]+)\)$/.exec(item.subject || '');
-    if (!sm) return null;
-    const pick = (re) => { const m = re.exec(text || ''); return m ? m[1].trim() : ''; };
-    const times = /(\d{1,2}:\d{2} [AP]M) to (\d{1,2}:\d{2} [AP]M)/.exec(pick(/^Event: (.+)$/m));
-    const contact = pick(/^Contact: (.+)$/m).split(' / ');
-    const guests = /about (\d+) guests/.exec(pick(/^Space: (.+)$/m));
-    const dep = /deposit (\$[\d,.]+)/.exec(text || '');
-    const hold = pick(/^Date held through: (.+)$/m);
-    const holdDate = new Date(`${hold} 12:00:00 UTC`);
-    return {
-      source: 'email',
-      ref: sm[3],
-      name: sm[1],
-      date: sm[2],
-      start: times ? to24(times[1]) : '',
-      end: times ? to24(times[2]) : '',
-      guests: guests ? parseInt(guests[1], 10) : null,
-      space: pick(/^Space: (.+), about \d+ guests$/m),
-      phone: contact[0] || '',
-      email: contact[1] || '',
-      deposit: dep ? dep[1] : '',
-      holdThrough: hold,
-      holdISO: isNaN(holdDate.getTime()) ? '' : holdDate.toISOString().slice(0, 10),
-      link: pick(/^Client link:\s*\n(\S+)/m),
-    };
-  }
-
-  async function loadIssuedAgreements(signedRefs) {
-    if (!resendGet) return [];
-    if (Date.now() - issuedListCache.at > 60000) {
-      const found = [];
-      let after;
-      for (let page = 0; page < 5; page++) {
-        const r = await resendGetRetry(`/emails?limit=100${after ? `&after=${encodeURIComponent(after)}` : ''}`);
-        if (r.status >= 300) break;
-        const items = r.body.data || [];
-        for (const it of items) {
-          if (typeof it.subject === 'string' && it.subject.startsWith('Agreement Created: ')) found.push({ id: it.id, subject: it.subject });
-        }
-        if (!r.body.has_more || !items.length) break;
-        after = items[items.length - 1].id;
-        await sleep(400);
-      }
-      issuedListCache = { at: Date.now(), items: found };
-    }
-    const rows = [];
-    for (const it of issuedListCache.items) {
-      const refM = /\((IVY-[A-Z0-9]+)\)$/.exec(it.subject);
-      if (refM && signedRefs.has(refM[1])) continue; // already signed: the calendar row covers it
-      let row = issuedCache.get(it.id);
-      if (!row) {
-        await sleep(600);
-        const r = await resendGetRetry(`/emails/${encodeURIComponent(it.id)}`);
-        if (r.status >= 300 || !r.body || !r.body.text) continue;
-        row = parseCreatedEmail(it, r.body.text);
-        if (!row) continue;
-        issuedCache.set(it.id, row);
-      }
-      rows.push(row);
-    }
-    return rows;
-  }
-
   function handleAdminAgreementsPage(req, res) {
     if (!checkBasicAuth(req)) return denyAdmin(res);
     sendHtml(res, 200, agreementsPageHtml());
@@ -1888,32 +1877,53 @@ function createContractHandlers(deps) {
   async function handleAdminAgreementsData(req, res) {
     if (!checkBasicAuth(req)) return denyAdmin(res);
     const warnings = [];
-    const signedRows = [];
+    const today = chicagoToday();
+
+    let dbRows = [];
+    if (db) {
+      try {
+        dbRows = db.prepare('SELECT * FROM agreements ORDER BY event_date, start_time').all().map((r) => ({
+          source: 'database',
+          ref: r.ref,
+          status: r.status === 'awaiting' && r.hold_through && r.hold_through < today ? 'expired' : r.status,
+          name: r.name || '',
+          guests: r.guests,
+          space: r.space || '',
+          date: r.event_date,
+          start: r.start_time || '',
+          end: r.end_time || '',
+          email: r.email || '',
+          phone: r.phone || '',
+          deposit: r.deposit != null ? fmtMoney(r.deposit) : '',
+          holdThrough: r.hold_through ? fmtDateShort(r.hold_through) : '',
+          link: r.signed_link || r.link || '',
+        }));
+      } catch (err) {
+        console.error('Agreements list database error:', err.message);
+        warnings.push('Could not read the agreements database.');
+      }
+    }
+
+    // Signed parties on the calendar that are not in the database (for
+    // example agreements signed before the database existed) are listed too.
+    const known = new Set(dbRows.map((r) => r.ref));
+    const calendarOnly = [];
     if (listCalendarEvents) {
       try {
         for (const status of ['deposit-pending', 'confirmed', 'cancelled']) {
           const items = await listCalendarEvents(`privateExtendedProperty=${encodeURIComponent(`status=${status}`)}&singleEvents=true&orderBy=startTime&maxResults=250`);
           for (const e of items) {
             const row = parseCalendarAgreement(e);
-            if (row) signedRows.push(row);
+            if (row && !known.has(row.ref)) calendarOnly.push(row);
           }
         }
       } catch (err) {
         console.error('Agreements list calendar error:', err.message);
-        warnings.push('Could not read the events calendar, so signed agreements are missing from this list.');
+        warnings.push('Could not read the events calendar, so older signed agreements may be missing from this list.');
       }
     }
-    let unsignedRows = [];
-    try {
-      unsignedRows = await loadIssuedAgreements(new Set(signedRows.map((r) => r.ref)));
-    } catch (err) {
-      console.error('Agreements list history error:', err.message);
-      warnings.push('Could not read the sent-agreement history, so agreements awaiting signature may be missing.');
-    }
-    const today = chicagoToday();
-    const rows = signedRows
-      .concat(unsignedRows.map((r) => ({ ...r, status: r.holdISO && r.holdISO < today ? 'expired' : 'awaiting' })))
-      .filter((r) => !/please ignore/i.test(r.name));
+
+    const rows = dbRows.concat(calendarOnly).filter((r) => !/please ignore/i.test(r.name));
     sendJson(res, 200, { ok: true, today, rows, warnings });
   }
 
@@ -1944,6 +1954,7 @@ function createContractHandlers(deps) {
         return sendJson(res, 502, { ok: false, error: `The calendar entry could not be updated, so nothing was changed. (${err.message.slice(0, 120)})` });
       }
     }
+    saveAgreement(c, { status: 'cancelled', signed_link: signedLink, cancelled_at: new Date().toISOString(), cancel_note: conf.note || null });
 
     try {
       await sendEmail({
