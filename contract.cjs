@@ -176,7 +176,7 @@ const TERMS_VERSIONS = {
     const hasBev = c.lines.some((l) => l[3] === 'bev');
 
     const pricingNotes = `
-      <p>Pricing excludes applicable taxes and a <strong>20% service charge</strong>, which are added to the final bill. The service charge is calculated on food and beverage before tax. Additional gratuity for our team is always at the Client's discretion.</p>
+      <p>Pricing excludes applicable taxes and a required <strong>20% service charge</strong>, which are added to the final bill. The service charge is calculated on food and beverage before tax. Any additional gratuity for our team beyond the 20% is always at the Client's discretion.</p>
       <p>No separate room rental, setup, or service fees apply except as described in this agreement.</p>
       <p>If the Client's total food and beverage charges (before tax and service charge) come to less than the <strong>Food &amp; Beverage Minimum</strong>, the difference is added to the final bill.</p>`;
 
