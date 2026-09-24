@@ -1601,41 +1601,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // TEMPORARY: emails the attorney review packet once, then this route and the
-  // PDF are removed.
-  if (req.method === 'POST' && urlPath === '/admin/send-counsel-packet') {
-    if (!checkBasicAuth(req)) {
-      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
-      res.end('Unauthorized');
-      return;
-    }
-    (async () => {
-      try {
-        const filename = 'Ivy-Event-Agreement-for-Attorney.pdf';
-        const content = fs.readFileSync(path.join(__dirname, 'counsel', filename)).toString('base64');
-        const result = await resendSendEmail({
-          to: 'info@consumelz.com',
-          subject: 'Private event agreement for attorney review: The Ivy Bar & Kitchen',
-          text: [
-            'Attached is the private event space agreement for The Ivy Bar & Kitchen (Thirsty Angus LLC), for attorney review.',
-            '',
-            'Pages 1 and 2 summarize the business terms the owner chose and list the questions for counsel. The full agreement follows, shown with sample client data as a client would sign it.',
-            '',
-            'Clients receive a link, review the terms online, and sign by typing their name. The signed copy is emailed to both parties.',
-          ].join('\n'),
-          attachments: [{ filename, content }],
-        });
-        const ok = result.status >= 200 && result.status < 300;
-        res.writeHead(ok ? 200 : 502, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok, resend: result.body }));
-      } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: false, error: err.message }));
-      }
-    })();
-    return;
-  }
-
   // Emails the three current print-menu PDFs to info@theivybk.com. Reads and
   // base64-encodes the files server-side (never through an LLM context) since
   // that's the only practical way to move ~1-2MB of binary attachment data.
