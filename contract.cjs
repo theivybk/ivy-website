@@ -761,6 +761,52 @@ const ADMIN_SCRIPT = `
   try { $('rep').value = localStorage.getItem('ivy-contract-rep') || ''; } catch (e) {}
   recalc();
 
+  // ---- confirm a deposit
+  var cInfo = null;
+  var amountTouched = false;
+  function cSay(text, isErr) { var m = $('c-msg'); m.textContent = text; m.style.color = isErr ? '#8C2F1B' : '#2E6B45'; m.hidden = false; }
+  function suggestAmount() {
+    if (!cInfo || amountTouched) return;
+    var mult = $('c-method').value === 'Credit card' ? 1.03 : 1;
+    $('c-amount').value = (Math.round(cInfo.deposit * mult * 100) / 100).toFixed(2);
+  }
+  $('c-amount').addEventListener('input', function () { amountTouched = true; });
+  $('c-method').addEventListener('change', suggestAmount);
+  $('c-date').value = ymd(new Date());
+
+  $('c-lookup').addEventListener('click', function () {
+    $('c-msg').hidden = true;
+    fetch('/admin/contracts/lookup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ link: $('c-link').value }) })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.d.ok) { $('c-panel').hidden = true; cSay(res.d.error || 'Could not look that up.', true); return; }
+        cInfo = res.d;
+        amountTouched = false;
+        $('c-summary').textContent = res.d.name + ' (' + res.d.ref + '): ' + res.d.type + ' on ' + res.d.date + ', about ' + res.d.guests + ' guests. Deposit due ' + money(res.d.deposit) + '. Signed ' + res.d.signedAt + '.' + (res.d.alreadyConfirmed ? ' Already marked received.' : '');
+        suggestAmount();
+        $('c-panel').hidden = false;
+      })
+      .catch(function () { cSay('Network error. Please try again.', true); });
+  });
+
+  $('c-confirm').addEventListener('click', function () {
+    if (!cInfo) return;
+    if (!confirm('Mark the deposit received and email ' + cInfo.email + ' that the date is confirmed?')) return;
+    var b = $('c-confirm');
+    b.disabled = true; b.textContent = 'Confirming...';
+    fetch('/admin/contracts/confirm-deposit', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ link: $('c-link').value, amount: parseFloat($('c-amount').value), receivedOn: $('c-date').value, method: $('c-method').value, note: $('c-note').value })
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        b.disabled = false; b.textContent = 'Deposit received: confirm the date';
+        if (res.ok && res.d.ok) cSay('Confirmed. Emailed ' + res.d.emailed + '. Calendar: ' + res.d.calendar + '.', false);
+        else cSay(res.d.error || 'Could not confirm the deposit.', true);
+      })
+      .catch(function () { b.disabled = false; b.textContent = 'Deposit received: confirm the date'; cSay('Network error. Please try again.', true); });
+  });
+
   var lastToken = null;
   var form = $('f');
   var msg = $('msg');
@@ -899,6 +945,24 @@ function adminPageHtml() {
         </div>
         <p class="fine" id="emailed" hidden></p>
       </div>
+
+      <fieldset style="margin-top:36px">
+        <legend>Confirm a deposit</legend>
+        <p class="fine" style="margin:0 0 14px">When a deposit arrives, paste the signed agreement link (it is in the "Agreement Signed" email and in the calendar entry). One click emails the client that their date is confirmed, turns the calendar entry green, and logs it to the events team.</p>
+        <div class="fld"><label for="c-link">Signed agreement link</label><input id="c-link" placeholder="https://theivybk.com/contract/..."></div>
+        <p style="margin:0 0 14px"><button type="button" class="btn plain" id="c-lookup" style="width:auto;padding:10px 20px">Look up</button></p>
+        <div id="c-panel" hidden>
+          <div class="callout" id="c-summary"></div>
+          <div class="row three">
+            <div class="fld"><label for="c-amount">Amount received ($)</label><input id="c-amount" type="number" min="0" step="0.01"><div class="help">Credit card payments include the 3% surcharge.</div></div>
+            <div class="fld"><label for="c-date">Date received</label><input id="c-date" type="date"></div>
+            <div class="fld"><label for="c-method">Paid by</label><select id="c-method"><option>Credit card</option><option>Cash</option><option>Check</option><option>Other</option></select></div>
+          </div>
+          <div class="fld"><label for="c-note">Internal note (optional, not shown to the client)</label><input id="c-note"></div>
+          <button type="button" class="btn" id="c-confirm" style="max-width:340px">Deposit received: confirm the date</button>
+        </div>
+        <p class="err" id="c-msg" hidden></p>
+      </fieldset>
     </div>`;
   const script = ADMIN_SCRIPT.replace('__CATALOG__', () => jsonForScript(CATALOG));
   return shell({ title: 'New Event Agreement | The Ivy', body, script }).replace('</style>', () => `${ADMIN_CSS}</style>`);
@@ -907,7 +971,7 @@ function adminPageHtml() {
 // ------------------------------------------------------- tokens & handlers
 
 function createContractHandlers(deps) {
-  const { resendSendEmail, emailTemplate, checkBasicAuth, readJsonBody, getClientIp, createCalendarEvent, secret, hasResend } = deps;
+  const { resendSendEmail, emailTemplate, checkBasicAuth, readJsonBody, getClientIp, createCalendarEvent, updateCalendarEvent, secret, hasResend } = deps;
 
   // In-memory only (resets on deploy): maps an agreement id to its signed
   // link so a repeat visit or double-click doesn't produce a second signature.
@@ -1081,6 +1145,73 @@ function createContractHandlers(deps) {
     }).catch((err) => console.error('Agreement client copy email error:', err.message));
   }
 
+  // Builds the events-calendar entry for a signed agreement. `conf` is null
+  // while the deposit is pending, and { amount, receivedOn, method } once it
+  // has been received, which turns the entry green and titled CONFIRMED.
+  function buildCalendarEvent(c, signedData, signedLink, conf) {
+    const cl = signedData.cl;
+    const t = computeTotals(c);
+    const nextDay = (ymd) => new Date(Date.parse(ymd + 'T12:00:00Z') + 86400000).toISOString().slice(0, 10);
+    const endDay = c.end <= c.start ? nextDay(c.date) : c.date;
+    const [sh, sm] = c.start.split(':').map((n) => parseInt(n, 10));
+    const setupMins = (sh * 60 + sm - 30 + 1440) % 1440;
+    const setupTime = fmtTime(`${String(Math.floor(setupMins / 60)).padStart(2, '0')}:${String(setupMins % 60).padStart(2, '0')}`);
+
+    const statusLine = conf
+      ? `CONFIRMED: deposit received ${fmtDateShort(conf.receivedOn)} (${fmtMoney(conf.amount)} by ${conf.method.toLowerCase()}). The agreement is in effect.`
+      : `DEPOSIT PENDING: the date is not confirmed until the ${fmtMoney(t.deposit)} deposit is received (held through ${fmtDateShort(c.exp)}).`;
+
+    const description = [
+      statusLine,
+      '',
+      'EVENT',
+      `${c.type}`,
+      `${fmtDate(c.date)}`,
+      `Setup: ${setupTime}  |  Start: ${fmtTime(c.start)}  |  End: ${fmtTime(c.end)}`,
+      c.arrive ? `Guest arrival: ${fmtTime(c.arrive)}` : null,
+      `Space: ${c.space}`,
+      `Estimated guests: ${c.guests} (final guaranteed count due 7 days before)`,
+      '',
+      'CLIENT',
+      `${c.name}${cl.company ? ` (${cl.company})` : ''}`,
+      `Phone: ${cl.phone}`,
+      `Email: ${cl.email}`,
+      `Day-of contact: ${cl.dayName ? `${cl.dayName}${cl.dayPhone ? `, ${cl.dayPhone}` : ''}` : `same as client${cl.dayPhone ? `, ${cl.dayPhone}` : ''}`}`,
+      '',
+      'SELECTIONS',
+      ...(c.lines.length
+        ? c.lines.map((l) => `- ${l[1]} x ${l[0]} @ ${fmtMoney(l[2])} = ${fmtMoney(l[1] * l[2])}`)
+        : ['- To be confirmed with the final guest count']),
+      c.sel ? `Menu selections: ${c.sel}` : null,
+      '',
+      'PRICING',
+      `Estimated food & beverage: ${fmtMoney(t.est)}`,
+      t.min > 0 ? `Food & beverage minimum: ${fmtMoney(t.min)}` : null,
+      `Deposit: ${fmtMoney(t.deposit)} (${conf ? `received ${fmtDateShort(conf.receivedOn)}` : 'pending'})`,
+      `Estimated remaining balance: ${fmtMoney(t.remaining)} (before tax and service charge)`,
+      `Estimated 20% service charge: ${fmtMoney(t.service)}`,
+      'Tax and the 3% credit card surcharge are extra.',
+      c.notes ? '' : null,
+      c.notes ? 'NOTES & SPECIAL ARRANGEMENTS' : null,
+      c.notes ? c.notes : null,
+      '',
+      'AGREEMENT',
+      `${refOf(c)}, signed by ${signedData.sig.name} on ${fmtStamp(signedData.sig.at)}`,
+      `Issued by: ${c.rep}`,
+      `Signed agreement: ${signedLink}`,
+    ].filter((line) => line !== null).join('\n');
+
+    return {
+      summary: `Private Event: ${c.name} (${c.guests} guests) [${conf ? 'CONFIRMED' : 'deposit pending'}]`,
+      description,
+      location: `${VENUE.name}, ${VENUE.address} (${c.space})`,
+      colorId: conf ? '10' : '5',
+      start: { dateTime: `${c.date}T${c.start}:00`, timeZone: 'America/Chicago' },
+      end: { dateTime: `${endDay}T${c.end}:00`, timeZone: 'America/Chicago' },
+      extendedProperties: { private: { agreementRef: refOf(c), agreementId: c.id, status: conf ? 'confirmed' : 'deposit-pending' } },
+    };
+  }
+
   // Puts the signed party on the events calendar. The event id is derived from
   // the agreement id, so signing twice can never create a duplicate. It is
   // titled "deposit pending" because the date is not confirmed until the
@@ -1088,65 +1219,8 @@ function createContractHandlers(deps) {
   // emails the events team so they can add the party by hand.
   async function addToCalendar(c, signedData, signedLink) {
     if (!createCalendarEvent) return;
-    const cl = signedData.cl;
     try {
-      const t = computeTotals(c);
-      const nextDay = (ymd) => new Date(Date.parse(ymd + 'T12:00:00Z') + 86400000).toISOString().slice(0, 10);
-      const endDay = c.end <= c.start ? nextDay(c.date) : c.date;
-      const [sh, sm] = c.start.split(':').map((n) => parseInt(n, 10));
-      const setupMins = (sh * 60 + sm - 30 + 1440) % 1440;
-      const setupTime = fmtTime(`${String(Math.floor(setupMins / 60)).padStart(2, '0')}:${String(setupMins % 60).padStart(2, '0')}`);
-
-      const description = [
-        `DEPOSIT PENDING: the date is not confirmed until the ${fmtMoney(t.deposit)} deposit is received (held through ${fmtDateShort(c.exp)}).`,
-        '',
-        'EVENT',
-        `${c.type}`,
-        `${fmtDate(c.date)}`,
-        `Setup: ${setupTime}  |  Start: ${fmtTime(c.start)}  |  End: ${fmtTime(c.end)}`,
-        c.arrive ? `Guest arrival: ${fmtTime(c.arrive)}` : null,
-        `Space: ${c.space}`,
-        `Estimated guests: ${c.guests} (final guaranteed count due 7 days before)`,
-        '',
-        'CLIENT',
-        `${c.name}${cl.company ? ` (${cl.company})` : ''}`,
-        `Phone: ${cl.phone}`,
-        `Email: ${cl.email}`,
-        `Day-of contact: ${cl.dayName ? `${cl.dayName}${cl.dayPhone ? `, ${cl.dayPhone}` : ''}` : `same as client${cl.dayPhone ? `, ${cl.dayPhone}` : ''}`}`,
-        '',
-        'SELECTIONS',
-        ...(c.lines.length
-          ? c.lines.map((l) => `- ${l[1]} x ${l[0]} @ ${fmtMoney(l[2])} = ${fmtMoney(l[1] * l[2])}`)
-          : ['- To be confirmed with the final guest count']),
-        c.sel ? `Menu selections: ${c.sel}` : null,
-        '',
-        'PRICING',
-        `Estimated food & beverage: ${fmtMoney(t.est)}`,
-        t.min > 0 ? `Food & beverage minimum: ${fmtMoney(t.min)}` : null,
-        `Deposit: ${fmtMoney(t.deposit)} (pending)`,
-        `Estimated remaining balance: ${fmtMoney(t.remaining)} (before tax and service charge)`,
-        `Estimated 20% service charge: ${fmtMoney(t.service)}`,
-        'Tax and the 3% credit card surcharge are extra.',
-        c.notes ? '' : null,
-        c.notes ? 'NOTES & SPECIAL ARRANGEMENTS' : null,
-        c.notes ? c.notes : null,
-        '',
-        'AGREEMENT',
-        `${refOf(c)}, signed by ${signedData.sig.name} on ${fmtStamp(signedData.sig.at)}`,
-        `Issued by: ${c.rep}`,
-        `Signed agreement: ${signedLink}`,
-      ].filter((line) => line !== null).join('\n');
-
-      await createCalendarEvent({
-        id: 'agr' + c.id,
-        summary: `Private Event: ${c.name} (${c.guests} guests) [deposit pending]`,
-        description,
-        location: `${VENUE.name}, ${VENUE.address} (${c.space})`,
-        colorId: '5',
-        start: { dateTime: `${c.date}T${c.start}:00`, timeZone: 'America/Chicago' },
-        end: { dateTime: `${endDay}T${c.end}:00`, timeZone: 'America/Chicago' },
-        extendedProperties: { private: { agreementRef: refOf(c), agreementId: c.id, status: 'deposit-pending' } },
-      });
+      await createCalendarEvent({ id: 'agr' + c.id, ...buildCalendarEvent(c, signedData, signedLink, null) });
     } catch (err) {
       console.error('Agreement calendar event error:', err.message);
       try {
@@ -1237,6 +1311,134 @@ function createContractHandlers(deps) {
     }
   }
 
+  // ---- deposit confirmation (admin)
+
+  // Accepts a full signed-agreement link or the bare token.
+  function tokenFromLink(input) {
+    const s = String(input || '').trim();
+    const m = /\/contract\/([A-Za-z0-9_-]+)/.exec(s);
+    return m ? m[1] : s.replace(/[?#].*$/, '');
+  }
+
+  // Best effort, resets on deploy: stops a double click from emailing the
+  // client twice. Marking a deposit received is otherwise safe to repeat.
+  const confirmedIds = new Set();
+
+  async function handleAdminLookup(req, res) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    let body;
+    try { body = await readJsonBody(req); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+    const data = open(tokenFromLink(body.link));
+    if (!data) return sendJson(res, 400, { ok: false, error: 'That link is not valid. Paste the signed agreement link from the "Agreement Signed" email.' });
+    if (data.k !== 'signed') return sendJson(res, 400, { ok: false, error: 'That agreement has not been signed yet.' });
+    const c = data.c;
+    const t = computeTotals(c);
+    sendJson(res, 200, {
+      ok: true,
+      ref: refOf(c),
+      name: c.name,
+      email: data.cl.email,
+      type: c.type,
+      date: fmtDate(c.date),
+      guests: c.guests,
+      deposit: t.deposit,
+      signedAt: fmtStamp(data.sig.at),
+      alreadyConfirmed: confirmedIds.has(c.id),
+    });
+  }
+
+  async function handleAdminConfirmDeposit(req, res) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    if (!hasResend()) return sendJson(res, 503, { ok: false, error: 'Email is not configured on the server.' });
+    let body;
+    try { body = await readJsonBody(req); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+
+    const link = String(body.link || '').trim();
+    const token = tokenFromLink(link);
+    const data = open(token);
+    if (!data || data.k !== 'signed') return sendJson(res, 400, { ok: false, error: 'That is not a valid signed agreement link.' });
+    const c = data.c;
+    if (confirmedIds.has(c.id)) return sendJson(res, 409, { ok: false, error: 'This deposit was already marked received. Check the calendar entry and the confirmation email.' });
+
+    const amount = r2(body.amount);
+    if (!(amount > 0 && amount <= 1000000)) return sendJson(res, 400, { ok: false, error: 'Enter the amount received.' });
+    const receivedOn = cleanLine(body.receivedOn, 10);
+    if (!validYmd(receivedOn) || receivedOn > chicagoToday()) return sendJson(res, 400, { ok: false, error: 'Enter the date the deposit was received (today or earlier).' });
+    const methods = { 'credit card': 'Credit card', cash: 'Cash', check: 'Check', other: 'Other' };
+    const method = methods[cleanLine(body.method, 20).toLowerCase()];
+    if (!method) return sendJson(res, 400, { ok: false, error: 'Choose how the deposit was paid.' });
+    const note = cleanText(body.note, 300);
+
+    const conf = { amount, receivedOn, method };
+    const t = computeTotals(c);
+    const signedLink = urlFor(token);
+    const deadline = fmtDate(new Date(Date.parse(c.date + 'T12:00:00Z') - 7 * 86400000).toISOString().slice(0, 10));
+
+    const rows = [
+      ['Event', `${c.type}, ${fmtDate(c.date)}`],
+      ['Time', `${fmtTime(c.start)} to ${fmtTime(c.end)} (setup begins 30 minutes earlier)`],
+      ['Space', c.space],
+      ['Estimated guests', String(c.guests)],
+      ['Deposit received', `${fmtMoney(amount)} on ${fmtDateShort(receivedOn)} (${method.toLowerCase()})`],
+      ['Remaining balance', `About ${fmtMoney(t.remaining)} plus tax and service charge, due on the day of the event`],
+    ];
+    const rowsText = rows.map(([k, v]) => `${k}: ${v}`).join('\n');
+    const rowsHtml = `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">${
+      rows.map(([k, v]) => `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:140px; vertical-align:top;">${esc(k)}</td><td style="padding:4px 0;">${esc(v)}</td></tr>`).join('')
+    }</table>`;
+
+    // Client confirmation first, so a failure here changes nothing else.
+    try {
+      const mail = await resendSendEmail({
+        to: data.cl.email,
+        subject: 'Your date is confirmed | The Ivy Bar and Kitchen',
+        text: `Hi ${c.name},\n\nWe've received your deposit, and your ${c.type.toLowerCase()} on ${fmtDate(c.date)} is confirmed. Your agreement is now in effect.\n\n${rowsText}\n\nTo do next: send us your final guaranteed guest count, menu selections, dietary needs, and the number of beverage-package wristbands by ${deadline}.\n\nYour signed agreement: ${signedLink}\n\nQuestions? Call ${VENUE.phone} or reply to this email.\n\n${VENUE.name}\n${VENUE.address}`,
+        html: emailTemplate({
+          heading: 'Your date is confirmed',
+          bodyHtml: `<p style="margin:0 0 16px;">Hi ${esc(c.name)},</p><p style="margin:0 0 16px;">We've received your deposit, and your ${esc(c.type.toLowerCase())} on ${esc(fmtDate(c.date))} is confirmed. Your agreement is now in effect.</p>${rowsHtml}<p style="margin:0 0 16px;"><strong>To do next:</strong> send us your final guaranteed guest count, menu selections, dietary needs, and the number of beverage-package wristbands by <strong>${esc(deadline)}</strong>.</p><p style="margin:0 0 16px;"><a href="${esc(signedLink)}" style="color:#1F3D2A;">View your signed agreement</a></p><p style="margin:0 0 16px;">Questions? Call <a href="tel:+17737998160" style="color:#1F3D2A;">${esc(VENUE.phone)}</a> or reply to this email.</p>`,
+        }),
+        replyTo: VENUE.eventsEmail,
+      });
+      if (mail.status < 200 || mail.status >= 300) throw new Error(`Resend status ${mail.status}`);
+    } catch (err) {
+      console.error('Deposit confirmation email failed:', err.message);
+      return sendJson(res, 502, { ok: false, error: 'The confirmation email to the client did not send, so nothing was changed. Please try again.' });
+    }
+    confirmedIds.add(c.id);
+
+    // Calendar: update the pending entry; if it is missing, create the
+    // confirmed one. Never fails the request, but reports what happened.
+    let calendar = 'not configured';
+    if (createCalendarEvent) {
+      try {
+        const event = buildCalendarEvent(c, data, signedLink, conf);
+        const patched = updateCalendarEvent ? await updateCalendarEvent('agr' + c.id, event) : null;
+        if (patched && patched.missing) {
+          await createCalendarEvent(patched.missing === 404 ? { id: 'agr' + c.id, ...event } : event);
+          calendar = 'created (no pending entry was found)';
+        } else {
+          calendar = 'updated to CONFIRMED';
+        }
+      } catch (err) {
+        console.error('Deposit calendar update error:', err.message);
+        calendar = `FAILED (${err.message.slice(0, 120)}). Please update the entry by hand.`;
+      }
+    }
+
+    // Record email to the events team: the durable log of the confirmation.
+    try {
+      await resendSendEmail({
+        to: VENUE.notifyTo,
+        subject: `Deposit Received: ${c.name}, ${c.date} (${refOf(c)})`,
+        text: `Deposit marked received for ${c.name} (${refOf(c)}).\n\n${rowsText}\n${note ? `\nNote: ${note}\n` : ''}\nClient confirmation email: sent to ${data.cl.email}\nCalendar: ${calendar}\n\nSigned agreement: ${signedLink}`,
+      });
+    } catch (err) {
+      console.error('Deposit record email error:', err.message);
+    }
+
+    sendJson(res, 200, { ok: true, emailed: data.cl.email, calendar });
+  }
+
   function cleanLine(v, max) {
     return typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, max) : '';
   }
@@ -1325,7 +1527,7 @@ function createContractHandlers(deps) {
     };
   }
 
-  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail };
+  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit };
 }
 
 module.exports = {

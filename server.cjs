@@ -982,6 +982,49 @@ async function insertCalendarEvent(event) {
   });
 }
 
+// Updates an existing calendar event by id. Resolves { missing } instead of
+// throwing when the event no longer exists (404, 410, or a deleted tombstone),
+// so the caller can create it fresh.
+async function patchCalendarEvent(eventId, patch) {
+  if (!GOOGLE_CALENDAR_CLIENT_ID || !GOOGLE_CALENDAR_CLIENT_SECRET || !GOOGLE_CALENDAR_REFRESH_TOKEN) return null;
+  const accessToken = await getGoogleCalendarAccessToken();
+  const body = JSON.stringify(patch);
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: 'www.googleapis.com',
+        path: `/calendar/v3/calendars/${encodeURIComponent(GOOGLE_CALENDAR_ID)}/events/${encodeURIComponent(eventId)}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}`, 'Content-Length': Buffer.byteLength(body) },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
+          if (res.statusCode === 404 || res.statusCode === 410) {
+            resolve({ missing: res.statusCode });
+            return;
+          }
+          if (res.statusCode >= 300) {
+            reject(new Error(`Calendar update failed: ${res.statusCode} ${data}`));
+            return;
+          }
+          let parsed = {};
+          try { parsed = JSON.parse(data); } catch {}
+          if (parsed.status === 'cancelled') {
+            resolve({ missing: 'cancelled' });
+            return;
+          }
+          resolve(parsed);
+        });
+      }
+    );
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
 async function handleReservation(req, res) {
   if (!RESEND_API_KEY) {
     res.writeHead(503, { 'Content-Type': 'application/json' });
@@ -1514,6 +1557,7 @@ const contracts = require('./contract.cjs').createContractHandlers({
   readJsonBody,
   getClientIp,
   createCalendarEvent: insertCalendarEvent,
+  updateCalendarEvent: patchCalendarEvent,
   secret: (process.env.CONTRACT_SECRET || '').trim() || ADMIN_PASS,
   hasResend: () => !!RESEND_API_KEY,
 });
@@ -1596,8 +1640,71 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/admin/contracts/lookup') {
+    contracts.handleAdminLookup(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/admin/contracts/confirm-deposit') {
+    contracts.handleAdminConfirmDeposit(req, res);
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/admin/contracts/email') {
     contracts.handleAdminEmail(req, res);
+    return;
+  }
+
+  // TEMPORARY: reads back (and optionally deletes) the calendar event created by
+  // a test agreement signing. Removed right after it has been used once.
+  if (req.method === 'POST' && urlPath === '/admin/calendar-test-cleanup') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    const wantDelete = new URL(req.url, 'http://localhost').searchParams.get('delete') === '1';
+    const gcal = (method, pathAndQuery, accessToken) => new Promise((resolve, reject) => {
+      const r = https.request(
+        { hostname: 'www.googleapis.com', path: pathAndQuery, method, headers: { Authorization: `Bearer ${accessToken}` } },
+        (resp) => {
+          let data = '';
+          resp.on('data', (chunk) => (data += chunk));
+          resp.on('end', () => {
+            let parsed = {};
+            try { parsed = JSON.parse(data); } catch {}
+            resolve({ status: resp.statusCode, body: parsed });
+          });
+        }
+      );
+      r.on('error', reject);
+      r.end();
+    });
+    (async () => {
+      try {
+        const accessToken = await getGoogleCalendarAccessToken();
+        const calId = encodeURIComponent(GOOGLE_CALENDAR_ID);
+        const list = await gcal('GET', `/calendar/v3/calendars/${calId}/events?timeMin=${encodeURIComponent('2026-11-13T00:00:00Z')}&timeMax=${encodeURIComponent('2026-11-16T00:00:00Z')}&singleEvents=true&maxResults=100`, accessToken);
+        const matches = (list.body.items || []).filter((e) => (e.summary || '').startsWith('Private Event: Test Agreement Please Ignore'));
+        const deleted = [];
+        if (wantDelete) {
+          for (const e of matches) {
+            const d = await gcal('DELETE', `/calendar/v3/calendars/${calId}/events/${encodeURIComponent(e.id)}`, accessToken);
+            deleted.push({ id: e.id, status: d.status });
+          }
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          listStatus: list.status,
+          totalInWindow: (list.body.items || []).length,
+          matches: matches.map((e) => ({ id: e.id, summary: e.summary, start: e.start, end: e.end, colorId: e.colorId, location: e.location, extendedProperties: e.extendedProperties, description: e.description })),
+          deleted,
+        }, null, 2));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    })();
     return;
   }
 
