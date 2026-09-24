@@ -701,10 +701,10 @@ function resendUnsubscribe(email) {
   });
 }
 
-function resendSendEmail({ to, subject, text, html, replyTo, attachments, headers }) {
+function resendSendEmail({ to, from, subject, text, html, replyTo, attachments, headers }) {
   return new Promise((resolve, reject) => {
     const payload = {
-      from: 'The Ivy Bar and Kitchen <info@theivybk.com>',
+      from: from || 'The Ivy Bar and Kitchen <info@theivybk.com>',
       to: Array.isArray(to) ? to : [to],
       subject,
       text,
@@ -1182,6 +1182,8 @@ async function handleReservation(req, res) {
 }
 
 const EVENT_TO_EMAIL = 'events@theivybk.com';
+// Everything about private events is sent from, and answered at, events@.
+const EVENTS_FROM = 'The Ivy Bar and Kitchen <events@theivybk.com>';
 
 async function handleEventInquiry(req, res) {
   if (!RESEND_API_KEY) {
@@ -1268,7 +1270,7 @@ async function handleEventInquiry(req, res) {
   });
 
   try {
-    const result = await resendSendEmail({ to: EVENT_TO_EMAIL, subject, text, html: notificationHtml, replyTo: email });
+    const result = await resendSendEmail({ to: EVENT_TO_EMAIL, from: EVENTS_FROM, subject, text, html: notificationHtml, replyTo: email });
     if (result.status === 200 || result.status === 201) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
@@ -1318,7 +1320,7 @@ async function handleEventInquiry(req, res) {
           <p style="margin:0 0 16px;">Our events team will follow up within one business day. Have a question in the meantime? Call us at <a href="tel:+17737998160" style="color:#1F3D2A;">(773) 799-8160</a>.</p>
         `,
       });
-      resendSendEmail({ to: email, subject: 'Got your inquiry — The Ivy Bar and Kitchen', text: confirmationText, html: confirmationHtml })
+      resendSendEmail({ to: email, from: EVENTS_FROM, replyTo: EVENT_TO_EMAIL, subject: 'Got your inquiry — The Ivy Bar and Kitchen', text: confirmationText, html: confirmationHtml })
         .catch((err) => console.error('Event inquiry confirmation email error:', err.message));
     } else {
       console.error('Resend send failed:', result.status, result.body);

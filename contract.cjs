@@ -26,7 +26,9 @@ const VENUE = {
   address: '1625 W Irving Park Rd, Chicago, IL 60613',
   phone: '(773) 799-8160',
   eventsEmail: 'events@theivybk.com',
-  notifyTo: ['events@theivybk.com', 'info@theivybk.com'],
+  notifyTo: ['events@theivybk.com'],
+  // Every agreement email is sent from, and answered at, events@ (never info@).
+  from: 'The Ivy Bar and Kitchen <events@theivybk.com>',
   origin: 'https://theivybk.com',
   logo: 'https://theivybk.com/assets/img/logo/logo-gold.png',
 };
@@ -972,6 +974,7 @@ function adminPageHtml() {
 
 function createContractHandlers(deps) {
   const { resendSendEmail, emailTemplate, checkBasicAuth, readJsonBody, getClientIp, createCalendarEvent, updateCalendarEvent, secret, hasResend } = deps;
+  const sendEmail = (opts) => resendSendEmail({ from: VENUE.from, ...opts });
 
   // In-memory only (resets on deploy): maps an agreement id to its signed
   // link so a repeat visit or double-click doesn't produce a second signature.
@@ -1110,7 +1113,7 @@ function createContractHandlers(deps) {
     // The email to The Ivy is the permanent record, so the signature only
     // counts once that email has actually gone out.
     try {
-      const venueResult = await resendSendEmail({
+      const venueResult = await sendEmail({
         to: VENUE.notifyTo,
         subject: `Agreement Signed: ${c.name}, ${c.date} (${refOf(c)})`,
         text: `${signedData.sig.name} signed the private event agreement on ${fmtStamp(signedData.sig.at)}.\n\n${summaryText}\n\nSigned agreement: ${signedLink}\n\nThe signed copy is also attached. The Ivy will confirm the date once the deposit is received.`,
@@ -1132,7 +1135,7 @@ function createContractHandlers(deps) {
 
     addToCalendar(c, signedData, signedLink);
 
-    resendSendEmail({
+    sendEmail({
       to: signedData.cl.email,
       subject: 'Your signed agreement | The Ivy Bar and Kitchen',
       text: `Hi ${c.name},\n\nThank you for signing your private event agreement with The Ivy Bar and Kitchen. A copy is attached, and you can view it any time here:\n${signedLink}\n\n${summaryText}\n\nNext, we'll contact you to collect the deposit. Your date is confirmed once we receive it.\n\nQuestions? Call ${VENUE.phone} or email ${VENUE.eventsEmail}.\n\n${VENUE.name}\n${VENUE.address}`,
@@ -1148,7 +1151,7 @@ function createContractHandlers(deps) {
       }
     }).catch((err) => {
       console.error('Agreement client copy email error:', err.message);
-      resendSendEmail({
+      sendEmail({
         to: VENUE.notifyTo,
         subject: `Signed copy did NOT reach the client: ${c.name} (${refOf(c)})`,
         text: `${c.name} signed the agreement, but the signed copy could not be emailed to ${signedData.cl.email}. The address may be mistyped.\n\nPlease contact them at ${signedData.cl.phone} and send them this link:\n${signedLink}\n\nReason: ${err.message}`,
@@ -1235,7 +1238,7 @@ function createContractHandlers(deps) {
     } catch (err) {
       console.error('Agreement calendar event error:', err.message);
       try {
-        await resendSendEmail({
+        await sendEmail({
           to: VENUE.notifyTo,
           subject: `Add to calendar by hand: ${c.name}, ${c.date} (${refOf(c)})`,
           text: `${c.name} signed the private event agreement, but the party could not be added to the events calendar automatically.\n\nPlease add it by hand:\n${c.type}, about ${c.guests} guests\n${c.space}\n${fmtDate(c.date)}, ${fmtTime(c.start)} to ${fmtTime(c.end)}\n\nSigned agreement: ${signedLink}\n\nError: ${err.message}`,
@@ -1278,7 +1281,7 @@ function createContractHandlers(deps) {
 
     let recorded = true;
     try {
-      const result = await resendSendEmail({
+      const result = await sendEmail({
         to: VENUE.notifyTo,
         subject: `Agreement Created: ${c.name}, ${c.date} (${refOf(c)})`,
         text: `${summaryText}\n\nClient link:\n${url}\n\nThis is a record copy. The client has not been emailed unless you used "Email to client".`,
@@ -1304,7 +1307,7 @@ function createContractHandlers(deps) {
     const c = data.c;
     const url = urlFor(body.token);
     try {
-      const result = await resendSendEmail({
+      const result = await sendEmail({
         to: c.email,
         subject: `Your event agreement | The Ivy Bar and Kitchen`,
         text: `Hi ${c.name},\n\nThanks for choosing The Ivy for your ${c.type.toLowerCase()} on ${fmtDate(c.date)}. Your event agreement is ready to review and sign:\n\n${url}\n\nWe're holding the date through ${fmtDateShort(c.exp)}. To keep it, please sign and we'll follow up to collect the deposit.\n\nQuestions? Call ${VENUE.phone} or reply to this email.\n\n${VENUE.name}\n${VENUE.address}`,
@@ -1400,7 +1403,7 @@ function createContractHandlers(deps) {
 
     // Client confirmation first, so a failure here changes nothing else.
     try {
-      const mail = await resendSendEmail({
+      const mail = await sendEmail({
         to: data.cl.email,
         subject: 'Your date is confirmed | The Ivy Bar and Kitchen',
         text: `Hi ${c.name},\n\nWe've received your deposit, and your ${c.type.toLowerCase()} on ${fmtDate(c.date)} is confirmed. Your agreement is now in effect.\n\n${rowsText}\n\nTo do next: send us your final guaranteed guest count, menu selections, dietary needs, and the number of beverage-package wristbands by ${deadline}.\n\nYour signed agreement: ${signedLink}\n\nQuestions? Call ${VENUE.phone} or reply to this email.\n\n${VENUE.name}\n${VENUE.address}`,
@@ -1440,7 +1443,7 @@ function createContractHandlers(deps) {
 
     // Record email to the events team: the durable log of the confirmation.
     try {
-      await resendSendEmail({
+      await sendEmail({
         to: VENUE.notifyTo,
         subject: `Deposit Received: ${c.name}, ${c.date} (${refOf(c)})`,
         text: `Deposit marked received for ${c.name} (${refOf(c)}).\n\n${rowsText}\n${note ? `\nNote: ${note}\n` : ''}\nClient confirmation email: sent to ${data.cl.email}\nCalendar: ${calendar}\n\nSigned agreement: ${signedLink}`,
