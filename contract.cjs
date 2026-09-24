@@ -21,9 +21,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const VENUE = {
   name: 'The Ivy Bar and Kitchen',
-  // Replace with the registered legal entity (for example
-  // "XYZ Hospitality LLC d/b/a The Ivy Bar and Kitchen") once confirmed.
-  legalName: 'The Ivy Bar and Kitchen',
+  // The contracting party named in the agreement (registered entity and DBA).
+  legalName: 'Thirsty Angus LLC d/b/a The Ivy Bar & Kitchen',
   address: '1625 W Irving Park Rd, Chicago, IL 60613',
   phone: '(773) 799-8160',
   eventsEmail: 'events@theivybk.com',
@@ -186,12 +185,12 @@ const TERMS_VERSIONS = {
     sections.push({
       title: 'Booking, Deposit & Payment',
       html: `
-        <p>A <strong>20% deposit</strong> is required to secure the event date. The event is not confirmed until The Ivy has received the deposit, and The Ivy will confirm by email once it has.</p>
+        <p>A <strong>20% deposit</strong> is required to secure the event date. The event is not confirmed until The Ivy has received the deposit, and The Ivy will confirm by email once it has. The Ivy accepts this agreement by confirming the date, so no separate signature from The Ivy is required.</p>
         <p>The Ivy is holding the date for the Client through <strong>${esc(fmtDateShort(c.exp))}</strong>. If The Ivy has not received the signed agreement and the deposit by then, The Ivy may release the date.</p>
         <p>After the agreement is signed, The Ivy will contact the Client to collect the deposit by credit card. Please do not email or text card numbers.</p>
         <p>The deposit is credited toward the Client's final bill.</p>
         <p>The remaining balance is due <strong>on the day of the event</strong>. Final payment must be made using <strong>one credit card</strong>; the balance cannot be split across cards. Drinks that guests buy on their own individual tabs are separate from the Client's final bill.</p>
-        <p>By signing, the Client authorizes The Ivy to charge the credit card the Client provides for any amount owed under this agreement, including the remaining balance, damage fees, and cancellation charges. The Ivy will let the Client know before charging for damage fees or cancellation charges.</p>`,
+        <p>By signing, the Client authorizes The Ivy to charge the credit card the Client provides for any amount owed under this agreement, including the remaining balance and any damage fees. The Ivy will let the Client know before charging for damage fees.</p>`,
     });
 
     sections.push({
@@ -244,9 +243,8 @@ const TERMS_VERSIONS = {
     sections.push({
       title: 'Cancellation',
       html: `
-        <p>Cancellations must be made <strong>in writing</strong> (email ${esc(VENUE.eventsEmail)}) at least <strong>7 days before the event date</strong>.</p>
-        <p>All deposits are <strong>non-refundable</strong> and are forfeited upon cancellation.</p>
-        <p>If the event is cancelled less than 7 days before the event date, or the Client does not show up, the Client will owe charges based on the guaranteed guest count (or the estimated guest count, if a guaranteed count has not been provided) and the selections in this agreement, and never less than the Food &amp; Beverage Minimum. The deposit is credited toward that amount.</p>
+        <p>Cancellations must be made <strong>in writing</strong> (email ${esc(VENUE.eventsEmail)}).</p>
+        <p>All deposits are <strong>non-refundable</strong> and are forfeited upon cancellation. If the event is cancelled less than 7 days before the event date, or the Client does not show up, the result is the same: the deposit is forfeited and the Client owes no further charges for the cancellation.</p>
         <p>If The Ivy cancels the event, see <em>Weather &amp; Events Beyond Our Control</em>.</p>`,
     });
 
@@ -339,6 +337,7 @@ li { margin:0 0 6px; }
 .sum .hint { display:block; font-weight:400; font-size:12px; color:var(--ink-mute); }
 .callout { background:var(--cream); border:1px solid var(--border); border-radius:2px; padding:12px 16px; margin:0 0 14px; }
 .sigs { display:grid; grid-template-columns:1fr 1fr; gap:32px; margin:22px 0 6px; }
+.sigs.one { grid-template-columns:minmax(0,440px); }
 .sigline { min-height:54px; border-bottom:1px solid var(--ink); display:flex; align-items:flex-end; padding-bottom:4px; }
 .script { font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-size:32px; line-height:1.1; color:var(--ivy); }
 .pending { color:var(--ink-mute); font-size:14px; font-style:italic; }
@@ -474,34 +473,28 @@ function documentHtml(c, signed) {
 
   const ackNum = terms.sections.length + 3;
 
-  const repBlock = `
-    <div class="sigcol">
-      <div class="sigline"><span class="script">${esc(c.rep)}</span></div>
-      <div class="siglabel">The Ivy Representative</div>
-      <div class="sigmeta">${esc(c.rep)} &middot; Issued ${esc(fmtDateShort(new Date(c.iat).toLocaleDateString('en-CA', { timeZone: 'America/Chicago' })))}</div>
-    </div>`;
+  // Only the Client signs. The Ivy accepts by confirming the date once the
+  // deposit is received (see Booking, Deposit & Payment).
+  const issuedOn = fmtDateShort(new Date(c.iat).toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }));
 
-  let ack;
+  let ack = '';
   if (signed) {
     ack = `
-      <div class="sigs">
+      <div class="sigs one">
         <div class="sigcol">
           <div class="sigline"><span class="script">${esc(signed.sig.name)}</span></div>
           <div class="siglabel">Client Signature</div>
           <div class="sigmeta">${esc(c.name)} &middot; Signed ${esc(fmtStamp(signed.sig.at))}</div>
         </div>
-        ${repBlock}
       </div>
       <div class="audit">
         <strong>Signed electronically.</strong> Agreement ${esc(refOf(c))} &middot; signed by ${esc(signed.sig.name)} on ${esc(fmtStamp(signed.sig.at))} &middot; IP ${esc(signed.sig.ip)} &middot; document fingerprint ${esc(signed.sig.fp)}.
       </div>`;
-  } else {
-    ack = `<div class="sigs">${repBlock}<div></div></div>`;
   }
 
   return `
     <div class="doc">
-      <span class="eyebrow">Agreement ${esc(refOf(c))}</span>
+      <span class="eyebrow">Agreement ${esc(refOf(c))} &middot; Issued ${esc(issuedOn)}</span>
       <h1>Private Event Space Agreement</h1>
       <p class="lede">Thank you for choosing The Ivy for your upcoming event. This agreement outlines the event details, payment terms, cancellation policy, and guidelines for use of our private event space. In this agreement, &ldquo;The Ivy&rdquo; means ${esc(VENUE.legalName)}, ${esc(VENUE.address)}, and &ldquo;Client&rdquo; means the person or organization named below.</p>
 
@@ -881,7 +874,7 @@ function adminPageHtml() {
           <legend>Offer</legend>
           <div class="row">
             <div class="fld"><label for="exp">Hold the date through</label><input id="exp" type="date" required><div class="help">The link stops working after this date, and the client is asked to sign and pay the deposit by then. Links can't be revoked, so keep this short.</div></div>
-            <div class="fld"><label for="rep">Issued by (The Ivy representative)</label><input id="rep" required></div>
+            <div class="fld"><label for="rep">Issued by (your name, for our records)</label><input id="rep" required></div>
           </div>
           <div class="fld"><label for="notes">Notes &amp; special arrangements (optional, shown to the client)</label><textarea id="notes"></textarea></div>
         </fieldset>
