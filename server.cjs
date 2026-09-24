@@ -1655,6 +1655,28 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // TEMPORARY: reports Resend's delivery status for one sent email. Removed
+  // right after it has been used.
+  if (req.method === 'GET' && urlPath === '/admin/email-status') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    const emailId = (new URL(req.url, 'http://localhost').searchParams.get('id') || '').replace(/[^a-zA-Z0-9-]/g, '');
+    resendGet(`/emails/${emailId}`)
+      .then((r) => {
+        const b = r.body || {};
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: r.status, to: b.to, from: b.from, subject: b.subject, created_at: b.created_at, last_event: b.last_event, raw: r.status >= 300 ? b : undefined }, null, 2));
+      })
+      .catch((err) => {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      });
+    return;
+  }
+
   // TEMPORARY: reads back (and optionally deletes) the calendar event created by
   // a test agreement signing. Removed right after it has been used once.
   if (req.method === 'POST' && urlPath === '/admin/calendar-test-cleanup') {
