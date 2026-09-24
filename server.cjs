@@ -5,6 +5,10 @@ const path = require('path');
 const zlib = require('zlib');
 const crypto = require('crypto');
 const os = require('os');
+const {
+  escapeHtml, dayLabel, emailTemplate, reservationEmails, inquiryEmails, welcomeEmail,
+  weeklyReportEmail, backupEmail, applicationEmail, menusEmail, emailPreviewPage,
+} = require('./emails.cjs');
 const { DatabaseSync } = require('node:sqlite');
 
 const PORT = process.env.PORT || 3000;
@@ -381,11 +385,12 @@ async function sendDatabaseBackup(reason) {
     csv = `Could not export agreements: ${err.message}\r\n`;
   }
 
-  const summary = `Agreements: ${counts.agreements}\nReservations: ${counts.reservations}\nEvent inquiries: ${counts.event_inquiries}`;
+  const mail = backupEmail({ reason, stamp, counts });
   const result = await resendSendEmail({
     to: BACKUP_TO_EMAIL,
-    subject: `Database backup ${stamp}`,
-    text: `${reason === 'manual' ? 'Backup requested by an admin.' : 'Weekly backup.'}\n\n${summary}\n\nAttached:\n- ivy-database-${stamp}.db is the full database (agreements, reservations, and event inquiries). It can be restored as is.\n- agreements-${stamp}.csv is a spreadsheet of every agreement.\n\nKeep the latest copy somewhere safe.`,
+    subject: mail.subject,
+    text: mail.text,
+    html: mail.html,
     attachments: [
       { filename: `ivy-database-${stamp}.db`, content: dbBase64 },
       { filename: `agreements-${stamp}.csv`, content: Buffer.from(csv, 'utf8').toString('base64') },
@@ -453,52 +458,6 @@ function timeToMinutes(t) {
   let h = parseInt(m[1], 10) % 12;
   if (/pm/i.test(m[3])) h += 12;
   return h * 60 + parseInt(m[2], 10);
-}
-
-function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-const dayLabel = (dateStr) => new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-// Simple branded HTML wrapper for customer-facing emails — table-based layout
-// with inline styles, since email clients don't support external stylesheets
-// or much modern CSS.
-function emailTemplate({ heading, bodyHtml, unsubscribeUrl }) {
-  return `<!doctype html>
-<html>
-<body style="margin:0; padding:0; background-color:#EBE3D2;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#EBE3D2; padding:32px 16px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="background-color:#FBF7EE; border-radius:4px; overflow:hidden; max-width:480px; width:100%;">
-          <tr>
-            <td align="center" style="background-color:#1F3D2A; padding:32px 24px;">
-              <img src="https://theivybk.com/assets/img/logo/logo-gold.png" alt="The Ivy Bar and Kitchen" width="64" style="display:block; width:64px; height:auto;">
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:32px 32px 8px; font-family:Georgia,'Times New Roman',serif;">
-              <h1 style="font-style:italic; font-weight:normal; font-size:26px; color:#1F3D2A; margin:0 0 16px; text-align:center;">${heading}</h1>
-              <div style="font-size:15px; line-height:1.6; color:#14140F;">
-                ${bodyHtml}
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:8px 32px 32px; font-family:Georgia,'Times New Roman',serif;">
-              <p style="font-size:12px; color:#686860; text-align:center; margin:16px 0 0; border-top:1px solid rgba(31,61,42,.15); padding-top:16px;">
-                The Ivy Bar and Kitchen &middot; 1625 W Irving Park Rd, Chicago, IL 60613 &middot; (773) 799-8160
-              </p>
-              ${unsubscribeUrl ? `<p style="font-size:12px; color:#686860; text-align:center; margin:8px 0 0;"><a href="${unsubscribeUrl}" style="color:#686860;">Unsubscribe from marketing emails</a></p>` : ''}
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
 }
 
 async function getWeekReservations(weekParam) {
@@ -599,25 +558,14 @@ async function handleWeeklyReportEmail(req, res, query) {
 
   const { mondayStr, sundayStr, inRange, byDay } = await getWeekReservations(query.get('week'));
 
-  const lines = [`Reservation requests for the week of ${dayLabel(mondayStr)} - ${dayLabel(sundayStr)}`, ''];
-  if (inRange.length === 0) {
-    lines.push('No reservation requests for this week.');
-  } else {
-    for (const dateStr of Object.keys(byDay).sort()) {
-      lines.push(dayLabel(dateStr).toUpperCase());
-      for (const r of byDay[dateStr]) {
-        lines.push(`  ${r.time} — ${r.full_name}, party of ${r.party_size} — ${r.phone} — ${r.email}${r.notes ? ` — ${r.notes}` : ''}`);
-      }
-      lines.push('');
-    }
-  }
-  lines.push(`Full printable report: https://www.theivybk.com/admin/reservations?week=${mondayStr}`);
+  const mail = weeklyReportEmail({ mondayStr, sundayStr, inRange, byDay });
 
   try {
     const result = await resendSendEmail({
       to: RESERVATION_TO_EMAIL,
-      subject: `Weekly Reservations — ${mondayStr} to ${sundayStr} (${inRange.length})`,
-      text: lines.join('\n'),
+      subject: mail.subject,
+      text: mail.text,
+      html: mail.html,
     });
     if (result.status === 200 || result.status === 201) {
       res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -824,6 +772,61 @@ function resendUnsubscribe(email) {
   });
 }
 
+// Looks an address up in the Resend audience (the official newsletter list):
+// { exists, unsubscribed }. Nothing about subscribers is stored on our side.
+async function contactStatus(email) {
+  const direct = await resendGet(`/audiences/${RESEND_AUDIENCE_ID}/contacts/${encodeURIComponent(email)}`);
+  if (direct.status === 200 && direct.body && direct.body.id) {
+    return { exists: true, unsubscribed: !!direct.body.unsubscribed };
+  }
+  if (direct.status === 404) return { exists: false, unsubscribed: false };
+  // Unexpected answer: fall back to scanning the whole list.
+  const list = await resendGet(`/audiences/${RESEND_AUDIENCE_ID}/contacts`);
+  if (list.status < 300 && list.body && Array.isArray(list.body.data)) {
+    const hit = list.body.data.find((c) => String(c.email || '').toLowerCase() === email.toLowerCase());
+    return hit ? { exists: true, unsubscribed: !!hit.unsubscribed } : { exists: false, unsubscribed: false };
+  }
+  throw new Error(`Could not check the newsletter list (status ${direct.status}).`);
+}
+
+// Addresses whose welcome email is already queued in this process, so a double
+// submit (or two quick reservations) can never queue two.
+const welcomeQueued = new Set();
+
+// Used after a reservation or private event inquiry. Adds the guest to the
+// newsletter and sends the welcome email ONLY if they are not already on the
+// list. Someone who is already subscribed gets nothing again, and someone who
+// unsubscribed is never re-added or emailed.
+async function subscribeNewGuest(email, label) {
+  const key = email.toLowerCase();
+  if (welcomeQueued.has(key)) return;
+  welcomeQueued.add(key);
+  try {
+    const status = await contactStatus(email);
+    if (status.exists) {
+      welcomeQueued.delete(key);
+      return;
+    }
+    const result = await resendSubscribe(email);
+    if (result.status !== 200 && result.status !== 201) {
+      welcomeQueued.delete(key);
+      console.error(`${label} newsletter subscribe failed:`, result.status, result.body);
+      return;
+    }
+    // Delayed a day so it does not land alongside the confirmation. In-memory
+    // timer: if the server restarts before it fires (e.g. a redeploy), this
+    // send is lost. Acceptable for a non-critical marketing email; keeping a
+    // queue would mean storing subscriber emails, which we do not do.
+    setTimeout(() => {
+      welcomeQueued.delete(key);
+      sendWelcomeEmail(email).catch((err) => console.error(`${label} welcome email error:`, err.message));
+    }, 24 * 60 * 60 * 1000).unref();
+  } catch (err) {
+    welcomeQueued.delete(key);
+    console.error(`${label} newsletter subscribe error:`, err.message);
+  }
+}
+
 function resendSendEmail({ to, from, subject, text, html, replyTo, attachments, headers }) {
   return new Promise((resolve, reject) => {
     const payload = {
@@ -863,81 +866,8 @@ function resendSendEmail({ to, from, subject, text, html, replyTo, attachments, 
 }
 
 function sendWelcomeEmail(email) {
-  const unsubscribeUrl = `https://theivybk.com/unsubscribe?email=${encodeURIComponent(email)}`;
-  const welcomeText = [
-    `You're on the list!`,
-    ``,
-    `Thanks for signing up for updates from The Ivy Bar and Kitchen. Here's what's happening every week:`,
-    ``,
-    `Weekly Specials`,
-    `Monday — Monday Night Pizza: half off pizza with the purchase of a drink`,
-    `Tuesday — Taco Tuesday: $3 tacos, $6 Modelos, $9 margaritas`,
-    `Wednesday — Burger & Brew: burger and beer combo, $20`,
-    `Thursday — Girl Dinner Thursday: salad, truffle fries & a glass of wine, $30`,
-    ``,
-    `HAPPY HOUR — Monday–Thursday, 3-5pm`,
-    `$1 off draft, cans & bottles · $2 off wine · $3 off cocktails`,
-    ``,
-    `TRIVIA NIGHT — Every Wednesday, 7-9pm`,
-    `Hosted by Geeks Who Drink.`,
-    ``,
-    `Order Online`,
-    `https://order.toasttab.com/online/the-ivy-1625-west-irving-park-road`,
-    ``,
-    `See you soon.`,
-    ``,
-    `The Ivy Bar and Kitchen`,
-    `1625 W Irving Park Rd, Chicago, IL 60613`,
-    `(773) 799-8160`,
-    ``,
-    `Unsubscribe from marketing emails: ${unsubscribeUrl}`,
-  ].join('\n');
-  const welcomeHtml = emailTemplate({
-    heading: "You're on the list!",
-    bodyHtml: `
-      <p style="margin:0 0 20px;">Thanks for signing up for updates from The Ivy Bar and Kitchen. Here's what's happening every week:</p>
-      <p style="margin:0 0 8px; font-weight:bold; color:#7A5F27; text-transform:uppercase; font-size:12px; letter-spacing:.04em;">Weekly Specials</p>
-      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 16px; font-size:14px;">
-        <tr><td style="padding:4px 0; font-weight:bold; width:90px; vertical-align:top;">Mon</td><td style="padding:4px 0;">Monday Night Pizza — half off pizza with a drink</td></tr>
-        <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Tue</td><td style="padding:4px 0;">Taco Tuesday — $3 tacos, $6 Modelos, $9 margaritas</td></tr>
-        <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Wed</td><td style="padding:4px 0;">Burger &amp; Brew — burger + beer combo, $20</td></tr>
-        <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Thu</td><td style="padding:4px 0;">Girl Dinner Thursday — salad, truffle fries &amp; a glass of wine, $30</td></tr>
-      </table>
-      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 24px;">
-        <tr>
-          <td style="background-color:#1F3D2A; border-radius:4px; padding:18px 20px; text-align:center;">
-            <p style="margin:0 0 4px; color:#D8B563; text-transform:uppercase; font-size:12px; letter-spacing:.06em; font-weight:bold;">Happy Hour</p>
-            <p style="margin:0 0 8px; color:#FBF7EE; font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:19px;">Monday&ndash;Thursday, 3&ndash;5pm</p>
-            <p style="margin:0; color:rgba(251,247,238,.85); font-size:13px;">$1 off draft, cans &amp; bottles &nbsp;&middot;&nbsp; $2 off wine &nbsp;&middot;&nbsp; $3 off cocktails</p>
-          </td>
-        </tr>
-      </table>
-      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 24px;">
-        <tr>
-          <td style="background-color:#FBF7EE; border:1px solid #B8923D; border-radius:4px; padding:18px 20px; text-align:center;">
-            <p style="margin:0 0 4px; color:#7A5F27; text-transform:uppercase; font-size:12px; letter-spacing:.06em; font-weight:bold;">Trivia Night</p>
-            <p style="margin:0 0 8px; color:#1F3D2A; font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:19px;">Every Wednesday, 7&ndash;9pm</p>
-            <p style="margin:0; color:#686860; font-size:13px;">Hosted by Geeks Who Drink</p>
-          </td>
-        </tr>
-      </table>
-      <p style="margin:0 0 24px; text-align:center;">
-        <a href="https://order.toasttab.com/online/the-ivy-1625-west-irving-park-road" style="display:inline-block; background-color:#1F3D2A; color:#FBF7EE; text-decoration:none; padding:12px 28px; border-radius:2px; font-size:14px;">Order Online</a>
-      </p>
-      <p style="margin:0;">See you soon.</p>
-    `,
-    unsubscribeUrl,
-  });
-  return resendSendEmail({
-    to: email,
-    subject: "You're on the list — The Ivy Bar and Kitchen",
-    text: welcomeText,
-    html: welcomeHtml,
-    headers: {
-      'List-Unsubscribe': `<${unsubscribeUrl}>`,
-      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-    },
-  });
+  const mail = welcomeEmail(email);
+  return resendSendEmail({ to: email, subject: mail.subject, text: mail.text, html: mail.html, headers: mail.headers });
 }
 
 const RESERVATION_TO_EMAIL = 'info@theivybk.com';
@@ -1232,56 +1162,18 @@ async function handleReservation(req, res) {
     return;
   }
 
-  const subject = `Table Reservation — ${date} at ${time} — ${fullName}`;
-  const text = [
-    `Name: ${fullName}`,
-    `Phone: ${phone}`,
-    `Email: ${email}`,
-    `Date: ${date}`,
-    `Time: ${time}`,
-    `Party Size: ${partySize}`,
-    ``,
-    `Special Requests:`,
-    notes,
-  ].join('\n');
-  // The admin reservations report parses this exact plain-text format out of
-  // Resend's email history (see parseReservationEmailText), so the `text`
-  // field above must keep its labels as-is. The `html` version below is
-  // purely a nicer-looking display layer on top — it doesn't touch parsing.
-  const notificationHtml = emailTemplate({
-    heading: 'New Reservation Request',
-    bodyHtml: `
-      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:120px; vertical-align:top;">Name</td><td style="padding:4px 0;">${escapeHtml(fullName)}</td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Phone</td><td style="padding:4px 0;"><a href="tel:${escapeHtml(phone)}" style="color:#1F3D2A;">${escapeHtml(phone)}</a></td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Email</td><td style="padding:4px 0;"><a href="mailto:${escapeHtml(email)}" style="color:#1F3D2A;">${escapeHtml(email)}</a></td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Date</td><td style="padding:4px 0;">${escapeHtml(date)}</td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Time</td><td style="padding:4px 0;">${escapeHtml(time)}</td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Party Size</td><td style="padding:4px 0;">${escapeHtml(partySize)}</td></tr>
-        ${notes !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Special Requests</td><td style="padding:4px 0;">${escapeHtml(notes)}</td></tr>` : ''}
-      </table>
-      <p style="margin:0; font-size:13px; color:#686860;">Reply directly to this email to reach ${escapeHtml(fullName)} at ${escapeHtml(email)}.</p>
-    `,
-  });
+  const mail = reservationEmails({ fullName, phone, email, date, time, partySize, notes });
 
   try {
-    const result = await resendSendEmail({ to: RESERVATION_TO_EMAIL, subject, text, html: notificationHtml, replyTo: email });
+    const result = await resendSendEmail({ to: RESERVATION_TO_EMAIL, subject: mail.notification.subject, text: mail.notification.text, html: mail.notification.html, replyTo: email });
     if (result.status === 200 || result.status === 201) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
-      resendSubscribe(email).catch((err) => console.error('Reservation newsletter subscribe error:', err.message));
+      subscribeNewGuest(email, 'Reservation');
 
       createReservationCalendarEvent({ fullName, phone, email, date, time, partySize, notes }).catch((err) =>
         console.error('Calendar event creation error:', err.message)
       );
-
-      // Delayed a day so it doesn't land alongside the reservation confirmation.
-      // In-memory timer -- if the server restarts before it fires (e.g. a
-      // redeploy), this send is lost. Acceptable for a non-critical marketing
-      // email; not worth a durable job queue for this volume.
-      setTimeout(() => {
-        sendWelcomeEmail(email).catch((err) => console.error('Reservation welcome email error:', err.message));
-      }, 24 * 60 * 60 * 1000).unref();
 
       try {
         insertReservation.run(result.body.id, fullName, phone, email, date, time, partySize, notes);
@@ -1289,40 +1181,7 @@ async function handleReservation(req, res) {
         console.error('Reservation DB insert error:', err.message);
       }
 
-      const confirmationText = [
-        `Hi ${fullName},`,
-        ``,
-        `You're all set! Here's your reservation at The Ivy Bar and Kitchen:`,
-        ``,
-        `Date: ${dayLabel(date)}`,
-        `Time: ${time}`,
-        `Party Size: ${partySize}`,
-        ...(notes !== '—' ? [`Special Requests: ${notes}`] : []),
-        ``,
-        `Need to make a change or have a question? Call us at (773) 799-8160 — happy to help.`,
-        ``,
-        `We can't wait to see you.`,
-        ``,
-        `The Ivy Bar and Kitchen`,
-        `1625 W Irving Park Rd, Chicago, IL 60613`,
-        `(773) 799-8160`,
-      ].join('\n');
-      const confirmationHtml = emailTemplate({
-        heading: "You're all set!",
-        bodyHtml: `
-          <p style="margin:0 0 16px;">Hi ${escapeHtml(fullName)},</p>
-          <p style="margin:0 0 16px;">Here's your reservation at The Ivy Bar and Kitchen:</p>
-          <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">
-            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:120px; vertical-align:top;">Date</td><td style="padding:4px 0;">${escapeHtml(dayLabel(date))}</td></tr>
-            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Time</td><td style="padding:4px 0;">${escapeHtml(time)}</td></tr>
-            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Party Size</td><td style="padding:4px 0;">${escapeHtml(partySize)}</td></tr>
-            ${notes !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Special Requests</td><td style="padding:4px 0;">${escapeHtml(notes)}</td></tr>` : ''}
-          </table>
-          <p style="margin:0 0 16px;">Need to make a change or have a question? Call us at <a href="tel:+17737998160" style="color:#1F3D2A;">(773) 799-8160</a> — happy to help.</p>
-          <p style="margin:0;">We can't wait to see you.</p>
-        `,
-      });
-      resendSendEmail({ to: email, subject: "You're Confirmed — The Ivy Bar and Kitchen", text: confirmationText, html: confirmationHtml })
+      resendSendEmail({ to: email, subject: mail.confirmation.subject, text: mail.confirmation.text, html: mail.confirmation.html })
         .catch((err) => console.error('Reservation confirmation email error:', err.message));
     } else {
       console.error('Resend send failed:', result.status, result.body);
@@ -1384,55 +1243,14 @@ async function handleEventInquiry(req, res) {
     return;
   }
 
-  const subject = `Private Event Inquiry — ${occasion} — ${fullName}`;
-  const text = [
-    `Name: ${fullName}`,
-    `Phone: ${phone}`,
-    `Email: ${email}`,
-    `Company: ${company}`,
-    `Preferred Date: ${eventDate}`,
-    `Preferred Time: ${eventTime}`,
-    `Number of Guests: ${guestCount}`,
-    `Duration: ${duration}`,
-    `Occasion: ${occasion}`,
-    `Space Preference: ${spacePreference}`,
-    `Budget Per Person: ${budgetPerPerson}`,
-    `How They Heard About Us: ${referralSource}`,
-    ``,
-    `Details:`,
-    details,
-  ].join('\n');
-  const notificationHtml = emailTemplate({
-    heading: 'New Private Event Inquiry',
-    bodyHtml: `
-      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:150px; vertical-align:top;">Name</td><td style="padding:4px 0;">${escapeHtml(fullName)}</td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Phone</td><td style="padding:4px 0;"><a href="tel:${escapeHtml(phone)}" style="color:#1F3D2A;">${escapeHtml(phone)}</a></td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Email</td><td style="padding:4px 0;"><a href="mailto:${escapeHtml(email)}" style="color:#1F3D2A;">${escapeHtml(email)}</a></td></tr>
-        ${company !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Company</td><td style="padding:4px 0;">${escapeHtml(company)}</td></tr>` : ''}
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Preferred Date</td><td style="padding:4px 0;">${escapeHtml(eventDate)}</td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Preferred Time</td><td style="padding:4px 0;">${escapeHtml(eventTime)}</td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Guests</td><td style="padding:4px 0;">${escapeHtml(guestCount)}</td></tr>
-        ${duration !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Duration</td><td style="padding:4px 0;">${escapeHtml(duration)}</td></tr>` : ''}
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Occasion</td><td style="padding:4px 0;">${escapeHtml(occasion)}</td></tr>
-        <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Space</td><td style="padding:4px 0;">${escapeHtml(spacePreference)}</td></tr>
-        ${budgetPerPerson !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Budget/Person</td><td style="padding:4px 0;">${escapeHtml(budgetPerPerson)}</td></tr>` : ''}
-        ${referralSource !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Heard About Us</td><td style="padding:4px 0;">${escapeHtml(referralSource)}</td></tr>` : ''}
-        ${details !== '—' ? `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Details</td><td style="padding:4px 0;">${escapeHtml(details)}</td></tr>` : ''}
-      </table>
-      <p style="margin:0; font-size:13px; color:#686860;">Reply directly to this email to reach ${escapeHtml(fullName)} at ${escapeHtml(email)}.</p>
-    `,
-  });
+  const mail = inquiryEmails({ fullName, phone, email, company, eventDate, eventTime, guestCount, duration, occasion, spacePreference, budgetPerPerson, referralSource, details });
 
   try {
-    const result = await resendSendEmail({ to: EVENT_TO_EMAIL, from: EVENTS_FROM, subject, text, html: notificationHtml, replyTo: email });
+    const result = await resendSendEmail({ to: EVENT_TO_EMAIL, from: EVENTS_FROM, subject: mail.notification.subject, text: mail.notification.text, html: mail.notification.html, replyTo: email });
     if (result.status === 200 || result.status === 201) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
-      resendSubscribe(email).catch((err) => console.error('Event inquiry newsletter subscribe error:', err.message));
-      setTimeout(() => {
-        sendWelcomeEmail(email).catch((err) => console.error('Event inquiry welcome email error:', err.message));
-      }, 24 * 60 * 60 * 1000).unref();
+      subscribeNewGuest(email, 'Event inquiry');
 
       try {
         insertEventInquiry.run(
@@ -1443,39 +1261,7 @@ async function handleEventInquiry(req, res) {
         console.error('Event inquiry DB insert error:', err.message);
       }
 
-      const confirmationText = [
-        `Hi ${fullName},`,
-        ``,
-        `Thanks for your interest in hosting at The Ivy Bar and Kitchen! Here's what you sent us:`,
-        ``,
-        `Preferred Date: ${eventDate}`,
-        `Preferred Time: ${eventTime}`,
-        `Number of Guests: ${guestCount}`,
-        `Occasion: ${occasion}`,
-        `Space Preference: ${spacePreference}`,
-        ``,
-        `Our events team will follow up within one business day. Have a question in the meantime? Call us at (773) 799-8160.`,
-        ``,
-        `The Ivy Bar and Kitchen`,
-        `1625 W Irving Park Rd, Chicago, IL 60613`,
-        `(773) 799-8160`,
-      ].join('\n');
-      const confirmationHtml = emailTemplate({
-        heading: 'Got your inquiry!',
-        bodyHtml: `
-          <p style="margin:0 0 16px;">Hi ${escapeHtml(fullName)},</p>
-          <p style="margin:0 0 16px;">Thanks for your interest in hosting at The Ivy Bar and Kitchen! Here's what you sent us:</p>
-          <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">
-            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:140px; vertical-align:top;">Preferred Date</td><td style="padding:4px 0;">${escapeHtml(eventDate)}</td></tr>
-            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Preferred Time</td><td style="padding:4px 0;">${escapeHtml(eventTime)}</td></tr>
-            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Guests</td><td style="padding:4px 0;">${escapeHtml(guestCount)}</td></tr>
-            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Occasion</td><td style="padding:4px 0;">${escapeHtml(occasion)}</td></tr>
-            <tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; vertical-align:top;">Space</td><td style="padding:4px 0;">${escapeHtml(spacePreference)}</td></tr>
-          </table>
-          <p style="margin:0 0 16px;">Our events team will follow up within one business day. Have a question in the meantime? Call us at <a href="tel:+17737998160" style="color:#1F3D2A;">(773) 799-8160</a>.</p>
-        `,
-      });
-      resendSendEmail({ to: email, from: EVENTS_FROM, replyTo: EVENT_TO_EMAIL, subject: 'Got your inquiry — The Ivy Bar and Kitchen', text: confirmationText, html: confirmationHtml })
+      resendSendEmail({ to: email, from: EVENTS_FROM, replyTo: EVENT_TO_EMAIL, subject: mail.confirmation.subject, text: mail.confirmation.text, html: mail.confirmation.html })
         .catch((err) => console.error('Event inquiry confirmation email error:', err.message));
     } else {
       console.error('Resend send failed:', result.status, result.body);
@@ -1526,19 +1312,7 @@ async function handleApply(req, res) {
     return;
   }
 
-  const subject = `Job Application — ${position} — ${fullName}`;
-  const text = [
-    `Name: ${fullName}`,
-    `Phone: ${phone}`,
-    `Email: ${email}`,
-    `Position: ${position}`,
-    `Availability: ${availability}`,
-    `Experience: ${experience}`,
-    `Resume: ${file ? file.filename : '—'}`,
-    ``,
-    `Message:`,
-    message,
-  ].join('\n');
+  const mail = applicationEmail({ fullName, phone, email, position, availability, experience, file, message });
 
   const attachments = [];
   if (file && file.buffer && file.buffer.length) {
@@ -1546,7 +1320,7 @@ async function handleApply(req, res) {
   }
 
   try {
-    const result = await resendSendEmail({ to: RESERVATION_TO_EMAIL, subject, text, replyTo: email, attachments });
+    const result = await resendSendEmail({ to: RESERVATION_TO_EMAIL, subject: mail.subject, text: mail.text, html: mail.html, replyTo: email, attachments });
     if (result.status === 200 || result.status === 201) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
@@ -1584,13 +1358,26 @@ async function handleNewsletterSignup(req, res) {
   }
 
   try {
-    const result = await resendSubscribe(email);
-    const alreadyExists = /already|exist/i.test(result.body && result.body.message || '');
-    if (result.status === 200 || result.status === 201 || alreadyExists) {
+    let status = null;
+    try {
+      status = await contactStatus(email);
+    } catch (err) {
+      console.error('Newsletter status check error:', err.message);
+    }
+    if (status && status.exists && !status.unsubscribed) {
+      // Already on the list: nothing to add and no second welcome email.
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ ok: true, alreadySubscribed: alreadyExists && result.status >= 400 }));
+      res.end(JSON.stringify({ ok: true, alreadySubscribed: true }));
+      return;
+    }
+    // New, or someone who unsubscribed and is choosing to join again.
+    const result = await resendSubscribe(email);
+    if (result.status === 200 || result.status === 201) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, alreadySubscribed: false }));
 
-      if (!alreadyExists) {
+      // If the check itself failed we cannot tell whether they were new, so skip the welcome.
+      if (status) {
         sendWelcomeEmail(email).catch((err) => console.error('Newsletter welcome email error:', err.message));
       }
     } else {
@@ -1818,6 +1605,81 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Shows every email the site sends, with sample data, exactly as built.
+  if (req.method === 'GET' && urlPath === '/admin/email-preview') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    const RES_FROM = 'The Ivy Bar and Kitchen <info@theivybk.com>';
+    const sampleReservation = reservationEmails({ fullName: 'Jane Smith', phone: '312-555-0142', email: 'jane@example.com', date: '2026-10-09', time: '7:30 PM', partySize: '6', notes: 'Birthday dinner, one high chair please' });
+    const sampleInquiry = inquiryEmails({ fullName: 'Marcus Lee', phone: '312-555-0188', email: 'marcus@example.com', company: 'Lee & Co', eventDate: '2026-11-14', eventTime: '6:00 PM', guestCount: '35 – 50', duration: '3 hours', occasion: 'Corporate Event', spacePreference: 'The Ivy Bundle', budgetPerPerson: '$60', referralSource: 'Search Engine', details: 'Holiday party for our team. Need AV for a short slideshow.' });
+    const sampleWeek = { mondayStr: '2026-09-28', sundayStr: '2026-10-04', inRange: [
+      { date: '2026-10-01', time: '6:00 PM', full_name: 'Ana Ruiz', party_size: '4', phone: '773-555-0101', email: 'ana@example.com', notes: '' },
+      { date: '2026-10-01', time: '7:30 PM', full_name: 'Tom Baker', party_size: '8', phone: '773-555-0102', email: 'tom@example.com', notes: 'Rooftop if possible' },
+      { date: '2026-10-03', time: '8:00 PM', full_name: 'Priya Shah', party_size: '2', phone: '773-555-0103', email: 'priya@example.com', notes: '' },
+    ] };
+    sampleWeek.byDay = {};
+    for (const r of sampleWeek.inRange) (sampleWeek.byDay[r.date] = sampleWeek.byDay[r.date] || []).push(r);
+    const items = [
+      { group: 'Guests', title: 'Reservation confirmation', from: RES_FROM, to: 'the guest', mail: sampleReservation.confirmation },
+      { group: 'Guests', title: 'Private event inquiry received', from: 'The Ivy Bar and Kitchen <events@theivybk.com>', to: 'the person who asked', mail: sampleInquiry.confirmation },
+      { group: 'Guests', title: 'Newsletter welcome', from: RES_FROM, to: 'a new subscriber', mail: welcomeEmail('guest@example.com') },
+      ...contracts.previewEmails().filter((e) => e.group === 'Clients'),
+      { group: 'Our team', title: 'New reservation request', from: RES_FROM, to: 'info@theivybk.com', mail: sampleReservation.notification },
+      { group: 'Our team', title: 'New private event inquiry', from: 'The Ivy Bar and Kitchen <events@theivybk.com>', to: 'events@theivybk.com', mail: sampleInquiry.notification },
+      ...contracts.previewEmails().filter((e) => e.group === 'Our team'),
+      { group: 'Our team', title: 'Weekly reservations', from: RES_FROM, to: 'info@theivybk.com', mail: weeklyReportEmail(sampleWeek) },
+      { group: 'Our team', title: 'Database backup', from: RES_FROM, to: 'info@theivybk.com', mail: backupEmail({ reason: 'weekly', stamp: '2026-09-28', counts: { agreements: 12, reservations: 340, event_inquiries: 41 } }) },
+      { group: 'Our team', title: 'Job application', from: RES_FROM, to: 'info@theivybk.com', mail: applicationEmail({ fullName: 'Sam Rivera', phone: '312-555-0177', email: 'sam@example.com', position: 'Bartender', availability: 'Evenings and weekends', experience: '3 years at a Wrigleyville bar', file: { filename: 'Sam-Rivera-Resume.pdf' }, message: 'Happy to come in for a shift trial.' }) },
+      { group: 'Our team', title: 'Updated print menus', from: RES_FROM, to: 'info@theivybk.com', mail: menusEmail() },
+    ];
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' });
+    res.end(emailPreviewPage(items));
+    return;
+  }
+
+  // TEMPORARY: checks how Resend looks contacts up. Reports counts and statuses
+  // only, never addresses. Removed right after it has been used.
+  if (req.method === 'GET' && urlPath === '/admin/newsletter-check') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    (async () => {
+      try {
+        const base = `/audiences/${RESEND_AUDIENCE_ID}/contacts`;
+        const list = await resendGet(base);
+        const contacts = (list.body && list.body.data) || [];
+        const existing = contacts[0];
+        const unsub = contacts.find((c) => c.unsubscribed);
+        const out = { listStatus: list.status, listCount: contacts.length, hasMoreField: list.body ? list.body.has_more : undefined, unsubscribedInList: contacts.filter((c) => c.unsubscribed).length };
+        if (existing) {
+          const d = await resendGet(`${base}/${encodeURIComponent(existing.email)}`);
+          out.lookupExisting = { status: d.status, hasId: !!(d.body && d.body.id), unsubscribedField: d.body ? d.body.unsubscribed : undefined };
+          out.contactStatusExisting = await contactStatus(existing.email);
+        }
+        if (unsub) {
+          const d = await resendGet(`${base}/${encodeURIComponent(unsub.email)}`);
+          out.lookupUnsubscribed = { status: d.status, unsubscribedField: d.body ? d.body.unsubscribed : undefined };
+          out.contactStatusUnsubscribed = await contactStatus(unsub.email);
+        }
+        const missingEmail = `not-a-contact-${Date.now()}@example.org`;
+        const m = await resendGet(`${base}/${encodeURIComponent(missingEmail)}`);
+        out.lookupMissing = { status: m.status, message: m.body && m.body.message };
+        out.contactStatusMissing = await contactStatus(missingEmail);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(out, null, 2));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/admin/contracts/void') {
     contracts.handleAdminVoid(req, res);
     return;
@@ -1846,6 +1708,64 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // TEMPORARY: reads back (and optionally deletes) the calendar event created by
+  // a test agreement signing. Removed right after it has been used once.
+  if (req.method === 'POST' && urlPath === '/admin/calendar-test-cleanup') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    const wantDelete = new URL(req.url, 'http://localhost').searchParams.get('delete') === '1';
+    const gcal = (method, pathAndQuery, accessToken) => new Promise((resolve, reject) => {
+      const r = https.request(
+        { hostname: 'www.googleapis.com', path: pathAndQuery, method, headers: { Authorization: `Bearer ${accessToken}` } },
+        (resp) => {
+          let data = '';
+          resp.on('data', (chunk) => (data += chunk));
+          resp.on('end', () => {
+            let parsed = {};
+            try { parsed = JSON.parse(data); } catch {}
+            resolve({ status: resp.statusCode, body: parsed });
+          });
+        }
+      );
+      r.on('error', reject);
+      r.end();
+    });
+    (async () => {
+      try {
+        const accessToken = await getGoogleCalendarAccessToken();
+        const calId = encodeURIComponent(GOOGLE_CALENDAR_ID);
+        const list = await gcal('GET', `/calendar/v3/calendars/${calId}/events?timeMin=${encodeURIComponent('2026-11-13T00:00:00Z')}&timeMax=${encodeURIComponent('2026-11-16T00:00:00Z')}&singleEvents=true&maxResults=100`, accessToken);
+        const matches = (list.body.items || []).filter((e) => (e.summary || '').startsWith('Private Event: Test Agreement Please Ignore'));
+        const deleted = [];
+        if (wantDelete) {
+          for (const e of matches) {
+            const d = await gcal('DELETE', `/calendar/v3/calendars/${calId}/events/${encodeURIComponent(e.id)}`, accessToken);
+            deleted.push({ id: e.id, status: d.status });
+          }
+        }
+        let dbDeleted = 0;
+        if (wantDelete) dbDeleted = db.prepare("DELETE FROM agreements WHERE lower(name) LIKE '%please ignore%'").run().changes;
+        const dbTestRows = db.prepare("SELECT ref, status, name, event_date, emailed_at, signed_by, signed_link, deposit_received, deposit_method, deposit_received_on, cancelled_at, cancel_note, day_of_name, phone, email FROM agreements WHERE lower(name) LIKE '%please ignore%'").all();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          dbDeleted,
+          dbTestRows,
+          listStatus: list.status,
+          totalInWindow: (list.body.items || []).length,
+          matches: matches.map((e) => ({ id: e.id, summary: e.summary, start: e.start, end: e.end, colorId: e.colorId, location: e.location, extendedProperties: e.extendedProperties, description: e.description })),
+          deleted,
+        }, null, 2));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
   // Emails the three current print-menu PDFs to info@theivybk.com. Reads and
   // base64-encodes the files server-side (never through an LLM context) since
   // that's the only practical way to move ~1-2MB of binary attachment data.
@@ -1864,8 +1784,9 @@ const server = http.createServer((req, res) => {
         }));
         const result = await resendSendEmail({
           to: 'info@theivybk.com',
-          subject: 'Updated Print Menus',
-          text: 'Attached are the latest print-ready menu PDFs: Beer & Cocktails, Food & Pizza, and Spirits.',
+          subject: menusEmail().subject,
+          text: menusEmail().text,
+          html: menusEmail().html,
           attachments,
         });
         const ok = result.status >= 200 && result.status < 300;

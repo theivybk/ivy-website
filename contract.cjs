@@ -1294,6 +1294,295 @@ function agreementsPageHtml() {
     .replace('</style>', () => `${ADMIN_CSS}${AGREEMENTS_CSS}</style>`);
 }
 
+// ------------------------------------------------------------------ emails
+//
+// Every email the agreement system sends. Emails to clients come from, and
+// reply to, events@. Internal notices go to events@ only. Each builder returns
+// { subject, text, html }, in the same branded layout as the rest of the site.
+
+const E = require('./emails.cjs');
+const AGREEMENTS_URL = `${VENUE.origin}/admin/agreements`;
+
+const rowsToText = (rows) => rows
+  .filter((r) => r && r[1] != null && String(r[1]).trim() !== '')
+  .map(([k, v]) => `${k}: ${v}`)
+  .join('\n');
+
+const eventRows = (c) => [
+  ['Event', c.type],
+  ['Date', fmtDate(c.date)],
+  ['Time', `${fmtTime(c.start)} to ${fmtTime(c.end)}`],
+  ['Space', c.space],
+  ['Estimated guests', String(c.guests)],
+];
+
+const clientRows = (c, cl) => [
+  ['Client', c.name + (cl.company ? ` (${cl.company})` : '')],
+  ['Phone', cl.phone, 'tel'],
+  ['Email', cl.email, 'mailto'],
+  ['Day-of contact', cl.dayName ? `${cl.dayName}${cl.dayPhone ? `, ${cl.dayPhone}` : ''}` : ''],
+];
+
+const clientSignoff = `Questions? Call ${VENUE.phone} or reply to this email.\n\n${VENUE.name}\n${VENUE.address}`;
+
+const AGREEMENT_EMAILS = {
+  // To the client: the link to review and sign.
+  clientLink(c, url) {
+    const t = computeTotals(c);
+    const rows = [...eventRows(c), ['Deposit to secure the date', fmtMoney(t.deposit)], ['Date held through', fmtDateShort(c.exp)]];
+    return {
+      subject: 'Your event agreement | The Ivy Bar and Kitchen',
+      text: `Hi ${c.name},\n\nThanks for choosing The Ivy for your ${c.type.toLowerCase()} on ${fmtDate(c.date)}. Your event agreement is ready to review and sign:\n\n${url}\n\n${rowsToText(rows)}\n\nWe're holding the date through ${fmtDateShort(c.exp)}. To keep it, please sign and we'll follow up to collect the deposit. Credit card payments carry a 3% surcharge.\n\n${clientSignoff}`,
+      html: E.emailTemplate({
+        heading: 'Your event agreement',
+        bodyHtml: E.emailPara(`Hi ${c.name},`)
+          + E.emailPara(`Thanks for choosing The Ivy for your ${c.type.toLowerCase()} on ${fmtDate(c.date)}. Your agreement is ready to review and sign.`)
+          + E.emailDetails(rows, 170)
+          + E.emailButton('Review & Sign Agreement', url)
+          + E.emailPara(`We're holding the date through ${fmtDateShort(c.exp)}. To keep it, sign the agreement and we'll follow up to collect the deposit. Credit card payments carry a 3% surcharge.`)
+          + E.emailContact(),
+      }),
+    };
+  },
+
+  // To the client, right after they sign.
+  signedClient(c, sd, signedLink) {
+    const t = computeTotals(c);
+    const rows = [...eventRows(c), ['Deposit to secure the date', fmtMoney(t.deposit)], ['Date held through', fmtDateShort(c.exp)], ['Reference', refOf(c)]];
+    return {
+      subject: 'Your signed agreement | The Ivy Bar and Kitchen',
+      text: `Hi ${c.name},\n\nThank you for signing your private event agreement with The Ivy Bar and Kitchen. A copy is attached, and you can view it any time here:\n${signedLink}\n\n${rowsToText(rows)}\n\nNext, we'll contact you to collect the deposit. Credit card payments carry a 3% surcharge. Your date is confirmed once we receive it.\n\n${clientSignoff}`,
+      html: E.emailTemplate({
+        heading: 'Thank you for signing',
+        bodyHtml: E.emailPara(`Hi ${c.name},`)
+          + E.emailPara('Thank you for signing your private event agreement. A copy is attached, and you can view it any time with the button below.')
+          + E.emailDetails(rows, 170)
+          + E.emailButton('View signed agreement', signedLink)
+          + E.emailCallout('What happens next', `We'll contact you to collect the ${fmtMoney(t.deposit)} deposit. Credit card payments carry a 3% surcharge. Your date is confirmed once we receive it.`)
+          + E.emailContact(),
+      }),
+    };
+  },
+
+  // To the client when their deposit is confirmed.
+  depositClient(c, sd, conf, signedLink, deadline) {
+    const t = computeTotals(c);
+    const rows = [
+      ['Event', c.type],
+      ['Date', fmtDate(c.date)],
+      ['Time', `${fmtTime(c.start)} to ${fmtTime(c.end)} (setup begins 30 minutes earlier)`],
+      ['Space', c.space],
+      ['Estimated guests', String(c.guests)],
+      ['Deposit received', `${fmtMoney(conf.amount)} on ${fmtDateShort(conf.receivedOn)} (${conf.method.toLowerCase()})`],
+      ['Remaining balance', `About ${fmtMoney(t.remaining)} plus tax and service charge, due on the day of the event`],
+    ];
+    return {
+      subject: 'Your date is confirmed | The Ivy Bar and Kitchen',
+      text: `Hi ${c.name},\n\nWe've received your deposit, and your ${c.type.toLowerCase()} on ${fmtDate(c.date)} is confirmed. Your agreement is now in effect.\n\n${rowsToText(rows)}\n\nTo do next: send us your final guaranteed guest count, menu selections, dietary needs, and the number of beverage-package wristbands by ${deadline}.\n\nYour signed agreement: ${signedLink}\n\n${clientSignoff}`,
+      html: E.emailTemplate({
+        heading: 'Your date is confirmed',
+        bodyHtml: E.emailPara(`Hi ${c.name},`)
+          + E.emailPara(`We've received your deposit, and your ${c.type.toLowerCase()} on ${fmtDate(c.date)} is confirmed. Your agreement is now in effect.`)
+          + E.emailDetails(rows, 170)
+          + E.emailCallout('To do next', `Send us your final guaranteed guest count, menu selections, dietary needs, and the number of beverage-package wristbands by ${deadline}.`)
+          + E.emailButton('View your signed agreement', signedLink)
+          + E.emailContact(),
+      }),
+    };
+  },
+
+  // To us: an agreement was created.
+  created(c, url) {
+    const t = computeTotals(c);
+    const rows = [
+      ['Client', c.name + (c.company ? ` (${c.company})` : '')],
+      ['Phone', c.phone, 'tel'],
+      ['Email', c.email, 'mailto'],
+      ...eventRows(c),
+      ['Estimated food & beverage', fmtMoney(t.est)],
+      ['Food & beverage minimum', t.min > 0 ? fmtMoney(t.min) : ''],
+      ['Deposit', fmtMoney(t.deposit)],
+      ['Date held through', fmtDateShort(c.exp)],
+      ['Issued by', c.rep],
+      ['Reference', refOf(c)],
+    ];
+    return {
+      subject: `Agreement Created: ${c.name}, ${c.date} (${refOf(c)})`,
+      text: `${c.rep} created an agreement for ${c.name}.\n\n${rowsToText(rows)}\n\nClient link:\n${url}\n\nThis is a record copy. The client has not been emailed unless "Email to client" was used.`,
+      html: E.emailTemplate({
+        heading: 'Agreement created',
+        bodyHtml: E.emailPara(`${c.rep} created an agreement for ${c.name}. The client has not been emailed unless "Email to client" was used.`)
+          + E.emailDetails(rows, 170)
+          + E.emailButton('Open the client link', url)
+          + E.emailLink('See all agreements', AGREEMENTS_URL),
+      }),
+    };
+  },
+
+  // To us: the client signed.
+  signedVenue(c, sd, signedLink) {
+    const t = computeTotals(c);
+    const rows = [
+      ...clientRows(c, sd.cl),
+      ...eventRows(c),
+      ['Deposit due', `${fmtMoney(t.deposit)} (date held through ${fmtDateShort(c.exp)})`],
+      ['Signed', fmtStamp(sd.sig.at)],
+      ['Reference', refOf(c)],
+    ];
+    return {
+      subject: `Agreement Signed: ${c.name}, ${c.date} (${refOf(c)})`,
+      text: `${sd.sig.name} signed the agreement for ${c.name}'s ${c.type.toLowerCase()} on ${fmtStamp(sd.sig.at)}.\n\n${rowsToText(rows)}\n\nSigned agreement: ${signedLink}\n\nThe signed copy is attached. Next: collect the ${fmtMoney(t.deposit)} deposit, then confirm it on the Agreements page: ${AGREEMENTS_URL}`,
+      html: E.emailTemplate({
+        heading: 'Agreement signed',
+        bodyHtml: E.emailPara(`${sd.sig.name} signed the agreement for ${c.name}'s ${c.type.toLowerCase()} on ${fmtStamp(sd.sig.at)}.`)
+          + E.emailCallout('Next step', `Collect the ${fmtMoney(t.deposit)} deposit, then confirm it on the Agreements page so the client gets their confirmation.`)
+          + E.emailDetails(rows, 170)
+          + E.emailButton('View signed agreement', signedLink)
+          + E.emailLink('Open the Agreements page', AGREEMENTS_URL)
+          + E.emailFine('The signed copy is attached.'),
+      }),
+    };
+  },
+
+  // To us: a deposit was confirmed.
+  depositRecord(c, sd, conf, note, calendar, signedLink) {
+    const rows = [
+      ...clientRows(c, sd.cl),
+      ...eventRows(c),
+      ['Amount received', fmtMoney(conf.amount)],
+      ['Paid by', conf.method],
+      ['Date received', fmtDateShort(conf.receivedOn)],
+      ['Note', note],
+      ['Confirmation sent to', sd.cl.email],
+      ['Calendar', calendar],
+      ['Reference', refOf(c)],
+    ];
+    return {
+      subject: `Deposit Received: ${c.name}, ${c.date} (${refOf(c)})`,
+      text: `Deposit marked received for ${c.name} (${refOf(c)}).\n\n${rowsToText(rows)}\n\nSigned agreement: ${signedLink}`,
+      html: E.emailTemplate({
+        heading: 'Deposit received',
+        bodyHtml: E.emailPara(`${fmtMoney(conf.amount)} received from ${c.name} on ${fmtDateShort(conf.receivedOn)}. The date is confirmed, and the client has been emailed.`)
+          + E.emailDetails(rows, 170)
+          + E.emailButton('View signed agreement', signedLink)
+          + E.emailLink('Open the Agreements page', AGREEMENTS_URL),
+      }),
+    };
+  },
+
+  // To us: a signed agreement was cancelled.
+  cancelled(c, sd, conf, calendar, signedLink) {
+    const rows = [
+      ...clientRows(c, sd.cl),
+      ...eventRows(c),
+      ['Cancelled on', fmtDateShort(conf.cancelledOn)],
+      ['Reason', conf.note],
+      ['Calendar', calendar],
+      ['Reference', refOf(c)],
+    ];
+    return {
+      subject: `Agreement Cancelled: ${c.name}, ${c.date} (${refOf(c)})`,
+      text: `${c.name} (${refOf(c)}) was marked cancelled on ${fmtDateShort(conf.cancelledOn)}.\n\n${rowsToText(rows)}\n\nAny deposit paid is forfeited and nothing further is owed under the agreement.\n\nSigned agreement: ${signedLink}`,
+      html: E.emailTemplate({
+        heading: 'Agreement cancelled',
+        bodyHtml: E.emailPara(`${c.name}'s ${c.type.toLowerCase()} was marked cancelled. Any deposit paid is forfeited and nothing further is owed under the agreement.`)
+          + E.emailDetails(rows, 170)
+          + E.emailButton('View signed agreement', signedLink)
+          + E.emailLink('Open the Agreements page', AGREEMENTS_URL),
+      }),
+    };
+  },
+
+  // To us: an unsigned agreement was voided.
+  voided(c, note) {
+    const rows = [
+      ['Client', c.name + (c.company ? ` (${c.company})` : '')],
+      ['Email', c.email, 'mailto'],
+      ...eventRows(c),
+      ['Voided on', fmtDateShort(chicagoToday())],
+      ['Reason', note],
+      ['Reference', refOf(c)],
+    ];
+    return {
+      subject: `Agreement Voided: ${c.name}, ${c.date} (${refOf(c)})`,
+      text: `The unsigned agreement for ${c.name} (${refOf(c)}) was voided on ${fmtDateShort(chicagoToday())}. Its link no longer works.\n\n${rowsToText(rows)}`,
+      html: E.emailTemplate({
+        heading: 'Agreement voided',
+        bodyHtml: E.emailPara(`The unsigned agreement for ${c.name} was voided. Its link no longer works.`)
+          + E.emailDetails(rows, 170)
+          + E.emailLink('Open the Agreements page', AGREEMENTS_URL),
+      }),
+    };
+  },
+
+  // To us: the calendar step failed after a signing.
+  calendarAlert(c, signedLink, errMsg) {
+    const rows = [...eventRows(c), ['Client', c.name], ['Reference', refOf(c)]];
+    return {
+      subject: `Add to calendar by hand: ${c.name}, ${c.date} (${refOf(c)})`,
+      text: `${c.name} signed the private event agreement, but the party could not be added to the events calendar automatically.\n\nPlease add it by hand:\n${rowsToText(rows)}\n\nSigned agreement: ${signedLink}\n\nError: ${errMsg}`,
+      html: E.emailTemplate({
+        heading: 'Add this party to the calendar',
+        bodyHtml: E.emailCallout('Action needed', `${c.name} signed, but the party could not be added to the events calendar automatically. Please add it by hand.`, 'action')
+          + E.emailDetails(rows, 170)
+          + E.emailButton('View signed agreement', signedLink)
+          + E.emailFine(`Error: ${errMsg}`),
+      }),
+    };
+  },
+
+  // To us: the signed copy could not be emailed to the client.
+  copyFailed(c, cl, signedLink, errMsg) {
+    const rows = [...clientRows(c, cl), ['Event', `${c.type}, ${fmtDate(c.date)}`], ['Reference', refOf(c)]];
+    return {
+      subject: `Signed copy did NOT reach the client: ${c.name} (${refOf(c)})`,
+      text: `${c.name} signed the agreement, but the signed copy could not be emailed to ${cl.email}. The address may be mistyped.\n\nPlease contact them at ${cl.phone} and send them this link:\n${signedLink}\n\nReason: ${errMsg}`,
+      html: E.emailTemplate({
+        heading: 'Signed copy did not reach the client',
+        bodyHtml: E.emailCallout('Action needed', `${c.name} signed, but the signed copy could not be emailed to ${cl.email}. The address may be mistyped. Please call them and send them the link below.`, 'action')
+          + E.emailDetails(rows, 170)
+          + E.emailButton('View signed agreement', signedLink)
+          + E.emailFine(`Reason: ${errMsg}`),
+      }),
+    };
+  },
+};
+
+// Sample data for the admin email preview page.
+function previewEmails() {
+  const c = {
+    v: 1, tv: 1, id: 'a1b2c3d4e5', iat: '2026-09-23T15:00:00.000Z', exp: '2026-10-07', rep: 'Events Team',
+    name: 'Sample Client', company: 'Sample Company LLC', phone: '(312) 555-0100', email: 'client@example.com',
+    date: '2026-10-24', type: 'Birthday', start: '18:00', end: '22:00', arrive: '18:30', guests: 40,
+    space: 'The Ivy Bundle (Rooftop + Ivy Room)',
+    lines: [['Classic Buffet, 2 hours (per guest)', 40, 30, 'food'], ['The Classic open bar, 2 hours: beer, wine & seltzers', 30, 35, 'bev']],
+    min: 3000, dep: 0, sel: '', notes: '',
+  };
+  c.dep = r2(computeTotals(c).base * DEPOSIT_RATE);
+  const sd = {
+    k: 'signed', c,
+    cl: { company: 'Sample Company LLC', phone: '(312) 555-0100', email: 'client@example.com', dayName: 'Sample Day-of Contact', dayPhone: '(312) 555-0111' },
+    sig: { name: 'Sample Client', at: '2026-09-24T16:30:00.000Z', ip: '203.0.113.10', fp: '0123456789abcdef' },
+  };
+  const url = `${VENUE.origin}/contract/SAMPLELINK`;
+  const signedLink = `${url}?signed=1`;
+  const conf = { amount: r2(c.dep * 1.03), receivedOn: '2026-09-25', method: 'Credit card' };
+  const to = VENUE.notifyTo.join(', ');
+  const item = (group, title, toWhom, mail) => ({ group, title, from: VENUE.from, to: toWhom, mail });
+  return [
+    item('Clients', 'Agreement link', 'the client', AGREEMENT_EMAILS.clientLink(c, url)),
+    item('Clients', 'Signed agreement', 'the client', AGREEMENT_EMAILS.signedClient(c, sd, signedLink)),
+    item('Clients', 'Date confirmed (deposit received)', 'the client', AGREEMENT_EMAILS.depositClient(c, sd, conf, signedLink, 'Saturday, October 17, 2026')),
+    item('Our team', 'Agreement created', to, AGREEMENT_EMAILS.created(c, url)),
+    item('Our team', 'Agreement signed', to, AGREEMENT_EMAILS.signedVenue(c, sd, signedLink)),
+    item('Our team', 'Deposit received', to, AGREEMENT_EMAILS.depositRecord(c, sd, conf, 'Paid over the phone', 'updated to CONFIRMED', signedLink)),
+    item('Our team', 'Agreement cancelled', to, AGREEMENT_EMAILS.cancelled(c, sd, { cancelledOn: '2026-09-26', note: 'Client changed plans' }, 'updated to CANCELLED', signedLink)),
+    item('Our team', 'Agreement voided', to, AGREEMENT_EMAILS.voided(c, 'Wrong date entered')),
+    item('Our team', 'Alert: add to calendar by hand', to, AGREEMENT_EMAILS.calendarAlert(c, signedLink, 'Calendar insert failed: 403')),
+    item('Our team', 'Alert: signed copy did not reach the client', to, AGREEMENT_EMAILS.copyFailed(c, sd.cl, signedLink, 'Resend status 422: Invalid to address')),
+  ];
+}
+
 // ------------------------------------------------------- tokens & handlers
 
 function createContractHandlers(deps) {
@@ -1495,33 +1784,17 @@ function createContractHandlers(deps) {
       filename: `Ivy-Event-Agreement-${refOf(c)}-signed.html`,
       content: Buffer.from(standaloneSignedHtml(signedData), 'utf8').toString('base64'),
     };
-    const t = computeTotals(c);
-    const summary = [
-      ['Client', c.name + (signedData.cl.company ? ` (${signedData.cl.company})` : '')],
-      ['Event', `${c.type}, ${fmtDate(c.date)}`],
-      ['Time', `${fmtTime(c.start)} to ${fmtTime(c.end)}`],
-      ['Space', c.space],
-      ['Estimated guests', String(c.guests)],
-      ['Deposit due', `${fmtMoney(t.deposit)} (date held through ${fmtDateShort(c.exp)})`],
-      ['Phone', signedData.cl.phone],
-      ['Email', signedData.cl.email],
-    ];
-    const summaryText = summary.map(([k, v]) => `${k}: ${v}`).join('\n');
-    const summaryHtml = `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">${
-      summary.map(([k, v]) => `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:130px; vertical-align:top;">${esc(k)}</td><td style="padding:4px 0;">${esc(v)}</td></tr>`).join('')
-    }</table>`;
+    const venueMail = AGREEMENT_EMAILS.signedVenue(c, signedData, signedLink);
+    const clientMail = AGREEMENT_EMAILS.signedClient(c, signedData, signedLink);
 
     // The email to The Ivy is the permanent record, so the signature only
     // counts once that email has actually gone out.
     try {
       const venueResult = await sendEmail({
         to: VENUE.notifyTo,
-        subject: `Agreement Signed: ${c.name}, ${c.date} (${refOf(c)})`,
-        text: `${signedData.sig.name} signed the private event agreement on ${fmtStamp(signedData.sig.at)}.\n\n${summaryText}\n\nSigned agreement: ${signedLink}\n\nThe signed copy is also attached. The Ivy will confirm the date once the deposit is received.`,
-        html: emailTemplate({
-          heading: 'Agreement signed',
-          bodyHtml: `<p style="margin:0 0 16px;">${esc(signedData.sig.name)} signed the private event agreement on ${esc(fmtStamp(signedData.sig.at))}.</p>${summaryHtml}<p style="margin:0 0 16px;"><a href="${esc(signedLink)}" style="color:#1F3D2A;">View the signed agreement</a> (a copy is attached). Next step: collect the deposit and confirm the date.</p>`,
-        }),
+        subject: venueMail.subject,
+        text: venueMail.text,
+        html: venueMail.html,
         replyTo: signedData.cl.email,
         attachments: [attachment],
       });
@@ -1549,12 +1822,9 @@ function createContractHandlers(deps) {
 
     sendEmail({
       to: signedData.cl.email,
-      subject: 'Your signed agreement | The Ivy Bar and Kitchen',
-      text: `Hi ${c.name},\n\nThank you for signing your private event agreement with The Ivy Bar and Kitchen. A copy is attached, and you can view it any time here:\n${signedLink}\n\n${summaryText}\n\nNext, we'll contact you to collect the deposit. Your date is confirmed once we receive it.\n\nQuestions? Call ${VENUE.phone} or email ${VENUE.eventsEmail}.\n\n${VENUE.name}\n${VENUE.address}`,
-      html: emailTemplate({
-        heading: 'Thank you for signing',
-        bodyHtml: `<p style="margin:0 0 16px;">Hi ${esc(c.name)},</p><p style="margin:0 0 16px;">Thank you for signing your private event agreement. A copy is attached, and you can view it any time with the link below.</p>${summaryHtml}<p style="margin:0 0 20px;"><a href="${esc(signedLink)}" style="display:inline-block; background:#1F3D2A; color:#F5EFE3; padding:12px 22px; border-radius:2px; text-decoration:none; font-family:Arial,sans-serif; font-size:14px;">View signed agreement</a></p><p style="margin:0 0 16px;">Next, we'll contact you to collect the deposit. Your date is confirmed once we receive it. Questions? Call <a href="tel:+17737998160" style="color:#1F3D2A;">${esc(VENUE.phone)}</a> or reply to this email.</p>`,
-      }),
+      subject: clientMail.subject,
+      text: clientMail.text,
+      html: clientMail.html,
       replyTo: VENUE.eventsEmail,
       attachments: [attachment],
     }).then((result) => {
@@ -1563,11 +1833,8 @@ function createContractHandlers(deps) {
       }
     }).catch((err) => {
       console.error('Agreement client copy email error:', err.message);
-      sendEmail({
-        to: VENUE.notifyTo,
-        subject: `Signed copy did NOT reach the client: ${c.name} (${refOf(c)})`,
-        text: `${c.name} signed the agreement, but the signed copy could not be emailed to ${signedData.cl.email}. The address may be mistyped.\n\nPlease contact them at ${signedData.cl.phone} and send them this link:\n${signedLink}\n\nReason: ${err.message}`,
-      }).catch((mailErr) => console.error('Agreement client copy alert email error:', mailErr.message));
+      const alertMail = AGREEMENT_EMAILS.copyFailed(c, signedData.cl, signedLink, err.message);
+      sendEmail({ to: VENUE.notifyTo, subject: alertMail.subject, text: alertMail.text, html: alertMail.html }).catch((mailErr) => console.error('Agreement client copy alert email error:', mailErr.message));
     });
   }
 
@@ -1655,11 +1922,8 @@ function createContractHandlers(deps) {
     } catch (err) {
       console.error('Agreement calendar event error:', err.message);
       try {
-        await sendEmail({
-          to: VENUE.notifyTo,
-          subject: `Add to calendar by hand: ${c.name}, ${c.date} (${refOf(c)})`,
-          text: `${c.name} signed the private event agreement, but the party could not be added to the events calendar automatically.\n\nPlease add it by hand:\n${c.type}, about ${c.guests} guests\n${c.space}\n${fmtDate(c.date)}, ${fmtTime(c.start)} to ${fmtTime(c.end)}\n\nSigned agreement: ${signedLink}\n\nError: ${err.message}`,
-        });
+        const alertMail = AGREEMENT_EMAILS.calendarAlert(c, signedLink, err.message);
+        await sendEmail({ to: VENUE.notifyTo, subject: alertMail.subject, text: alertMail.text, html: alertMail.html });
       } catch (mailErr) {
         console.error('Agreement calendar alert email error:', mailErr.message);
       }
@@ -1685,27 +1949,15 @@ function createContractHandlers(deps) {
     const token = seal({ k: 'offer', c });
     const url = urlFor(token);
 
-    const t = computeTotals(c);
-    const summaryText = [
-      `Client: ${c.name}${c.company ? ` (${c.company})` : ''}`,
-      `Contact: ${c.phone} / ${c.email}`,
-      `Event: ${c.type}, ${fmtDate(c.date)}, ${fmtTime(c.start)} to ${fmtTime(c.end)}`,
-      `Space: ${c.space}, about ${c.guests} guests`,
-      `Estimated F&B: ${fmtMoney(t.est)}; minimum ${fmtMoney(t.min)}; deposit ${fmtMoney(t.deposit)}`,
-      `Date held through: ${fmtDateShort(c.exp)}`,
-      `Issued by: ${c.rep}`,
-    ].join('\n');
+    const createdMail = AGREEMENT_EMAILS.created(c, url);
 
     let recorded = true;
     try {
       const result = await sendEmail({
         to: VENUE.notifyTo,
-        subject: `Agreement Created: ${c.name}, ${c.date} (${refOf(c)})`,
-        text: `${summaryText}\n\nClient link:\n${url}\n\nThis is a record copy. The client has not been emailed unless you used "Email to client".`,
-        html: emailTemplate({
-          heading: 'Agreement created',
-          bodyHtml: `<pre style="font-family:Georgia,serif; font-size:14px; white-space:pre-wrap; margin:0 0 16px;">${esc(summaryText)}</pre><p style="margin:0 0 16px;"><a href="${esc(url)}" style="color:#1F3D2A;">Open the client link</a></p><p style="margin:0; font-size:13px; color:#686860;">This is a record copy. The client has not been emailed unless you used "Email to client".</p>`,
-        }),
+        subject: createdMail.subject,
+        text: createdMail.text,
+        html: createdMail.html,
       });
       if (result.status < 200 || result.status >= 300) recorded = false;
     } catch (err) {
@@ -1726,15 +1978,13 @@ function createContractHandlers(deps) {
     if (emailRow && emailRow.status !== 'awaiting') return sendJson(res, 409, { ok: false, error: emailRow.status === 'void' ? 'This agreement was voided, so its link no longer works.' : 'This agreement has already been signed.' });
     const c = data.c;
     const url = urlFor(body.token);
+    const mail = AGREEMENT_EMAILS.clientLink(c, url);
     try {
       const result = await sendEmail({
         to: c.email,
-        subject: `Your event agreement | The Ivy Bar and Kitchen`,
-        text: `Hi ${c.name},\n\nThanks for choosing The Ivy for your ${c.type.toLowerCase()} on ${fmtDate(c.date)}. Your event agreement is ready to review and sign:\n\n${url}\n\nWe're holding the date through ${fmtDateShort(c.exp)}. To keep it, please sign and we'll follow up to collect the deposit.\n\nQuestions? Call ${VENUE.phone} or reply to this email.\n\n${VENUE.name}\n${VENUE.address}`,
-        html: emailTemplate({
-          heading: 'Your event agreement',
-          bodyHtml: `<p style="margin:0 0 16px;">Hi ${esc(c.name)},</p><p style="margin:0 0 16px;">Thanks for choosing The Ivy for your ${esc(c.type.toLowerCase())} on ${esc(fmtDate(c.date))}. Your agreement is ready to review and sign.</p><p style="margin:0 0 20px; text-align:center;"><a href="${esc(url)}" style="display:inline-block; background:#1F3D2A; color:#F5EFE3; padding:13px 26px; border-radius:2px; text-decoration:none; font-family:Arial,sans-serif; font-size:15px;">Review &amp; Sign Agreement</a></p><p style="margin:0 0 16px;">We're holding the date through <strong>${esc(fmtDateShort(c.exp))}</strong>. To keep it, sign the agreement and we'll follow up to collect the deposit.</p><p style="margin:0 0 16px;">Questions? Call <a href="tel:+17737998160" style="color:#1F3D2A;">${esc(VENUE.phone)}</a> or reply to this email.</p>`,
-        }),
+        subject: mail.subject,
+        text: mail.text,
+        html: mail.html,
         replyTo: VENUE.eventsEmail,
       });
       if (result.status < 200 || result.status >= 300) return sendJson(res, 502, { ok: false, error: 'The email service rejected the message.' });
@@ -1811,29 +2061,15 @@ function createContractHandlers(deps) {
     const signedLink = urlFor(token);
     const deadline = fmtDate(new Date(Date.parse(c.date + 'T12:00:00Z') - 7 * 86400000).toISOString().slice(0, 10));
 
-    const rows = [
-      ['Event', `${c.type}, ${fmtDate(c.date)}`],
-      ['Time', `${fmtTime(c.start)} to ${fmtTime(c.end)} (setup begins 30 minutes earlier)`],
-      ['Space', c.space],
-      ['Estimated guests', String(c.guests)],
-      ['Deposit received', `${fmtMoney(amount)} on ${fmtDateShort(receivedOn)} (${method.toLowerCase()})`],
-      ['Remaining balance', `About ${fmtMoney(t.remaining)} plus tax and service charge, due on the day of the event`],
-    ];
-    const rowsText = rows.map(([k, v]) => `${k}: ${v}`).join('\n');
-    const rowsHtml = `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 20px; font-size:14px;">${
-      rows.map(([k, v]) => `<tr><td style="padding:4px 0; color:#7A5F27; font-weight:bold; width:140px; vertical-align:top;">${esc(k)}</td><td style="padding:4px 0;">${esc(v)}</td></tr>`).join('')
-    }</table>`;
+    const clientMail = AGREEMENT_EMAILS.depositClient(c, data, conf, signedLink, deadline);
 
     // Client confirmation first, so a failure here changes nothing else.
     try {
       const mail = await sendEmail({
         to: data.cl.email,
-        subject: 'Your date is confirmed | The Ivy Bar and Kitchen',
-        text: `Hi ${c.name},\n\nWe've received your deposit, and your ${c.type.toLowerCase()} on ${fmtDate(c.date)} is confirmed. Your agreement is now in effect.\n\n${rowsText}\n\nTo do next: send us your final guaranteed guest count, menu selections, dietary needs, and the number of beverage-package wristbands by ${deadline}.\n\nYour signed agreement: ${signedLink}\n\nQuestions? Call ${VENUE.phone} or reply to this email.\n\n${VENUE.name}\n${VENUE.address}`,
-        html: emailTemplate({
-          heading: 'Your date is confirmed',
-          bodyHtml: `<p style="margin:0 0 16px;">Hi ${esc(c.name)},</p><p style="margin:0 0 16px;">We've received your deposit, and your ${esc(c.type.toLowerCase())} on ${esc(fmtDate(c.date))} is confirmed. Your agreement is now in effect.</p>${rowsHtml}<p style="margin:0 0 16px;"><strong>To do next:</strong> send us your final guaranteed guest count, menu selections, dietary needs, and the number of beverage-package wristbands by <strong>${esc(deadline)}</strong>.</p><p style="margin:0 0 16px;"><a href="${esc(signedLink)}" style="color:#1F3D2A;">View your signed agreement</a></p><p style="margin:0 0 16px;">Questions? Call <a href="tel:+17737998160" style="color:#1F3D2A;">${esc(VENUE.phone)}</a> or reply to this email.</p>`,
-        }),
+        subject: clientMail.subject,
+        text: clientMail.text,
+        html: clientMail.html,
         replyTo: VENUE.eventsEmail,
       });
       if (mail.status < 200 || mail.status >= 300) {
@@ -1875,11 +2111,8 @@ function createContractHandlers(deps) {
 
     // Record email to the events team: the durable log of the confirmation.
     try {
-      await sendEmail({
-        to: VENUE.notifyTo,
-        subject: `Deposit Received: ${c.name}, ${c.date} (${refOf(c)})`,
-        text: `Deposit marked received for ${c.name} (${refOf(c)}).\n\n${rowsText}\n${note ? `\nNote: ${note}\n` : ''}\nClient confirmation email: sent to ${data.cl.email}\nCalendar: ${calendar}\n\nSigned agreement: ${signedLink}`,
-      });
+      const recordMail = AGREEMENT_EMAILS.depositRecord(c, data, conf, note, calendar, signedLink);
+      await sendEmail({ to: VENUE.notifyTo, subject: recordMail.subject, text: recordMail.text, html: recordMail.html });
     } catch (err) {
       console.error('Deposit record email error:', err.message);
     }
@@ -2008,11 +2241,8 @@ function createContractHandlers(deps) {
     saveAgreement(c, { status: 'cancelled', signed_link: signedLink, cancelled_at: new Date().toISOString(), cancel_note: conf.note || null });
 
     try {
-      await sendEmail({
-        to: VENUE.notifyTo,
-        subject: `Agreement Cancelled: ${c.name}, ${c.date} (${refOf(c)})`,
-        text: `${c.name} (${refOf(c)}) was marked cancelled on ${fmtDateShort(conf.cancelledOn)}.\n\n${c.type}, ${fmtDate(c.date)}, ${fmtTime(c.start)} to ${fmtTime(c.end)}\n${c.space}, about ${c.guests} guests\n\nAny deposit paid is forfeited and nothing further is owed under the agreement.\n${conf.note ? `\nNote: ${conf.note}\n` : ''}\nCalendar: ${calendar}\nSigned agreement: ${signedLink}`,
-      });
+      const cancelMail = AGREEMENT_EMAILS.cancelled(c, data, conf, calendar, signedLink);
+      await sendEmail({ to: VENUE.notifyTo, subject: cancelMail.subject, text: cancelMail.text, html: cancelMail.html });
     } catch (err) {
       console.error('Cancel record email error:', err.message);
     }
@@ -2037,11 +2267,8 @@ function createContractHandlers(deps) {
     const note = cleanText(body.note, 300);
     saveAgreement(c, { status: 'void', cancelled_at: new Date().toISOString(), cancel_note: note || null });
     try {
-      await sendEmail({
-        to: VENUE.notifyTo,
-        subject: `Agreement Voided: ${c.name}, ${c.date} (${refOf(c)})`,
-        text: `The unsigned agreement for ${c.name} (${refOf(c)}) was voided on ${fmtDateShort(chicagoToday())}. Its link no longer works.\n\n${c.type}, ${fmtDate(c.date)}, ${fmtTime(c.start)} to ${fmtTime(c.end)}\n${c.space}, about ${c.guests} guests${note ? `\n\nReason: ${note}` : ''}`,
-      });
+      const voidMail = AGREEMENT_EMAILS.voided(c, note);
+      await sendEmail({ to: VENUE.notifyTo, subject: voidMail.subject, text: voidMail.text, html: voidMail.html });
     } catch (err) {
       console.error('Void record email error:', err.message);
     }
@@ -2136,7 +2363,7 @@ function createContractHandlers(deps) {
     };
   }
 
-  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, handleAdminVoid, _buildCalendarEvent: buildCalendarEvent };
+  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, handleAdminVoid, previewEmails, _buildCalendarEvent: buildCalendarEvent };
 }
 
 module.exports = {
