@@ -994,7 +994,7 @@ table.ag .who { font-weight:600; color:var(--ivy); }
 .pill.awaiting { background:#E3E9F2; color:#2C4468; }
 .pill.pending { background:#F3E6BF; color:#6B5316; }
 .pill.confirmed { background:#DCEBDD; color:#1F5A34; }
-.pill.cancelled, .pill.expired { background:#E7E5E0; color:#555; }
+.pill.cancelled, .pill.expired, .pill.void { background:#E7E5E0; color:#555; }
 .acts { display:flex; flex-wrap:wrap; gap:6px; }
 .acts .b { font:600 12px 'Outfit',sans-serif; letter-spacing:.03em; padding:7px 11px; border-radius:2px; border:1px solid var(--ivy); background:transparent; color:var(--ivy); cursor:pointer; text-decoration:none; white-space:nowrap; }
 .acts .b.main { background:var(--ivy); color:var(--cream); }
@@ -1051,11 +1051,11 @@ const AGREEMENTS_SCRIPT = `
   }
 
   var STATUS = {
-    awaiting: 'Awaiting signature', pending: 'Deposit pending', confirmed: 'Confirmed', cancelled: 'Cancelled', expired: 'Expired, not signed'
+    awaiting: 'Awaiting signature', pending: 'Deposit pending', confirmed: 'Confirmed', cancelled: 'Cancelled', expired: 'Expired, not signed', void: 'Voided'
   };
   function inFilter(r) {
     if (filter === 'all') return true;
-    if (filter === 'closed') return r.status === 'cancelled' || r.status === 'expired';
+    if (filter === 'closed') return r.status === 'cancelled' || r.status === 'expired' || r.status === 'void';
     return r.status === filter;
   }
   function matches(r) {
@@ -1083,13 +1083,13 @@ const AGREEMENTS_SCRIPT = `
   function count(status) {
     return rows.filter(function (r) {
       if (status === 'all') return true;
-      if (status === 'closed') return r.status === 'cancelled' || r.status === 'expired';
+      if (status === 'closed') return r.status === 'cancelled' || r.status === 'expired' || r.status === 'void';
       return r.status === status;
     }).length;
   }
 
   function buildChips() {
-    var defs = [['all', 'All'], ['awaiting', 'Awaiting signature'], ['pending', 'Deposit pending'], ['confirmed', 'Confirmed'], ['closed', 'Cancelled or expired']];
+    var defs = [['all', 'All'], ['awaiting', 'Awaiting signature'], ['pending', 'Deposit pending'], ['confirmed', 'Confirmed'], ['closed', 'Cancelled, voided or expired']];
     var box = $('chips');
     box.textContent = '';
     defs.forEach(function (d) {
@@ -1144,6 +1144,25 @@ const AGREEMENTS_SCRIPT = `
       row2.appendChild(go);
       row2.appendChild(actionButton('Close', '', function () { openId = null; render(); }));
       td.appendChild(row2);
+    } else if (openMode === 'void') {
+      var pv = el('p', null, 'Void this agreement? The link stops working right away and the client can no longer sign it. Use this for a mistake, or a booking that fell through before it was signed.');
+      pv.style.margin = '0 0 10px';
+      td.appendChild(pv);
+      var whyv = el('input'); whyv.type = 'text'; whyv.placeholder = 'Reason (optional, internal)'; whyv.style.maxWidth = '420px';
+      td.appendChild(whyv);
+      var rowv = el('div', 'row2');
+      var yesv = actionButton('Yes, void it', 'danger', function () {
+        yesv.disabled = true; yesv.textContent = 'Voiding...';
+        post('/admin/contracts/void', { link: r.link, note: whyv.value })
+          .then(function (res) {
+            if (res.ok) { say('Voided. The link no longer works.'); openId = null; load(); }
+            else { yesv.disabled = false; yesv.textContent = 'Yes, void it'; say(res.d.error || 'Could not void.', true); }
+          })
+          .catch(function () { yesv.disabled = false; yesv.textContent = 'Yes, void it'; say('Network error. Please try again.', true); });
+      });
+      rowv.appendChild(yesv);
+      rowv.appendChild(actionButton('Keep it', '', function () { openId = null; render(); }));
+      td.appendChild(rowv);
     } else if (openMode === 'cancel') {
       var p = el('p', null, 'Mark this event cancelled? The calendar entry turns gray and reads CANCELLED, and the events team gets a record. Any deposit paid is forfeited and nothing more is owed.');
       p.style.margin = '0 0 10px';
@@ -1196,7 +1215,7 @@ const AGREEMENTS_SCRIPT = `
       var acts = el('div', 'acts');
       var link = r.link;
       if (link) {
-        var a = el('a', 'b', r.status === 'awaiting' || r.status === 'expired' ? 'Open link' : 'Open agreement');
+        var a = el('a', 'b', r.status === 'awaiting' || r.status === 'expired' || r.status === 'void' ? 'Open link' : 'Open agreement');
         a.href = link; a.target = '_blank'; a.rel = 'noopener';
         acts.appendChild(a);
       }
@@ -1210,6 +1229,9 @@ const AGREEMENTS_SCRIPT = `
             if (res.ok) say('Sent to ' + r.email + '.'); else say(res.d.error || 'Could not send the email.', true);
           }).catch(function () { say('Network error. Please try again.', true); });
         }));
+      }
+      if (r.status === 'awaiting') {
+        acts.appendChild(actionButton('Void', 'danger', function () { openId = r.ref; openMode = 'void'; render(); }));
       }
       if (r.status === 'pending') {
         acts.appendChild(actionButton('Confirm deposit', 'main', function () { openId = r.ref; openMode = 'confirm'; render(); }));
@@ -1331,6 +1353,17 @@ function createContractHandlers(deps) {
     }
   }
 
+  // The stored status of one agreement, or null if it is not in the database.
+  function getAgreementRow(id) {
+    if (!db) return null;
+    try {
+      return db.prepare('SELECT status, signed_link FROM agreements WHERE id = ?').get(id) || null;
+    } catch (err) {
+      console.error('Agreement lookup error:', err.message);
+      return null;
+    }
+  }
+
 
   // In-memory only (resets on deploy): maps an agreement id to its signed
   // link so a repeat visit or double-click doesn't produce a second signature.
@@ -1401,6 +1434,15 @@ function createContractHandlers(deps) {
       res.end();
       return;
     }
+    const stored = getAgreementRow(data.c.id);
+    if (stored && stored.status === 'void') {
+      return sendHtml(res, 410, statusPage('This agreement was withdrawn', `The Ivy withdrew this agreement. Please contact our events team at ${esc(VENUE.eventsEmail)} or ${esc(VENUE.phone)}.`));
+    }
+    if (stored && stored.signed_link && stored.status !== 'awaiting') {
+      res.writeHead(302, { Location: `/contract/${tokenFromLink(stored.signed_link)}`, 'Cache-Control': 'no-store' });
+      res.end();
+      return;
+    }
     if (isExpired(data.c)) {
       return sendHtml(res, 410, statusPage('This agreement has expired', `The hold on ${esc(fmtDateShort(data.c.date))} ended on ${esc(fmtDateShort(data.c.exp))}. Please contact our events team at ${esc(VENUE.eventsEmail)} or ${esc(VENUE.phone)} and we'll be glad to send a fresh one.`));
     }
@@ -1417,6 +1459,9 @@ function createContractHandlers(deps) {
     const c = data.c;
     const already = signedById.get(c.id);
     if (already) return sendJson(res, 200, { ok: true, signedUrl: `/contract/${already}?signed=1` });
+    const storedRow = getAgreementRow(c.id);
+    if (storedRow && storedRow.status === 'void') return sendJson(res, 410, { ok: false, error: 'This agreement has been withdrawn. Please contact our events team.' });
+    if (storedRow && storedRow.signed_link && storedRow.status !== 'awaiting') return sendJson(res, 200, { ok: true, signedUrl: `/contract/${tokenFromLink(storedRow.signed_link)}?signed=1` });
     if (isExpired(c)) return sendJson(res, 410, { ok: false, error: 'This agreement has expired. Please contact our events team.' });
 
     const phone = cleanLine(body.phone, 40);
@@ -1677,6 +1722,8 @@ function createContractHandlers(deps) {
     try { body = await readJsonBody(req); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
     const data = open(body.token);
     if (!data || data.k !== 'offer') return sendJson(res, 400, { ok: false, error: 'That agreement link is not valid.' });
+    const emailRow = getAgreementRow(data.c.id);
+    if (emailRow && emailRow.status !== 'awaiting') return sendJson(res, 409, { ok: false, error: emailRow.status === 'void' ? 'This agreement was voided, so its link no longer works.' : 'This agreement has already been signed.' });
     const c = data.c;
     const url = urlFor(body.token);
     try {
@@ -1746,7 +1793,9 @@ function createContractHandlers(deps) {
     const data = open(token);
     if (!data || data.k !== 'signed') return sendJson(res, 400, { ok: false, error: 'That is not a valid signed agreement link.' });
     const c = data.c;
-    if (confirmedIds.has(c.id)) return sendJson(res, 409, { ok: false, error: 'This deposit was already marked received. Check the calendar entry and the confirmation email.' });
+    const confirmRow = getAgreementRow(c.id);
+    if (confirmedIds.has(c.id) || (confirmRow && confirmRow.status === 'confirmed')) return sendJson(res, 409, { ok: false, error: 'This deposit was already marked received. Check the calendar entry and the confirmation email.' });
+    if (confirmRow && confirmRow.status === 'cancelled') return sendJson(res, 409, { ok: false, error: 'This agreement was cancelled, so a deposit cannot be confirmed.' });
 
     const amount = r2(body.amount);
     if (!(amount > 0 && amount <= 1000000)) return sendJson(res, 400, { ok: false, error: 'Enter the amount received.' });
@@ -1935,6 +1984,8 @@ function createContractHandlers(deps) {
     const data = open(token);
     if (!data || data.k !== 'signed') return sendJson(res, 400, { ok: false, error: 'Only a signed agreement can be marked cancelled.' });
     const c = data.c;
+    const cancelRow = getAgreementRow(c.id);
+    if (cancelRow && cancelRow.status === 'cancelled') return sendJson(res, 409, { ok: false, error: 'This agreement is already marked cancelled.' });
     const conf = { cancelledOn: chicagoToday(), note: cleanText(body.note, 300) };
     const signedLink = urlFor(token);
 
@@ -1966,6 +2017,35 @@ function createContractHandlers(deps) {
       console.error('Cancel record email error:', err.message);
     }
     sendJson(res, 200, { ok: true, calendar });
+  }
+
+  // ---- void an unsigned agreement (admin)
+  //
+  // Marks an agreement that has not been signed as withdrawn. Its link stops
+  // working immediately, which finally makes an issued agreement revocable.
+  async function handleAdminVoid(req, res) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    let body;
+    try { body = await readJsonBody(req); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+    const data = open(tokenFromLink(body.link));
+    if (!data || data.k !== 'offer') return sendJson(res, 400, { ok: false, error: 'Only an agreement that has not been signed can be voided. For a signed one, use Cancel.' });
+    const c = data.c;
+    const row = getAgreementRow(c.id);
+    if (signedById.has(c.id) || (row && row.status !== 'awaiting')) {
+      return sendJson(res, 409, { ok: false, error: row && row.status === 'void' ? 'This agreement is already voided.' : 'This agreement has already been signed, so it cannot be voided. Use Cancel instead.' });
+    }
+    const note = cleanText(body.note, 300);
+    saveAgreement(c, { status: 'void', cancelled_at: new Date().toISOString(), cancel_note: note || null });
+    try {
+      await sendEmail({
+        to: VENUE.notifyTo,
+        subject: `Agreement Voided: ${c.name}, ${c.date} (${refOf(c)})`,
+        text: `The unsigned agreement for ${c.name} (${refOf(c)}) was voided on ${fmtDateShort(chicagoToday())}. Its link no longer works.\n\n${c.type}, ${fmtDate(c.date)}, ${fmtTime(c.start)} to ${fmtTime(c.end)}\n${c.space}, about ${c.guests} guests${note ? `\n\nReason: ${note}` : ''}`,
+      });
+    } catch (err) {
+      console.error('Void record email error:', err.message);
+    }
+    sendJson(res, 200, { ok: true });
   }
 
   function cleanLine(v, max) {
@@ -2056,7 +2136,7 @@ function createContractHandlers(deps) {
     };
   }
 
-  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, _buildCalendarEvent: buildCalendarEvent };
+  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, handleAdminVoid, _buildCalendarEvent: buildCalendarEvent };
 }
 
 module.exports = {

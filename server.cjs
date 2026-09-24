@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const crypto = require('crypto');
+const os = require('os');
 const { DatabaseSync } = require('node:sqlite');
 
 const PORT = process.env.PORT || 3000;
@@ -263,10 +264,15 @@ async function readReservations() {
   return dedupeReservations(reservations.filter((r) => !isTestReservation(r)));
 }
 
+// The database now lives on a persistent volume and new reservations, inquiries
+// and signups are written to it as they arrive, so the slow rebuild from Resend
+// history only runs for a table that is empty.
+const dbCount = (table) => db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get().n;
+
 async function hydrateDbFromResend() {
   if (!RESEND_API_KEY) return;
   try {
-    const reservations = await readReservations();
+    const reservations = dbCount('reservations') === 0 ? await readReservations() : [];
     for (const r of reservations) {
       insertReservation.run(r.resend_email_id, r.full_name, r.phone, r.email, r.date, r.time, r.party_size, r.notes);
     }
@@ -287,7 +293,7 @@ async function hydrateDbFromResend() {
   }
 
   try {
-    const inquiries = await readEventInquiries();
+    const inquiries = dbCount('event_inquiries') === 0 ? await readEventInquiries() : [];
     for (const i of inquiries) {
       insertEventInquiry.run(
         i.resend_email_id, i.full_name, i.phone, i.email, i.company, i.event_date, i.event_time,
@@ -335,6 +341,85 @@ function checkContractAuth(req) {
     const passOk = safeEqual(p, pass);
     return userOk && passOk;
   });
+}
+
+// ---- database backup
+//
+// The database on the Railway volume is the permanent record, so a copy of it
+// is emailed every Monday morning (Central time). The email carries the real
+// SQLite file, which can be restored as is, and a spreadsheet of agreements.
+db.exec(`CREATE TABLE IF NOT EXISTS app_state (key TEXT PRIMARY KEY, value TEXT)`);
+const BACKUP_TO_EMAIL = 'info@theivybk.com';
+
+function csvCell(v) {
+  const s = v == null ? '' : String(v);
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function chicagoNow() {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hour12: false, weekday: 'short',
+  }).formatToParts(new Date());
+  const get = (type) => (parts.find((p) => p.type === type) || {}).value;
+  return { date: `${get('year')}-${get('month')}-${get('day')}`, weekday: get('weekday'), hour: parseInt(get('hour'), 10) % 24 };
+}
+
+async function sendDatabaseBackup(reason) {
+  if (!RESEND_API_KEY) throw new Error('Email is not configured.');
+  const stamp = chicagoNow().date;
+  const copyPath = path.join(os.tmpdir(), `ivy-backup-${Date.now()}.db`);
+  let dbBase64;
+  try {
+    // VACUUM INTO writes a clean, consistent copy even while the site is running.
+    db.exec(`VACUUM INTO '${copyPath.replace(/'/g, "''")}'`);
+    dbBase64 = fs.readFileSync(copyPath).toString('base64');
+  } finally {
+    try { fs.unlinkSync(copyPath); } catch {}
+  }
+
+  const count = (table) => { try { return db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get().n; } catch { return 0; } };
+  const counts = {
+    agreements: count('agreements'),
+    reservations: count('reservations'),
+    event_inquiries: count('event_inquiries'),
+    newsletter_signups: count('newsletter_signups'),
+  };
+
+  let csv = '';
+  try {
+    const columns = db.prepare('PRAGMA table_info(agreements)').all().map((c) => c.name);
+    const rows = db.prepare('SELECT * FROM agreements ORDER BY event_date, start_time').all();
+    csv = [columns.map(csvCell).join(',')].concat(rows.map((r) => columns.map((c) => csvCell(r[c])).join(','))).join('\r\n') + '\r\n';
+  } catch (err) {
+    csv = `Could not export agreements: ${err.message}\r\n`;
+  }
+
+  const summary = `Agreements: ${counts.agreements}\nReservations: ${counts.reservations}\nEvent inquiries: ${counts.event_inquiries}\nNewsletter signups: ${counts.newsletter_signups}`;
+  const result = await resendSendEmail({
+    to: BACKUP_TO_EMAIL,
+    subject: `Database backup ${stamp}`,
+    text: `${reason === 'manual' ? 'Backup requested by an admin.' : 'Weekly backup.'}\n\n${summary}\n\nAttached:\n- ivy-database-${stamp}.db is the full database (agreements, reservations, inquiries, signups). It can be restored as is.\n- agreements-${stamp}.csv is a spreadsheet of every agreement.\n\nKeep the latest copy somewhere safe.`,
+    attachments: [
+      { filename: `ivy-database-${stamp}.db`, content: dbBase64 },
+      { filename: `agreements-${stamp}.csv`, content: Buffer.from(csv, 'utf8').toString('base64') },
+    ],
+  });
+  if (result.status < 200 || result.status >= 300) throw new Error(`Resend status ${result.status}`);
+  db.prepare('INSERT OR REPLACE INTO app_state (key, value) VALUES (?, ?)').run('last_backup_date', stamp);
+  return { ok: true, stamp, counts, dbKilobytes: Math.round((dbBase64.length * 3) / 4 / 1024), emailId: result.body && result.body.id };
+}
+
+async function maybeSendWeeklyBackup() {
+  try {
+    const now = chicagoNow();
+    if (now.weekday !== 'Mon' || now.hour < 6) return;
+    const last = db.prepare("SELECT value FROM app_state WHERE key = 'last_backup_date'").get();
+    if (last && last.value === now.date) return;
+    const r = await sendDatabaseBackup('weekly');
+    console.log('Weekly database backup sent:', JSON.stringify(r));
+  } catch (err) {
+    console.error('Weekly database backup failed:', err.message);
+  }
 }
 
 // Where the database lives, so the admin page can show whether it is on a
@@ -436,7 +521,7 @@ async function getWeekReservations(weekParam) {
   const mondayStr = toDateStr(monday);
   const sundayStr = toDateStr(sunday);
 
-  const all = await readReservations();
+  const all = dedupeReservations(db.prepare('SELECT * FROM reservations ORDER BY id DESC').all().filter((r) => !isTestReservation(r)));
   const inRange = all.filter((r) => r.date >= mondayStr && r.date <= sundayStr);
   inRange.sort((a, b) => (a.date === b.date ? timeToMinutes(a.time) - timeToMinutes(b.time) : a.date < b.date ? -1 : 1));
 
@@ -1752,6 +1837,29 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/admin/contracts/void') {
+    contracts.handleAdminVoid(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/admin/backup-now') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    sendDatabaseBackup('manual')
+      .then((r) => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(r));
+      })
+      .catch((err) => {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      });
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/admin/contracts/email') {
     contracts.handleAdminEmail(req, res);
     return;
@@ -1991,4 +2099,6 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`The Ivy site running on port ${PORT}`);
   hydrateDbFromResend();
+  setTimeout(maybeSendWeeklyBackup, 2 * 60 * 1000).unref();
+  setInterval(maybeSendWeeklyBackup, 60 * 60 * 1000).unref();
 });
