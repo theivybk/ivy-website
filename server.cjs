@@ -42,12 +42,6 @@ db.exec(`
     notes TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
-  CREATE TABLE IF NOT EXISTS newsletter_signups (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    resend_contact_id TEXT UNIQUE,
-    email TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  );
   CREATE TABLE IF NOT EXISTS event_inquiries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     resend_email_id TEXT UNIQUE,
@@ -67,11 +61,16 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 `);
+// Newsletter subscribers live only in the Resend audience, which is the official
+// list and handles unsubscribes. An earlier version kept a copy of the emails
+// here, so remove it and reclaim the space so nothing lingers in the file.
+if (db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'newsletter_signups'").get()) {
+  db.exec('DROP TABLE newsletter_signups');
+  db.exec('VACUUM');
+  console.log('Removed the newsletter signup copy from the database.');
+}
 const insertReservation = db.prepare(
   `INSERT OR IGNORE INTO reservations (resend_email_id, full_name, phone, email, date, time, party_size, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-);
-const insertNewsletterSignup = db.prepare(
-  `INSERT OR IGNORE INTO newsletter_signups (resend_contact_id, email) VALUES (?, ?)`
 );
 const insertEventInquiry = db.prepare(
   `INSERT OR IGNORE INTO event_inquiries (resend_email_id, full_name, phone, email, company, event_date, event_time, guest_count, duration, occasion, space_preference, budget_per_person, referral_source, details) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -264,8 +263,8 @@ async function readReservations() {
   return dedupeReservations(reservations.filter((r) => !isTestReservation(r)));
 }
 
-// The database now lives on a persistent volume and new reservations, inquiries
-// and signups are written to it as they arrive, so the slow rebuild from Resend
+// The database now lives on a persistent volume and new reservations and
+// inquiries are written to it as they arrive, so the slow rebuild from Resend
 // history only runs for a table that is empty.
 const dbCount = (table) => db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get().n;
 
@@ -279,17 +278,6 @@ async function hydrateDbFromResend() {
     console.log(`DB hydration: ${reservations.length} reservation(s) from Resend history.`);
   } catch (err) {
     console.error('DB hydration (reservations) error:', err.message);
-  }
-
-  try {
-    const result = await resendGet(`/audiences/${RESEND_AUDIENCE_ID}/contacts`);
-    const contacts = (result.status < 300 && result.body.data) || [];
-    for (const c of contacts) {
-      insertNewsletterSignup.run(c.id, c.email);
-    }
-    console.log(`DB hydration: ${contacts.length} newsletter signup(s) from Resend audience.`);
-  } catch (err) {
-    console.error('DB hydration (newsletter) error:', err.message);
   }
 
   try {
@@ -382,7 +370,6 @@ async function sendDatabaseBackup(reason) {
     agreements: count('agreements'),
     reservations: count('reservations'),
     event_inquiries: count('event_inquiries'),
-    newsletter_signups: count('newsletter_signups'),
   };
 
   let csv = '';
@@ -394,11 +381,11 @@ async function sendDatabaseBackup(reason) {
     csv = `Could not export agreements: ${err.message}\r\n`;
   }
 
-  const summary = `Agreements: ${counts.agreements}\nReservations: ${counts.reservations}\nEvent inquiries: ${counts.event_inquiries}\nNewsletter signups: ${counts.newsletter_signups}`;
+  const summary = `Agreements: ${counts.agreements}\nReservations: ${counts.reservations}\nEvent inquiries: ${counts.event_inquiries}`;
   const result = await resendSendEmail({
     to: BACKUP_TO_EMAIL,
     subject: `Database backup ${stamp}`,
-    text: `${reason === 'manual' ? 'Backup requested by an admin.' : 'Weekly backup.'}\n\n${summary}\n\nAttached:\n- ivy-database-${stamp}.db is the full database (agreements, reservations, inquiries, signups). It can be restored as is.\n- agreements-${stamp}.csv is a spreadsheet of every agreement.\n\nKeep the latest copy somewhere safe.`,
+    text: `${reason === 'manual' ? 'Backup requested by an admin.' : 'Weekly backup.'}\n\n${summary}\n\nAttached:\n- ivy-database-${stamp}.db is the full database (agreements, reservations, and event inquiries). It can be restored as is.\n- agreements-${stamp}.csv is a spreadsheet of every agreement.\n\nKeep the latest copy somewhere safe.`,
     attachments: [
       { filename: `ivy-database-${stamp}.db`, content: dbBase64 },
       { filename: `agreements-${stamp}.csv`, content: Buffer.from(csv, 'utf8').toString('base64') },
@@ -1603,12 +1590,6 @@ async function handleNewsletterSignup(req, res) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true, alreadySubscribed: alreadyExists && result.status >= 400 }));
 
-      try {
-        insertNewsletterSignup.run(result.body && result.body.id, email);
-      } catch (err) {
-        console.error('Newsletter signup DB insert error:', err.message);
-      }
-
       if (!alreadyExists) {
         sendWelcomeEmail(email).catch((err) => console.error('Newsletter welcome email error:', err.message));
       }
@@ -1905,26 +1886,22 @@ const server = http.createServer((req, res) => {
       return;
     }
     const query = new URL(req.url, `http://${req.headers.host || 'localhost'}`).searchParams;
-    // Test data from development (Claude-generated reservations/signups) is
+    // Test data from development (Claude-generated reservations) is
     // permanently baked into Resend's history -- Resend has no email-delete
     // API -- so we filter it out here rather than at the source.
-    const isTestSignup = (s) => /@example\.com$/i.test(s.email) || /^sqlite-test@/i.test(s.email);
     const isTestInquiry = (i) => /test/i.test(i.full_name) || /@example\.com$/i.test(i.email);
 
     const realReservations = dedupeReservations(db.prepare('SELECT * FROM reservations ORDER BY id DESC').all().filter((r) => !isTestReservation(r)));
-    const realSignups = db.prepare('SELECT * FROM newsletter_signups ORDER BY id DESC').all().filter((s) => !isTestSignup(s));
     const realInquiries = db.prepare('SELECT * FROM event_inquiries ORDER BY id DESC').all().filter((i) => !isTestInquiry(i));
     const reservations = realReservations.slice(0, 50);
-    const signups = realSignups.slice(0, 50);
     const inquiries = realInquiries.slice(0, 50);
     const dbInfo = dbFileInfo();
     const reservationCount = realReservations.length;
-    const signupCount = realSignups.length;
     const inquiryCount = realInquiries.length;
 
     if (query.get('format') === 'json') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ database: dbFileInfo(), reservationCount, signupCount, inquiryCount, reservations, signups, inquiries }, null, 2));
+      res.end(JSON.stringify({ database: dbFileInfo(), reservationCount, inquiryCount, reservations, inquiries }, null, 2));
       return;
     }
 
@@ -1939,14 +1916,6 @@ const server = http.createServer((req, res) => {
           <td data-label="Added" class="muted small">${escapeHtml(r.created_at)}</td>
         </tr>`).join('')
       : `<tr><td colspan="6" class="empty">No reservations yet.</td></tr>`;
-
-    const signupRows = signups.length
-      ? signups.map((s) => `
-        <tr>
-          <td data-label="Email"><a href="mailto:${escapeHtml(s.email)}">${escapeHtml(s.email)}</a></td>
-          <td data-label="Added" class="muted small">${escapeHtml(s.created_at)}</td>
-        </tr>`).join('')
-      : `<tr><td colspan="2" class="empty">No signups yet.</td></tr>`;
 
     const inquiryRows = inquiries.length
       ? inquiries.map((i) => `
@@ -2007,11 +1976,10 @@ const server = http.createServer((req, res) => {
 <body>
   <div class="wrap">
     <h1>The Ivy — Database</h1>
-    <p class="muted">Rebuilt from Resend on every server restart — nothing here can be lost.</p>
+    <p class="muted">Stored on the persistent volume. Reservations and inquiries are added as they arrive. Newsletter subscribers are kept only in Resend.</p>
     <p class="muted small" style="white-space:normal">Database file: ${escapeHtml(dbInfo.path)}${dbInfo.sizeBytes != null ? ` (${Math.round(dbInfo.sizeBytes / 1024)} KB)` : ''}${dbInfo.createdAt ? `, created ${escapeHtml(dbInfo.createdAt)}` : ''}${dbInfo.persistent ? ' &middot; on a persistent volume' : ' &middot; not on a volume, so it is wiped on every deploy'}</p>
     <div class="stats">
       <div class="stat"><div class="n">${reservationCount}</div><div class="label">Reservations</div></div>
-      <div class="stat"><div class="n">${signupCount}</div><div class="label">Newsletter Signups</div></div>
       <div class="stat"><div class="n">${inquiryCount}</div><div class="label">Event Inquiries</div></div>
     </div>
     <section>
@@ -2026,13 +1994,6 @@ const server = http.createServer((req, res) => {
       <table>
         <thead><tr><th>Date</th><th>Name</th><th>Occasion</th><th>Contact</th><th>Details</th><th>Added</th></tr></thead>
         <tbody>${inquiryRows}</tbody>
-      </table>
-    </section>
-    <section>
-      <h2>Newsletter Signups</h2>
-      <table>
-        <thead><tr><th>Email</th><th>Added</th></tr></thead>
-        <tbody>${signupRows}</tbody>
       </table>
     </section>
   </div>
