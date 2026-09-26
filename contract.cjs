@@ -34,7 +34,8 @@ const VENUE = {
 };
 
 const DEPOSIT_RATE = 0.2;
-const SERVICE_RATE = 0.2;
+const SERVICE_RATE = 0.2; // the required minimum gratuity (tip)
+const CARD_SURCHARGE_RATE = 0.03;
 
 const SPACES = [
   'The Ivy Rooftop',
@@ -179,9 +180,9 @@ const TERMS_VERSIONS = {
     const hasBev = c.lines.some((l) => l[3] === 'bev');
 
     const pricingNotes = `
-      <p><strong>Service charge and taxes.</strong> Pricing excludes applicable taxes and a required <strong>20% service charge</strong>, which are added to the final bill. The service charge is calculated on the food and beverage total before tax${t.min > 0 ? ' (or on the Food &amp; Beverage Minimum, if greater)' : ''}. Any additional gratuity for our team beyond the 20% is at the Client's discretion.</p>
+      <p><strong>Gratuity and taxes.</strong> Pricing excludes applicable taxes and a required minimum gratuity (tip) of <strong>20%</strong>, which are added to the final bill. The gratuity is calculated on the food and beverage total before tax${t.min > 0 ? ' (or on the Food &amp; Beverage Minimum, if greater)' : ''}. Any additional gratuity for our team beyond the 20% is at the Client's discretion.</p>
       <p><strong>Credit card surcharge.</strong> Credit card payments, including the deposit and the final payment, are subject to a 3% surcharge (see Booking, Deposit &amp; Payment).</p>
-      ${t.min > 0 ? '<p><strong>Food &amp; Beverage Minimum.</strong> If the Client\'s food and beverage charges (before tax, service charge, and surcharge) are less than the Food &amp; Beverage Minimum, the difference is added to the final bill.</p>' : ''}
+      ${t.min > 0 ? '<p><strong>Food &amp; Beverage Minimum.</strong> If the Client\'s food and beverage charges (before tax, gratuity, and surcharge) are less than the Food &amp; Beverage Minimum, the difference is added to the final bill.</p>' : ''}
       <p><strong>Other fees.</strong> No separate room rental, setup, or service fees apply except as described in this agreement.</p>`;
 
     const sections = [];
@@ -468,7 +469,9 @@ function documentHtml(c, signed) {
     c.lines.length ? `<tr><td>Estimated Food &amp; Beverage Total</td><td>${esc(fmtMoney(t.est))}</td></tr>` : '',
     t.min > 0 ? `<tr><td>Food &amp; Beverage Minimum</td><td>${esc(fmtMoney(t.min))}</td></tr>` : '',
     `<tr class="strong"><td>Deposit Due to Secure the Date<span class="hint">${t.deposit === r2(t.base * DEPOSIT_RATE) ? '20% of the food &amp; beverage amount above; ' : ''}credited toward the final bill</span></td><td>${esc(fmtMoney(t.deposit))}</td></tr>`,
-    `<tr><td>Estimated Remaining Balance<span class="hint">Before tax and service charge; due on the day of the event</span></td><td>${esc(fmtMoney(t.remaining))}</td></tr>`,
+    t.deposit > 0 ? `<tr><td>Deposit if Paid by Credit Card<span class="hint">The deposit plus the 3% credit card surcharge</span></td><td>${esc(fmtMoney(r2(t.deposit * (1 + CARD_SURCHARGE_RATE))))}</td></tr>` : '',
+    `<tr><td>Estimated Remaining Balance<span class="hint">Before tax, gratuity and any credit card surcharge; due on the day of the event</span></td><td>${esc(fmtMoney(t.remaining))}</td></tr>`,
+    `<tr><td>Credit Card Surcharge<span class="hint">Added to every credit card payment, including the deposit and the final payment</span></td><td>3%</td></tr>`,
   ].join('');
 
   const extra = [];
@@ -512,7 +515,7 @@ function documentHtml(c, signed) {
       <h2><span class="n">2</span>Selections &amp; Pricing</h2>
       ${linesHtml}
       <table class="tbl sum"><tbody>${sumRows}</tbody></table>
-      <div class="callout">Estimated 20% service charge on the amount above: <strong>${esc(fmtMoney(t.service))}</strong><br>A 3% surcharge applies to all credit card payments, including the deposit.</div>
+      <div class="callout">Required minimum gratuity (tip) of 20% on the amount above: <strong>${esc(fmtMoney(t.service))}</strong><br>A 3% surcharge applies to all credit card payments, including the deposit and the final payment.</div>
       ${extra.join('')}
       ${terms.pricingNotes}
 
@@ -1201,7 +1204,7 @@ const AGREEMENTS_SCRIPT = `
       });
       tbl.appendChild(tb);
       box.appendChild(tbl);
-      box.appendChild(el('p', null, 'Total before tax and service charge: ' + money(d.totals.base) + (d.adjustment > 0 ? ' (includes the minimum adjustment, so the invoice matches the agreement)' : '') + '.'));
+      box.appendChild(el('p', null, 'Total before tax, gratuity and surcharge: ' + money(d.totals.base) + (d.adjustment > 0 ? ' (includes the minimum adjustment, so the invoice matches the agreement)' : '') + '.'));
 
       box.appendChild(el('h5', null, '4. Deposit request'));
       box.appendChild(copyRow('Amount', money(d.totals.deposit)));
@@ -1210,8 +1213,8 @@ const AGREEMENTS_SCRIPT = `
 
       box.appendChild(el('h5', null, '5. Check before you send'));
       var ul = el('ul', 'tp-list');
-      ul.appendChild(el('li', null, 'Service charge: the agreement adds a required 20% service charge on food and beverage before tax (about ' + money(d.totals.service) + '). Add it the way your Toast service charge is set up.'));
-      ul.appendChild(el('li', null, 'Card surcharge: the agreement says credit card payments carry a 3% surcharge. Confirm how your Toast invoice applies it before you send the first one.'));
+      ul.appendChild(el('li', null, 'Gratuity: the agreement requires a minimum 20% tip on food and beverage before tax (about ' + money(d.totals.service) + '). Add it the way your Toast handles a required gratuity.'));
+      ul.appendChild(el('li', null, 'Card surcharge: the agreement adds 3% to every credit card payment, so paying the ' + money(d.totals.deposit) + ' deposit by card comes to ' + money(Math.round(d.totals.deposit * 103) / 100) + '. Make sure the Toast invoice adds it.'));
       ul.appendChild(el('li', null, 'Tax: Toast adds the tax to the invoice.'));
       box.appendChild(ul);
 
@@ -1554,7 +1557,7 @@ const AGREEMENT_EMAILS = {
       ['Space', c.space],
       ['Estimated guests', String(c.guests)],
       ['Deposit received', `${fmtMoney(conf.amount)} on ${fmtDateShort(conf.receivedOn)} (${conf.method.toLowerCase()})`],
-      ['Remaining balance', `About ${fmtMoney(t.remaining)} plus tax and service charge, due on the day of the event`],
+      ['Remaining balance', `About ${fmtMoney(t.remaining)} plus tax and the 20% minimum gratuity, due on the day of the event (credit card payments carry a 3% surcharge)`],
     ];
     return {
       subject: 'Your date is confirmed | The Ivy Bar and Kitchen',
@@ -2078,8 +2081,8 @@ function createContractHandlers(deps) {
       `Estimated food & beverage: ${fmtMoney(t.est)}`,
       t.min > 0 ? `Food & beverage minimum: ${fmtMoney(t.min)}` : null,
       `Deposit: ${fmtMoney(t.deposit)} (${cancelled ? 'cancelled' : confirmed ? `received ${fmtDateShort(conf.receivedOn)}` : 'pending'})`,
-      `Estimated remaining balance: ${fmtMoney(t.remaining)} (before tax and service charge)`,
-      `Estimated 20% service charge: ${fmtMoney(t.service)}`,
+      `Estimated remaining balance: ${fmtMoney(t.remaining)} (before tax and gratuity)`,
+      `Required minimum 20% gratuity (tip): ${fmtMoney(t.service)}`,
       'Tax and the 3% credit card surcharge are extra.',
       c.notes ? '' : null,
       c.notes ? 'NOTES & SPECIAL ARRANGEMENTS' : null,
@@ -2633,7 +2636,9 @@ function createContractHandlers(deps) {
       factRow('Estimated food & beverage', esc(fmtMoney(t.est))),
       factRow('Minimum', t.min > 0 ? esc(fmtMoney(t.min)) : ''),
       factRow('Deposit', `${esc(fmtMoney(t.deposit))} (${status === 'confirmed' ? 'received' : status === 'cancelled' ? 'cancelled' : 'not received yet'})`),
-      factRow('Estimated balance', `${esc(fmtMoney(t.remaining))} before tax and service charge`),
+      factRow('Estimated balance', `${esc(fmtMoney(t.remaining))} before tax, gratuity and card surcharge`),
+      factRow('Minimum gratuity (20%)', esc(fmtMoney(t.service))),
+      factRow('Card surcharge', '3% on every credit card payment, including the deposit and final payment'),
       factRow('Toast invoice', esc(toast.invoice.indexOf('http') === 0 ? 'Payment link saved' + (toast.sentAt ? ' and emailed to the client' : '') : toast.invoice)),
     ].join('');
 
