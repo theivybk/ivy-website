@@ -63,7 +63,11 @@ const navLinks = [
 <meta name="twitter:title" content={ogTitle ?? title}>
 <meta name="twitter:description" content={ogDescription ?? description}>
 <meta name="twitter:image" content={ogImage}>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/assets/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#1F3D2A">
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -189,11 +193,12 @@ const navLinks = [
           <input type="email" id="newsletter-email" name="email" placeholder="you@email.com" required aria-label="Email address">
           <button type="submit" class="btn btn--brass-outline">Sign Up</button>
         </form>
+        <p class="newsletter-consent">By signing up you agree to receive our emails. Unsubscribe anytime. <a href="/privacy">Privacy Policy</a></p>
         <p class="newsletter-note" id="newsletter-confirm"></p>
       </div>
     </div>
     <div class="bottom">
-      <span>&copy; 2026 The Ivy Bar &amp; Kitchen</span>
+      <span>&copy; 2026 The Ivy Bar &amp; Kitchen &middot; <a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></span>
       <span>Lakeview, Chicago</span>
     </div>
   </div>
@@ -211,6 +216,7 @@ const navLinks = [
       <input type="email" id="newsletter-popup-email" name="email" placeholder="you@email.com" required aria-label="Email address">
       <button type="submit" class="btn btn--primary">Sign Up</button>
     </form>
+    <p class="newsletter-consent">By signing up you agree to receive our emails. Unsubscribe anytime. <a href="/privacy">Privacy Policy</a></p>
     <p class="newsletter-note" id="newsletter-popup-confirm"></p>
   </div>
 </div>

@@ -1,0 +1,13 @@
+{
+  "name": "The Ivy Bar and Kitchen",
+  "short_name": "The Ivy",
+  "description": "Neighborhood bar and kitchen in Lakeview, Chicago, three blocks from Wrigley Field.",
+  "start_url": "/",
+  "display": "browser",
+  "theme_color": "#1F3D2A",
+  "background_color": "#F5EFE3",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
