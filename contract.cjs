@@ -148,6 +148,54 @@ function isExpired(c) {
   return chicagoToday() > c.exp;
 }
 
+// ---------------------------------------------------------------- reminders
+//
+// Which automatic reminders are due today. Pure, so it can be tested with made
+// up rows. `today` is the Chicago date (YYYY-MM-DD). Each reminder is sent once
+// per agreement (the sending code records it), so a window that stays open for
+// a few days only fires the first time it is seen.
+//
+//   client_details_early  14 to 9 days before the event: final details are due in a week
+//   client_details_final  8 to 7 days before: final details are due tomorrow or today
+//   staff_final_count     7 to 5 days before: the final count deadline (team)
+//   staff_tomorrow        1 day before, or the day of: the event brief (team)
+//   staff_hold_unsigned   3 days or less before the date hold ends, not signed (team)
+//   staff_hold_unpaid     3 days or less before the date hold ends, deposit not received (team)
+function daysUntilYmd(ymd, today) {
+  return Math.round((Date.parse(ymd + 'T12:00:00Z') - Date.parse(today + 'T12:00:00Z')) / 86400000);
+}
+
+function planReminders(rows, today) {
+  const out = [];
+  for (const r of rows) {
+    if (!r.event_date || !/^\d{4}-\d{2}-\d{2}$/.test(r.event_date)) continue;
+    const toEvent = daysUntilYmd(r.event_date, today);
+    if (toEvent < 0) continue;
+
+    if (r.status === 'confirmed') {
+      const confirmedOn = r.confirmed_at ? new Date(r.confirmed_at).toLocaleDateString('en-CA', { timeZone: 'America/Chicago' }) : '';
+      // The "date confirmed" email already carries the deadline, so nothing goes
+      // to the client on the day of confirmation, or when the date was confirmed
+      // this close to the deadline.
+      const confirmedToEvent = confirmedOn ? daysUntilYmd(r.event_date, confirmedOn) : 99;
+      const lateConfirm = confirmedToEvent <= 8;
+      const freshToday = confirmedOn === today;
+      if (!lateConfirm && !freshToday && toEvent <= 14 && toEvent >= 9) out.push({ row: r, kind: 'client_details_early', toEvent });
+      if (!lateConfirm && !freshToday && toEvent <= 8 && toEvent >= 7) out.push({ row: r, kind: 'client_details_final', toEvent });
+      if (!lateConfirm && toEvent <= 7 && toEvent >= 5) out.push({ row: r, kind: 'staff_final_count', toEvent });
+      if (toEvent <= 1) out.push({ row: r, kind: 'staff_tomorrow', toEvent });
+    } else if ((r.status === 'awaiting' || r.status === 'pending') && r.hold_through) {
+      const left = daysUntilYmd(r.hold_through, today);
+      if (left <= 3 && left >= 0) out.push({ row: r, kind: r.status === 'awaiting' ? 'staff_hold_unsigned' : 'staff_hold_unpaid', toEvent, left });
+    }
+  }
+  return out;
+}
+
+function chicagoHour() {
+  return Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', hour: 'numeric', hourCycle: 'h23' }).format(new Date())) % 24;
+}
+
 function refOf(c) {
   return 'IVY-' + String(c.id || '').slice(0, 6).toUpperCase();
 }
@@ -1547,6 +1595,112 @@ const AGREEMENT_EMAILS = {
     };
   },
 
+  // To the client, ahead of the final-details deadline (7 days before the event).
+  detailsReminder(c, sd, signedLink, dueYmd, daysToDue) {
+    const when = daysToDue <= 0 ? 'today' : daysToDue === 1 ? 'tomorrow' : `in ${daysToDue} days`;
+    const due = fmtDate(dueYmd);
+    const rows = eventRows(c);
+    const ask = 'your final guaranteed guest count, menu selections, dietary needs, and the number of beverage-package wristbands';
+    return {
+      subject: `Final details for your ${c.type.toLowerCase()} on ${fmtDateShort(c.date)} | The Ivy Bar and Kitchen`,
+      text: `Hi ${c.name},\n\nYour ${c.type.toLowerCase()} at The Ivy is coming up on ${fmtDate(c.date)}. Please send us ${ask} by ${due} (${when}). Just reply to this email with the details.\n\n${rowsToText(rows)}\n\nIf we don't hear from you by then, your estimated guest count of ${c.guests} becomes the guaranteed count. After the deadline we can add guests if we have room, but the count can't go down.\n\nYour signed agreement: ${signedLink}\n\n${clientSignoff}`,
+      html: E.emailTemplate({
+        heading: 'Your event is coming up',
+        bodyHtml: E.emailPara(`Hi ${c.name},`)
+          + E.emailPara(`Your ${c.type.toLowerCase()} at The Ivy is coming up on ${fmtDate(c.date)}.`)
+          + E.emailDetails(rows, 170)
+          + E.emailCallout(`Final details are due ${when}`, `Please reply to this email by ${due} with ${ask}.`)
+          + E.emailPara(`If we don't hear from you by then, your estimated guest count of ${c.guests} becomes the guaranteed count. After the deadline we can add guests if we have room, but the count can't go down.`)
+          + E.emailButton('View your signed agreement', signedLink)
+          + E.emailContact(),
+      }),
+    };
+  },
+
+  // To us, when the client's final details are due.
+  finalCountStaff(c, sd, signedLink, sheetLink, toEvent) {
+    const dueYmd = new Date(Date.parse(c.date + 'T12:00:00Z') - 7 * 86400000).toISOString().slice(0, 10);
+    const line = toEvent >= 7
+      ? `Today is the deadline for ${c.name}'s final guest count, menu selections, dietary needs and wristband count for the ${c.type.toLowerCase()} on ${fmtDate(c.date)}.`
+      : `The deadline for ${c.name}'s final guest count, menu selections, dietary needs and wristband count passed on ${fmtDate(dueYmd)}. The ${c.type.toLowerCase()} is on ${fmtDate(c.date)}.`;
+    const rows = [
+      ...clientRows(c, sd.cl),
+      ...eventRows(c),
+      ['Menu selections on file', c.sel || 'None received yet'],
+      ['Notes', c.notes],
+    ];
+    const note = `If the client has not sent a count, the estimate of ${c.guests} guests becomes the guaranteed count. Check the inbox for their reply and update the kitchen.`;
+    return {
+      subject: `Final count deadline: ${c.name}, ${fmtDateShort(c.date)}`,
+      text: `${line}\n\n${note}\n\n${rowsToText(rows)}\n\nEvent sheet: ${sheetLink}\nAgreements: ${AGREEMENTS_URL}`,
+      html: E.emailTemplate({
+        heading: 'Final count deadline',
+        bodyHtml: E.emailPara(line)
+          + E.emailPara(note)
+          + E.emailDetails(rows, 170)
+          + E.emailButton('Open the event sheet', sheetLink)
+          + E.emailLink('See all agreements', AGREEMENTS_URL),
+      }),
+    };
+  },
+
+  // To us, the day before the event (or the day of, if it was confirmed late).
+  eventBriefStaff(c, sd, signedLink, sheetLink, toEvent) {
+    const t = computeTotals(c);
+    const day = toEvent <= 0 ? 'Today' : 'Tomorrow';
+    const rows = [
+      ...clientRows(c, sd.cl),
+      ...eventRows(c),
+      ['Guests arrive', c.arrive ? fmtTime(c.arrive) : ''],
+      ['Menu selections', c.sel || 'None received yet'],
+      ['Notes', c.notes],
+      ['Balance due at the end', `About ${fmtMoney(t.remaining)} plus tax, the required minimum 20% tip (about ${fmtMoney(t.service)}) and the 3% credit card surcharge, on one credit card`],
+    ];
+    return {
+      subject: `${day}: ${c.type} for ${c.name}, ${fmtTime(c.start)}`,
+      text: `${day}: ${c.type.toLowerCase()} for ${c.name} on ${fmtDate(c.date)}. Setup begins 30 minutes before the start time.\n\n${rowsToText(rows)}\n\nPrint the event sheet for the kitchen and floor: ${sheetLink}\nSigned agreement: ${signedLink}`,
+      html: E.emailTemplate({
+        heading: `${day}: ${c.type.toLowerCase()} for ${c.name}`,
+        bodyHtml: E.emailPara(`${fmtDate(c.date)}. Setup begins 30 minutes before the start time.`)
+          + E.emailDetails(rows, 170)
+          + E.emailButton('Open the event sheet', sheetLink)
+          + E.emailLink('View the signed agreement', signedLink),
+      }),
+    };
+  },
+
+  // To us, when a date hold is about to end without a signature or a deposit.
+  holdEndingStaff(row, kind, left) {
+    const unsigned = kind === 'staff_hold_unsigned';
+    const holdLabel = fmtDateShort(row.hold_through);
+    const when = left <= 0 ? 'today' : left === 1 ? 'tomorrow' : `in ${left} days`;
+    const rows = [
+      ['Client', row.name],
+      ['Email', row.email, 'mailto'],
+      ['Phone', row.phone, 'tel'],
+      ['Event date', fmtDate(row.event_date)],
+      ['Date held through', `${holdLabel} (${when})`],
+      ['Reference', row.ref],
+    ];
+    const line = unsigned
+      ? `The date hold for ${row.name} ends ${when} and the agreement has not been signed. After that, The Ivy may release the date.`
+      : `The date hold for ${row.name} ends ${when} and the deposit has not been received. After that, The Ivy may release the date.`;
+    const next = unsigned
+      ? 'Follow up with the client. On the Agreements page you can use "Email link again", or create a new agreement with a later hold date.'
+      : 'Check Toast. If the invoice is paid, click Confirm deposit on the Agreements page. If not, follow up with the client.';
+    return {
+      subject: `Date hold ends ${holdLabel}: ${row.name} (${row.ref})`,
+      text: `${line}\n\n${next}\n\n${rowsToText(rows)}\n\nAgreements: ${AGREEMENTS_URL}`,
+      html: E.emailTemplate({
+        heading: 'A date hold is ending',
+        bodyHtml: E.emailPara(line)
+          + E.emailPara(next)
+          + E.emailDetails(rows, 170)
+          + E.emailButton('Open the Agreements page', AGREEMENTS_URL),
+      }),
+    };
+  },
+
   // To the client when their deposit is confirmed.
   depositClient(c, sd, conf, signedLink, deadline) {
     const t = computeTotals(c);
@@ -1764,6 +1918,12 @@ function previewEmails() {
     item('Our team', 'Agreement voided', to, AGREEMENT_EMAILS.voided(c, 'Wrong date entered')),
     item('Our team', 'Alert: add to calendar by hand', to, AGREEMENT_EMAILS.calendarAlert(c, signedLink, 'Calendar insert failed: 403')),
     item('Our team', 'Alert: signed copy did not reach the client', to, AGREEMENT_EMAILS.copyFailed(c, sd.cl, signedLink, 'Resend status 422: Invalid to address')),
+    item('Reminders', 'Final details reminder (14 days before the event)', 'the client', AGREEMENT_EMAILS.detailsReminder(c, sd, signedLink, '2026-10-17', 7)),
+    item('Reminders', 'Final details, due tomorrow (8 days before the event)', 'the client', AGREEMENT_EMAILS.detailsReminder(c, sd, signedLink, '2026-10-17', 1)),
+    item('Reminders', 'Final count deadline (7 days before)', to, AGREEMENT_EMAILS.finalCountStaff(c, sd, signedLink, `${VENUE.origin}/admin/event-sheet/SAMPLE`, 7)),
+    item('Reminders', 'Event brief (the day before)', to, AGREEMENT_EMAILS.eventBriefStaff(c, sd, signedLink, `${VENUE.origin}/admin/event-sheet/SAMPLE`, 1)),
+    item('Reminders', 'Date hold ending: not signed', to, AGREEMENT_EMAILS.holdEndingStaff({ name: c.name, email: c.email, phone: c.phone, event_date: c.date, hold_through: '2026-10-07', ref: refOf(c) }, 'staff_hold_unsigned', 2)),
+    item('Reminders', 'Date hold ending: deposit not received', to, AGREEMENT_EMAILS.holdEndingStaff({ name: c.name, email: c.email, phone: c.phone, event_date: c.date, hold_through: '2026-10-07', ref: refOf(c) }, 'staff_hold_unpaid', 1)),
   ];
 }
 
@@ -2577,6 +2737,87 @@ function createContractHandlers(deps) {
     sendJson(res, 200, { ok: true, emailed: data.cl.email });
   }
 
+  // ---- automatic reminders
+  //
+  // Runs hourly from server.cjs (never before 9 AM Central). Every reminder is
+  // recorded in agreement_reminders once it is sent, so a redeploy or a restart
+  // never sends one twice. A failed send is not recorded and is tried again the
+  // next hour.
+  if (db) {
+    try {
+      db.exec('CREATE TABLE IF NOT EXISTS agreement_reminders (agreement_id TEXT NOT NULL, kind TEXT NOT NULL, sent_at TEXT NOT NULL, PRIMARY KEY (agreement_id, kind))');
+    } catch (err) {
+      console.error('Reminders table error:', err.message);
+    }
+  }
+
+  function dueReminders(today) {
+    if (!db) return [];
+    const rows = db.prepare("SELECT id, ref, status, name, email, phone, event_date, hold_through, confirmed_at, signed_link, link FROM agreements WHERE status IN ('awaiting', 'pending', 'confirmed') AND event_date >= ?").all(today);
+    const sent = new Set(db.prepare('SELECT agreement_id, kind FROM agreement_reminders').all().map((r) => `${r.agreement_id}:${r.kind}`));
+    return planReminders(rows, today).filter((p) => !sent.has(`${p.row.id}:${p.kind}`));
+  }
+
+  // The email for one due reminder, or null when the agreement cannot be opened.
+  function reminderMail(p) {
+    if (p.kind === 'staff_hold_unsigned' || p.kind === 'staff_hold_unpaid') {
+      const m = AGREEMENT_EMAILS.holdEndingStaff(p.row, p.kind, p.left);
+      return { to: VENUE.notifyTo, subject: m.subject, text: m.text, html: m.html };
+    }
+    const token = tokenFromLink(p.row.signed_link);
+    const data = token ? open(token) : null;
+    if (!data || data.k !== 'signed') return null;
+    const c = data.c;
+    const signedLink = urlFor(token);
+    const sheetLink = `${VENUE.origin}/admin/event-sheet/${token}`;
+    if (p.kind === 'client_details_early' || p.kind === 'client_details_final') {
+      const dueYmd = new Date(Date.parse(c.date + 'T12:00:00Z') - 7 * 86400000).toISOString().slice(0, 10);
+      const m = AGREEMENT_EMAILS.detailsReminder(c, data, signedLink, dueYmd, p.toEvent - 7);
+      return { to: data.cl.email, subject: m.subject, text: m.text, html: m.html, replyTo: VENUE.eventsEmail };
+    }
+    const m = p.kind === 'staff_final_count'
+      ? AGREEMENT_EMAILS.finalCountStaff(c, data, signedLink, sheetLink, p.toEvent)
+      : AGREEMENT_EMAILS.eventBriefStaff(c, data, signedLink, sheetLink, p.toEvent);
+    return { to: VENUE.notifyTo, subject: m.subject, text: m.text, html: m.html };
+  }
+
+  // Sends what is due. { dry: true } only reports it. Unless { force: true },
+  // nothing goes out before 9 AM Central.
+  async function runReminders({ dry = false, force = false } = {}) {
+    if (!db || !hasResend()) return [];
+    if (!dry && !force && chicagoHour() < 9) return [];
+    const results = [];
+    for (const p of dueReminders(chicagoToday())) {
+      const entry = { ref: p.row.ref, kind: p.kind, toEvent: p.toEvent, sent: false };
+      if (dry) { results.push(entry); continue; }
+      try {
+        const mail = reminderMail(p);
+        if (!mail) {
+          entry.error = 'could not open the signed agreement';
+        } else {
+          const result = await sendEmail(mail);
+          if (result.status < 200 || result.status >= 300) throw new Error(`Resend status ${result.status}`);
+          db.prepare('INSERT OR IGNORE INTO agreement_reminders (agreement_id, kind, sent_at) VALUES (?, ?, ?)').run(p.row.id, p.kind, new Date().toISOString());
+          entry.sent = true;
+        }
+      } catch (err) {
+        entry.error = err.message;
+        console.error(`Reminder ${p.kind} for ${p.row.ref} failed:`, err.message);
+      }
+      results.push(entry);
+      await new Promise((resolve) => setTimeout(resolve, 600));
+    }
+    return results;
+  }
+
+  // Staff can see what is due, or send it now: POST /admin/reminders/run?send=1
+  async function handleAdminReminders(req, res, send) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    if (!db) return sendJson(res, 503, { ok: false, error: 'The database is not available.' });
+    const results = await runReminders({ dry: !send, force: true });
+    sendJson(res, 200, { ok: true, sending: !!send, today: chicagoToday(), results });
+  }
+
   const EVENT_SHEET_CSS = `
 .sheet { max-width:860px; }
 .es-actions { display:flex; gap:10px; margin:0 0 16px; }
@@ -2776,11 +3017,11 @@ function createContractHandlers(deps) {
     };
   }
 
-  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, handleAdminVoid, handleAdminDetails, handleAdminToastInvoice, handleAdminSendPaymentLink, handleAdminEventSheet, previewEmails, _eventSheetHtml: eventSheetHtml, _agreementDetails: agreementDetails, _buildCalendarEvent: buildCalendarEvent };
+  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, handleAdminVoid, handleAdminDetails, handleAdminToastInvoice, handleAdminSendPaymentLink, handleAdminEventSheet, handleAdminReminders, runReminders, previewEmails, _eventSheetHtml: eventSheetHtml, _agreementDetails: agreementDetails, _buildCalendarEvent: buildCalendarEvent };
 }
 
 module.exports = {
   createContractHandlers,
   // Exposed so the rendering can be exercised without a server.
-  _test: { documentHtml, offerPage, signedPage, adminPageHtml, agreementsPageHtml, computeTotals, termsFor, standaloneSignedHtml },
+  _test: { planReminders, documentHtml, offerPage, signedPage, adminPageHtml, agreementsPageHtml, computeTotals, termsFor, standaloneSignedHtml },
 };

@@ -1656,6 +1656,11 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/admin/reminders/run') {
+    contracts.handleAdminReminders(req, res, new URL(req.url, 'http://localhost').searchParams.get('send') === '1');
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/admin/contracts/toast-invoice') {
     contracts.handleAdminToastInvoice(req, res);
     return;
@@ -1691,6 +1696,61 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'POST' && urlPath === '/admin/contracts/email') {
     contracts.handleAdminEmail(req, res);
+    return;
+  }
+
+  // TEMPORARY: test helper for the automatic reminders. Works only on agreements
+  // whose name contains "please ignore". Removed right after the live test.
+  //   ?action=state     lists the test rows and the reminders recorded for them
+  //   ?action=backdate  sets confirmed_at on the test rows to 2026-09-01
+  //   ?action=delete    deletes the test rows, their reminders and calendar entries
+  if (req.method === 'POST' && urlPath === '/admin/tmp-reminder-test') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    const action = new URL(req.url, 'http://localhost').searchParams.get('action');
+    const gcal = (method, pathAndQuery, accessToken) => new Promise((resolve, reject) => {
+      const r = https.request(
+        { hostname: 'www.googleapis.com', path: pathAndQuery, method, headers: { Authorization: `Bearer ${accessToken}` } },
+        (resp) => {
+          let data = '';
+          resp.on('data', (chunk) => (data += chunk));
+          resp.on('end', () => resolve({ status: resp.statusCode }));
+        }
+      );
+      r.on('error', reject);
+      r.end();
+    });
+    (async () => {
+      try {
+        const testRows = () => db.prepare("SELECT id, ref, status, name, event_date, hold_through, confirmed_at FROM agreements WHERE lower(name) LIKE '%please ignore%'").all();
+        const out = {};
+        if (action === 'backdate') {
+          out.backdated = db.prepare("UPDATE agreements SET confirmed_at = '2026-09-01T15:00:00.000Z' WHERE lower(name) LIKE '%please ignore%' AND status = 'confirmed'").run().changes;
+        }
+        if (action === 'delete') {
+          const rows = testRows();
+          const accessToken = await getGoogleCalendarAccessToken();
+          const calId = encodeURIComponent(GOOGLE_CALENDAR_ID);
+          out.calendar = [];
+          for (const r of rows) {
+            const d = await gcal('DELETE', `/calendar/v3/calendars/${calId}/events/${encodeURIComponent('agr' + r.id)}`, accessToken);
+            out.calendar.push({ ref: r.ref, status: d.status });
+          }
+          out.remindersDeleted = db.prepare("DELETE FROM agreement_reminders WHERE agreement_id IN (SELECT id FROM agreements WHERE lower(name) LIKE '%please ignore%')").run().changes;
+          out.rowsDeleted = db.prepare("DELETE FROM agreements WHERE lower(name) LIKE '%please ignore%'").run().changes;
+        }
+        out.rows = testRows();
+        out.reminders = db.prepare("SELECT r.agreement_id, r.kind, r.sent_at FROM agreement_reminders r JOIN agreements a ON a.id = r.agreement_id WHERE lower(a.name) LIKE '%please ignore%'").all();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(out, null, 2));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    })();
     return;
   }
 
@@ -1911,4 +1971,15 @@ server.listen(PORT, () => {
   hydrateDbFromResend();
   setTimeout(maybeSendWeeklyBackup, 2 * 60 * 1000).unref();
   setInterval(maybeSendWeeklyBackup, 60 * 60 * 1000).unref();
+  // Automatic event reminders (final details, event brief, date holds ending).
+  const runEventReminders = async () => {
+    try {
+      const sent = (await contracts.runReminders()).filter((r) => r.sent || r.error);
+      if (sent.length) console.log('Event reminders:', JSON.stringify(sent));
+    } catch (err) {
+      console.error('Event reminders error:', err.message);
+    }
+  };
+  setTimeout(runEventReminders, 3 * 60 * 1000).unref();
+  setInterval(runEventReminders, 60 * 60 * 1000).unref();
 });
