@@ -1645,6 +1645,11 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/admin/contracts/send-payment-link') {
+    contracts.handleAdminSendPaymentLink(req, res);
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/admin/contracts/toast-invoice') {
     contracts.handleAdminToastInvoice(req, res);
     return;

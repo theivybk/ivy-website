@@ -1159,7 +1159,7 @@ const AGREEMENTS_SCRIPT = `
       var d = res.d;
       var box = el('div', 'tp');
       box.appendChild(el('h4', null, 'Create this invoice in Toast'));
-      box.appendChild(el('p', null, 'In Toast Web, open Invoicing and create a new invoice for this client, copying the details below. Toast emails the client a secure link to pay. When Toast shows the deposit as paid, come back and click Confirm deposit.'));
+      box.appendChild(el('p', null, 'In Toast Web, go to Finance > Payments > Customer invoices and create a new invoice for this client, copying the details below. After you send it, copy the invoice payment link, paste it in step 6, and email it to the client from here. When Toast shows the deposit as paid, come back and click Confirm deposit.'));
       var links = el('p', 'tp-links');
       [['How Toast invoicing works', 'https://support.toasttab.com/en/article/How-to-Send-an-Invoice'], ['Deposit requests in Toast', 'https://support.toasttab.com/en/article/Toast-Invoicing-Deposit-Feature']].forEach(function (l) {
         var a = el('a', null, l[0]); a.href = l[1]; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a);
@@ -1227,9 +1227,9 @@ const AGREEMENTS_SCRIPT = `
       allBtn.addEventListener('click', function () { copyText(all, allBtn); });
       var allP = el('p'); allP.appendChild(allBtn); box.appendChild(allP);
 
-      box.appendChild(el('h5', null, '6. Save the Toast invoice number here'));
+      box.appendChild(el('h5', null, '6. Save the invoice number, or email the payment link'));
       var wrap = el('div', 'tp-save');
-      var inp = el('input'); inp.type = 'text'; inp.placeholder = 'Invoice number or link from Toast'; inp.value = d.toastInvoice || '';
+      var inp = el('input'); inp.type = 'text'; inp.placeholder = 'Invoice number, or the payment link copied from Toast'; inp.value = d.toastInvoice || '';
       var saved = el('span', 'sub', d.toastInvoice ? 'Saved.' : 'Not saved yet.');
       var save = actionButton('Save', 'main', function () {
         save.disabled = true;
@@ -1240,7 +1240,20 @@ const AGREEMENTS_SCRIPT = `
         }).catch(function () { save.disabled = false; saved.textContent = 'Network error. Please try again.'; });
       });
       wrap.appendChild(inp); wrap.appendChild(save); wrap.appendChild(saved);
+      var emailBtn = actionButton('Email link to client', 'main', function () {
+        if (!window.confirm('Email this payment link to ' + d.client.email + '?')) return;
+        emailBtn.disabled = true; emailBtn.textContent = 'Sending...';
+        post('/admin/contracts/send-payment-link', { link: r.link, payLink: inp.value }).then(function (rs) {
+          emailBtn.disabled = false; emailBtn.textContent = 'Email link to client';
+          saved.textContent = rs.ok ? 'Emailed to ' + rs.d.emailed + '.' : (rs.d.error || 'Could not send.');
+          if (rs.ok) r.toastInvoice = inp.value.trim();
+        }).catch(function () { emailBtn.disabled = false; emailBtn.textContent = 'Email link to client'; saved.textContent = 'Network error. Please try again.'; });
+      });
+      var syncEmailBtn = function () { emailBtn.hidden = inp.value.trim().toLowerCase().indexOf('https://') !== 0; };
+      inp.addEventListener('input', syncEmailBtn); syncEmailBtn();
+      wrap.appendChild(emailBtn);
       box.appendChild(wrap);
+      if (d.payLinkSentAt) box.appendChild(el('p', 'sub', 'Payment link emailed to the client on ' + d.payLinkSentAt.slice(0, 10) + '.'));
 
       var close = el('p'); close.style.marginTop = '12px';
       close.appendChild(actionButton('Close', '', function () { openId = null; render(); }));
@@ -1352,7 +1365,7 @@ const AGREEMENTS_SCRIPT = `
       if (r.status === 'pending') c3.appendChild(el('span', 'sub', 'Hold through ' + r.holdThrough));
       if (r.status === 'expired') c3.appendChild(el('span', 'sub', 'Hold ended ' + r.holdThrough));
       var c4 = el('td', null, r.deposit || '');
-      if (r.toastInvoice) c4.appendChild(el('span', 'sub', 'Toast invoice ' + r.toastInvoice));
+      if (r.toastInvoice) c4.appendChild(el('span', 'sub', r.toastInvoice.indexOf('http') === 0 ? 'Toast payment link saved' : 'Toast invoice ' + r.toastInvoice));
       var c5 = el('td');
       var acts = el('div', 'acts');
       var link = r.link;
@@ -1507,6 +1520,25 @@ const AGREEMENT_EMAILS = {
           + E.emailDetails(rows, 170)
           + E.emailButton('View signed agreement', signedLink)
           + E.emailCallout('What happens next', `We'll email you a secure invoice to pay the ${fmtMoney(t.deposit)} deposit online. Credit card payments carry a 3% surcharge. Your date is confirmed once we receive it.`)
+          + E.emailContact(),
+      }),
+    };
+  },
+
+  // To the client: the Toast payment-page link for the deposit invoice.
+  paymentLink(c, sd, payLink) {
+    const t = computeTotals(c);
+    const rows = [['Event', c.type], ['Date', fmtDate(c.date)], ['Space', c.space], ['Deposit due', fmtMoney(t.deposit)], ['Date held through', fmtDateShort(c.exp)]];
+    return {
+      subject: 'Pay your deposit | The Ivy Bar and Kitchen',
+      text: `Hi ${c.name},\n\nThank you for signing your agreement. Here is the secure link to pay the ${fmtMoney(t.deposit)} deposit for your ${c.type.toLowerCase()} on ${fmtDate(c.date)}:\n\n${payLink}\n\n${rowsToText(rows)}\n\nYour date is held through ${fmtDateShort(c.exp)} and is confirmed once we receive the deposit. As noted in your agreement, credit card payments carry a 3% surcharge.\n\n${clientSignoff}`,
+      html: E.emailTemplate({
+        heading: 'Pay your deposit',
+        bodyHtml: E.emailPara(`Hi ${c.name},`)
+          + E.emailPara(`Thank you for signing your agreement. Here is the secure link to pay the ${fmtMoney(t.deposit)} deposit for your ${c.type.toLowerCase()} on ${fmtDate(c.date)}.`)
+          + E.emailDetails(rows, 170)
+          + E.emailButton('Pay deposit securely', payLink)
+          + E.emailPara(`Your date is held through ${fmtDateShort(c.exp)} and is confirmed once we receive the deposit. As noted in your agreement, credit card payments carry a 3% surcharge.`)
           + E.emailContact(),
       }),
     };
@@ -1720,6 +1752,7 @@ function previewEmails() {
   return [
     item('Clients', 'Agreement link', 'the client', AGREEMENT_EMAILS.clientLink(c, url)),
     item('Clients', 'Signed agreement', 'the client', AGREEMENT_EMAILS.signedClient(c, sd, signedLink)),
+    item('Clients', 'Deposit payment link', 'the client', AGREEMENT_EMAILS.paymentLink(c, sd, 'https://www.toasttab.com/pay/EXAMPLE')),
     item('Clients', 'Date confirmed (deposit received)', 'the client', AGREEMENT_EMAILS.depositClient(c, sd, conf, signedLink, 'Saturday, October 17, 2026')),
     item('Our team', 'Agreement created', to, AGREEMENT_EMAILS.created(c, url)),
     item('Our team', 'Agreement signed', to, AGREEMENT_EMAILS.signedVenue(c, sd, signedLink)),
@@ -1769,6 +1802,7 @@ function createContractHandlers(deps) {
       const have = db.prepare('PRAGMA table_info(agreements)').all().map((col) => col.name);
       if (!have.includes('toast_invoice')) db.exec('ALTER TABLE agreements ADD COLUMN toast_invoice TEXT');
       if (!have.includes('toast_invoice_at')) db.exec('ALTER TABLE agreements ADD COLUMN toast_invoice_at TEXT');
+      if (!have.includes('pay_link_sent_at')) db.exec('ALTER TABLE agreements ADD COLUMN pay_link_sent_at TEXT');
     } catch (err) {
       console.error('Agreement table upgrade error:', err.message);
     }
@@ -1776,7 +1810,7 @@ function createContractHandlers(deps) {
   const AGREEMENT_COLUMNS = new Set([
     'status', 'company', 'phone', 'email', 'link', 'emailed_at', 'signed_at', 'signed_by', 'signed_link',
     'day_of_name', 'day_of_phone', 'deposit_received', 'deposit_received_on', 'deposit_method', 'deposit_note',
-    'confirmed_at', 'cancelled_at', 'cancel_note', 'toast_invoice', 'toast_invoice_at',
+    'confirmed_at', 'cancelled_at', 'cancel_note', 'toast_invoice', 'toast_invoice_at', 'pay_link_sent_at',
   ]);
 
   // Makes sure the agreement has a row (built from the agreement data itself,
@@ -2441,13 +2475,13 @@ function createContractHandlers(deps) {
   // to enter, and the Toast invoice number is saved back on the agreement.
 
   function getToastInvoice(id) {
-    if (!db) return { invoice: '', at: '' };
+    if (!db) return { invoice: '', at: '', sentAt: '' };
     try {
-      const row = db.prepare('SELECT toast_invoice, toast_invoice_at FROM agreements WHERE id = ?').get(id);
-      return { invoice: (row && row.toast_invoice) || '', at: (row && row.toast_invoice_at) || '' };
+      const row = db.prepare('SELECT toast_invoice, toast_invoice_at, pay_link_sent_at FROM agreements WHERE id = ?').get(id);
+      return { invoice: (row && row.toast_invoice) || '', at: (row && row.toast_invoice_at) || '', sentAt: (row && row.pay_link_sent_at) || '' };
     } catch (err) {
       console.error('Toast invoice lookup error:', err.message);
-      return { invoice: '', at: '' };
+      return { invoice: '', at: '', sentAt: '' };
     }
   }
 
@@ -2484,6 +2518,7 @@ function createContractHandlers(deps) {
       depositDueLabel: fmtDateShort(c.exp),
       toastInvoice: toast.invoice,
       toastInvoiceAt: toast.at,
+      payLinkSentAt: toast.sentAt,
     };
   }
 
@@ -2505,6 +2540,38 @@ function createContractHandlers(deps) {
     const invoice = cleanLine(body.invoice, 200);
     saveAgreement(data.c, { toast_invoice: invoice || null, toast_invoice_at: invoice ? new Date().toISOString() : null });
     sendJson(res, 200, { ok: true, invoice });
+  }
+
+  async function handleAdminSendPaymentLink(req, res) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    if (!hasResend()) return sendJson(res, 503, { ok: false, error: 'Email is not configured on the server.' });
+    let body;
+    try { body = await readJsonBody(req); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+    const data = open(tokenFromLink(body.link));
+    if (!data || data.k !== 'signed') return sendJson(res, 400, { ok: false, error: 'That is not a signed agreement.' });
+    const c = data.c;
+    const row = getAgreementRow(c.id);
+    if (row && row.status === 'confirmed') return sendJson(res, 409, { ok: false, error: 'The deposit is already confirmed, so there is nothing to pay.' });
+    if (row && row.status === 'cancelled') return sendJson(res, 409, { ok: false, error: 'This agreement was cancelled.' });
+    const payLink = cleanLine(body.payLink, 1000);
+    let host = '';
+    try { const u = new URL(payLink); host = u.protocol === 'https:' ? u.hostname : ''; } catch {}
+    if (!host || host === 'theivybk.com' || host.endsWith('.theivybk.com')) {
+      return sendJson(res, 400, { ok: false, error: 'Paste the secure payment link copied from Toast. It starts with https://.' });
+    }
+    const mail = AGREEMENT_EMAILS.paymentLink(c, data, payLink);
+    try {
+      const result = await sendEmail({ to: data.cl.email, subject: mail.subject, text: mail.text, html: mail.html, replyTo: VENUE.eventsEmail });
+      if (result.status < 200 || result.status >= 300) {
+        throw new Error(`Resend status ${result.status}${result.body && result.body.message ? `: ${result.body.message}` : ''}`);
+      }
+    } catch (err) {
+      console.error('Payment link email failed:', err.message);
+      return sendJson(res, 502, { ok: false, error: `The email to ${data.cl.email} did not send. Check that the address is correct. (${err.message})` });
+    }
+    const now = new Date().toISOString();
+    saveAgreement(c, { toast_invoice: payLink, toast_invoice_at: now, pay_link_sent_at: now });
+    sendJson(res, 200, { ok: true, emailed: data.cl.email });
   }
 
   const EVENT_SHEET_CSS = `
@@ -2567,7 +2634,7 @@ function createContractHandlers(deps) {
       factRow('Minimum', t.min > 0 ? esc(fmtMoney(t.min)) : ''),
       factRow('Deposit', `${esc(fmtMoney(t.deposit))} (${status === 'confirmed' ? 'received' : status === 'cancelled' ? 'cancelled' : 'not received yet'})`),
       factRow('Estimated balance', `${esc(fmtMoney(t.remaining))} before tax and service charge`),
-      factRow('Toast invoice', esc(toast.invoice)),
+      factRow('Toast invoice', esc(toast.invoice.indexOf('http') === 0 ? 'Payment link saved' + (toast.sentAt ? ' and emailed to the client' : '') : toast.invoice)),
     ].join('');
 
     const box = (label) => `<li><span class="box"></span>${label}</li>`;
@@ -2704,7 +2771,7 @@ function createContractHandlers(deps) {
     };
   }
 
-  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, handleAdminVoid, handleAdminDetails, handleAdminToastInvoice, handleAdminEventSheet, previewEmails, _eventSheetHtml: eventSheetHtml, _agreementDetails: agreementDetails, _buildCalendarEvent: buildCalendarEvent };
+  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, handleAdminVoid, handleAdminDetails, handleAdminToastInvoice, handleAdminSendPaymentLink, handleAdminEventSheet, previewEmails, _eventSheetHtml: eventSheetHtml, _agreementDetails: agreementDetails, _buildCalendarEvent: buildCalendarEvent };
 }
 
 module.exports = {
