@@ -1159,7 +1159,7 @@ const AGREEMENTS_SCRIPT = `
       var d = res.d;
       var box = el('div', 'tp');
       box.appendChild(el('h4', null, 'Create this invoice in Toast'));
-      box.appendChild(el('p', null, 'In Toast Web, go to Finance > Payments > Customer invoices and create a new invoice for this client, copying the details below. After you send it, copy the invoice payment link, paste it in step 6, and email it to the client from here. When Toast shows the deposit as paid, come back and click Confirm deposit.'));
+      box.appendChild(el('p', null, 'In Toast Web, go to Finance > Payments > Customer invoices and create a new invoice for this client, copying the details below. Send it from Toast and Toast emails the client a secure link to pay. If the client never gets it, copy the payment link from the invoice, paste it in step 6, and email it to them from here. When Toast shows the deposit as paid, come back and click Confirm deposit.'));
       var links = el('p', 'tp-links');
       [['How Toast invoicing works', 'https://support.toasttab.com/en/article/How-to-Send-an-Invoice'], ['Deposit requests in Toast', 'https://support.toasttab.com/en/article/Toast-Invoicing-Deposit-Feature']].forEach(function (l) {
         var a = el('a', null, l[0]); a.href = l[1]; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a);
