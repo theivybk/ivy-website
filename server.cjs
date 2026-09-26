@@ -1928,3 +1928,10 @@ server.listen(PORT, () => {
   setTimeout(runEventReminders, 3 * 60 * 1000).unref();
   setInterval(runEventReminders, 60 * 60 * 1000).unref();
 });
+
+// Railway stops the old container with SIGTERM on every deploy. Exit cleanly so
+// the deploy is not reported as a crash.
+process.on('SIGTERM', () => {
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(0), 3000).unref();
+});
