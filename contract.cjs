@@ -191,7 +191,7 @@ const TERMS_VERSIONS = {
       html: `
         <p><strong>Deposit and effective date.</strong> A deposit of <strong>${esc(fmtMoney(t.deposit))}</strong> is required to secure the Event Date. The event is not confirmed until The Ivy has received the deposit. This agreement takes effect when The Ivy confirms the Event Date by email after receiving the deposit. That confirmation is The Ivy's acceptance, so no separate signature from The Ivy is required. If The Ivy is unable to confirm the date, any payment the Client has made will be refunded in full.</p>
         <p><strong>Date hold.</strong> The Ivy is holding the Event Date for the Client through <strong>${esc(fmtDateShort(c.exp))}</strong>. If The Ivy has not received the signed agreement and the deposit by then, The Ivy may release the date and this offer expires.</p>
-        <p><strong>How to pay.</strong> After the agreement is signed, The Ivy will contact the Client to collect the deposit by credit card. Please do not email or text card numbers.</p>
+        <p><strong>How to pay.</strong> After the agreement is signed, The Ivy will email the Client a secure invoice to pay the deposit online, or will contact the Client to arrange payment another way. Please do not email or text card numbers.</p>
         <p><strong>Credit card surcharge.</strong> Payments made by credit card, including the deposit and the final payment, carry a <strong>3% surcharge</strong>, which is added to the amount charged. The surcharge is not part of the deposit credit described below.</p>
         <p><strong>Deposit credit.</strong> The deposit is credited toward the Client's final bill.</p>
         <p><strong>Final payment.</strong> The remaining balance is due <strong>on the day of the event</strong>. Final payment must be made using <strong>one credit card</strong>; the balance cannot be split across cards. Drinks that guests buy on their own individual tabs are separate from the Client's final bill.</p>
@@ -543,7 +543,7 @@ function signFormHtml(c, token) {
       <label class="check"><input type="checkbox" name="consent" required><span>I agree to sign electronically and to receive this agreement and related notices by email.</span></label>
       <p class="err" id="sign-err" role="alert" hidden></p>
       <button type="submit" class="btn" id="sign-btn">Sign Agreement</button>
-      <p class="fine">After you sign, The Ivy will contact you to collect the ${esc(fmtMoney(t.deposit))} deposit (credit card payments carry a 3% surcharge). Your date is held through ${esc(fmtDateShort(c.exp))}. Questions? Call ${esc(VENUE.phone)} or email ${esc(VENUE.eventsEmail)}.</p>
+      <p class="fine">After you sign, The Ivy will email you a secure invoice to pay the ${esc(fmtMoney(t.deposit))} deposit online (credit card payments carry a 3% surcharge). Your date is held through ${esc(fmtDateShort(c.exp))}. Questions? Call ${esc(VENUE.phone)} or email ${esc(VENUE.eventsEmail)}.</p>
     </form>`;
 }
 
@@ -608,7 +608,7 @@ function offerPage(c, token) {
 function signedPage(data, opts) {
   const c = data.c;
   const banner = opts.justSigned
-    ? `<div class="notice ok noprint"><strong>Signed. Thank you.</strong> A copy is on its way to ${esc(data.cl.email)}. Next, The Ivy will contact you to collect the ${esc(fmtMoney(computeTotals(c).deposit))} deposit; your date is held through ${esc(fmtDateShort(c.exp))}, and it is confirmed once the deposit is received.</div>`
+    ? `<div class="notice ok noprint"><strong>Signed. Thank you.</strong> A copy is on its way to ${esc(data.cl.email)}. Next, The Ivy will email you a secure invoice to pay the ${esc(fmtMoney(computeTotals(c).deposit))} deposit online; your date is held through ${esc(fmtDateShort(c.exp))}, and it is confirmed once the deposit is received.</div>`
     : `<div class="notice ok noprint">This agreement was signed by <strong>${esc(data.sig.name)}</strong> on ${esc(fmtStamp(data.sig.at))}.</div>`;
   const body = `
     ${banner}
@@ -1009,6 +1009,22 @@ tr.detail td { background:var(--cream); }
 .msg.bad { border-left-color:var(--brick); color:var(--brick); }
 .empty { padding:22px; text-align:center; color:var(--ink-mute); font-style:italic; }
 @media (max-width:760px) { .detail .grid { grid-template-columns:1fr 1fr; } }
+.tp h4 { font:italic 600 22px/1.2 'Cormorant Garamond',Georgia,serif; color:var(--ivy); margin:0 0 6px; }
+.tp h5 { font:600 12px 'Outfit',sans-serif; letter-spacing:.08em; text-transform:uppercase; color:var(--brass-deep); margin:16px 0 6px; }
+.tp p { margin:0 0 8px; font-size:14px; }
+.tp-links a { color:var(--ivy); font-weight:600; font-size:13px; margin-right:14px; }
+.cp { display:grid; grid-template-columns:130px 1fr auto; gap:8px 12px; align-items:center; padding:5px 0; border-bottom:1px solid var(--border); font-size:14px; }
+.cp-l { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--brass-deep); font-weight:600; }
+.cp-v { overflow-wrap:anywhere; }
+.cp-b { font:600 12px 'Outfit',sans-serif; padding:5px 10px; border:1px solid var(--ivy); background:transparent; color:var(--ivy); border-radius:2px; cursor:pointer; }
+.cp-b.big { padding:9px 16px; background:var(--ivy); color:var(--cream); }
+.tp-t { width:100%; border-collapse:collapse; margin:0 0 6px; font-size:14px; }
+.tp-t td, .tp-t th { padding:5px 8px; border-bottom:1px solid var(--border); text-align:left; }
+.tp-t .r { text-align:right; white-space:nowrap; }
+.tp-list { margin:0 0 8px; padding-left:18px; font-size:14px; }
+.tp-save { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.tp-save input { flex:1 1 260px; padding:9px 10px; font:inherit; font-size:14px; background:#fff; border:1px solid var(--border); border-radius:2px; }
+@media (max-width:760px) { .cp { grid-template-columns:1fr auto; } .cp-l { grid-column:1 / -1; } }
 `;
 
 const AGREEMENTS_SCRIPT = `
@@ -1110,6 +1126,129 @@ const AGREEMENTS_SCRIPT = `
     return b;
   }
 
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+  function copyText(text, btn) {
+    var old = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', old);
+    var done = function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = old; }, 1200); };
+    try { navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); }); } catch (e) { fallbackCopy(text); done(); }
+  }
+  function copyRow(label, value) {
+    var row = el('div', 'cp');
+    row.appendChild(el('span', 'cp-l', label));
+    row.appendChild(el('span', 'cp-v', value));
+    var b = el('button', 'cp-b', 'Copy');
+    b.type = 'button';
+    b.addEventListener('click', function () { copyText(value, b); });
+    row.appendChild(b);
+    return row;
+  }
+
+  // Everything staff type into Toast, with a copy button beside each piece.
+  function buildToastPanel(td, r) {
+    td.appendChild(el('p', null, 'Loading the agreement details...'));
+    post('/admin/contracts/details', { link: r.link }).then(function (res) {
+      td.textContent = '';
+      if (!res.ok) { td.appendChild(el('p', 'err', res.d.error || 'Could not load the details.')); return; }
+      var d = res.d;
+      var box = el('div', 'tp');
+      box.appendChild(el('h4', null, 'Create this invoice in Toast'));
+      box.appendChild(el('p', null, 'In Toast Web, open Invoicing and create a new invoice for this client, copying the details below. Toast emails the client a secure link to pay. When Toast shows the deposit as paid, come back and click Confirm deposit.'));
+      var links = el('p', 'tp-links');
+      [['How Toast invoicing works', 'https://support.toasttab.com/en/article/How-to-Send-an-Invoice'], ['Deposit requests in Toast', 'https://support.toasttab.com/en/article/Toast-Invoicing-Deposit-Feature']].forEach(function (l) {
+        var a = el('a', null, l[0]); a.href = l[1]; a.target = '_blank'; a.rel = 'noopener'; links.appendChild(a);
+      });
+      box.appendChild(links);
+
+      var invoiceName = 'Private event ' + d.ref + ': ' + d.event.type + ', ' + d.event.dateLabel;
+      var invoiceNote = 'Agreement ' + d.ref + '. ' + d.event.space + ', about ' + d.event.guests + ' guests, ' + d.event.start + ' to ' + d.event.end + '.';
+
+      box.appendChild(el('h5', null, '1. Customer'));
+      box.appendChild(copyRow('Name', d.client.name));
+      box.appendChild(copyRow('Email', d.client.email));
+      box.appendChild(copyRow('Phone', d.client.phone));
+      if (d.client.company) box.appendChild(copyRow('Company', d.client.company));
+
+      box.appendChild(el('h5', null, '2. Invoice details'));
+      box.appendChild(copyRow('Invoice name', invoiceName));
+      box.appendChild(copyRow('Note to client', invoiceNote));
+
+      box.appendChild(el('h5', null, '3. Line items'));
+      var tbl = el('table', 'tp-t');
+      var head = el('tr');
+      ['Qty', 'Item', 'Price', 'Amount', ''].forEach(function (h) { head.appendChild(el('th', h === 'Price' || h === 'Amount' ? 'r' : null, h)); });
+      var thead = el('thead'); thead.appendChild(head); tbl.appendChild(thead);
+      var tb = el('tbody');
+      var itemRows = d.lines.map(function (l) { return { qty: l.qty, label: l.label, price: l.price, amount: l.amount }; });
+      if (d.adjustment > 0) itemRows.push({ qty: 1, label: 'Food and beverage minimum adjustment', price: d.adjustment, amount: d.adjustment });
+      itemRows.forEach(function (it) {
+        var tr = el('tr');
+        tr.appendChild(el('td', null, String(it.qty)));
+        tr.appendChild(el('td', null, it.label));
+        tr.appendChild(el('td', 'r', money(it.price)));
+        tr.appendChild(el('td', 'r', money(it.amount)));
+        var cell = el('td');
+        var cb = el('button', 'cp-b', 'Copy'); cb.type = 'button';
+        cb.addEventListener('click', function () { copyText(it.label, cb); });
+        cell.appendChild(cb); tr.appendChild(cell);
+        tb.appendChild(tr);
+      });
+      tbl.appendChild(tb);
+      box.appendChild(tbl);
+      box.appendChild(el('p', null, 'Total before tax and service charge: ' + money(d.totals.base) + (d.adjustment > 0 ? ' (includes the minimum adjustment, so the invoice matches the agreement)' : '') + '.'));
+
+      box.appendChild(el('h5', null, '4. Deposit request'));
+      box.appendChild(copyRow('Amount', money(d.totals.deposit)));
+      box.appendChild(copyRow('Due date', d.depositDueLabel));
+      box.appendChild(el('p', null, 'Use a fixed dollar amount. The due date is the date we are holding for the client.'));
+
+      box.appendChild(el('h5', null, '5. Check before you send'));
+      var ul = el('ul', 'tp-list');
+      ul.appendChild(el('li', null, 'Service charge: the agreement adds a required 20% service charge on food and beverage before tax (about ' + money(d.totals.service) + '). Add it the way your Toast service charge is set up.'));
+      ul.appendChild(el('li', null, 'Card surcharge: the agreement says credit card payments carry a 3% surcharge. Confirm how your Toast invoice applies it before you send the first one.'));
+      ul.appendChild(el('li', null, 'Tax: Toast adds the tax to the invoice.'));
+      box.appendChild(ul);
+
+      var all = [
+        'Customer: ' + d.client.name + ', ' + d.client.email + ', ' + d.client.phone + (d.client.company ? ', ' + d.client.company : ''),
+        'Invoice name: ' + invoiceName,
+        'Note: ' + invoiceNote,
+        'Items:'
+      ].concat(itemRows.map(function (it) { return '  ' + it.qty + ' x ' + it.label + ' @ ' + money(it.price) + ' = ' + money(it.amount); }))
+        .concat(['Deposit request: ' + money(d.totals.deposit) + ', due ' + d.depositDueLabel]).join('\\n');
+      var allBtn = el('button', 'cp-b big', 'Copy everything as text');
+      allBtn.type = 'button';
+      allBtn.addEventListener('click', function () { copyText(all, allBtn); });
+      var allP = el('p'); allP.appendChild(allBtn); box.appendChild(allP);
+
+      box.appendChild(el('h5', null, '6. Save the Toast invoice number here'));
+      var wrap = el('div', 'tp-save');
+      var inp = el('input'); inp.type = 'text'; inp.placeholder = 'Invoice number or link from Toast'; inp.value = d.toastInvoice || '';
+      var saved = el('span', 'sub', d.toastInvoice ? 'Saved.' : 'Not saved yet.');
+      var save = actionButton('Save', 'main', function () {
+        save.disabled = true;
+        post('/admin/contracts/toast-invoice', { link: r.link, invoice: inp.value }).then(function (rs) {
+          save.disabled = false;
+          if (rs.ok) { saved.textContent = inp.value.trim() ? 'Saved.' : 'Cleared.'; r.toastInvoice = rs.d.invoice; }
+          else saved.textContent = rs.d.error || 'Could not save.';
+        }).catch(function () { save.disabled = false; saved.textContent = 'Network error. Please try again.'; });
+      });
+      wrap.appendChild(inp); wrap.appendChild(save); wrap.appendChild(saved);
+      box.appendChild(wrap);
+
+      var close = el('p'); close.style.marginTop = '12px';
+      close.appendChild(actionButton('Close', '', function () { openId = null; render(); }));
+      box.appendChild(close);
+      td.appendChild(box);
+    }).catch(function () { td.textContent = 'Network error. Please try again.'; });
+  }
+
   function detailRow(r, cols) {
     var tr = el('tr', 'detail');
     var td = el('td');
@@ -1144,6 +1283,8 @@ const AGREEMENTS_SCRIPT = `
       row2.appendChild(go);
       row2.appendChild(actionButton('Close', '', function () { openId = null; render(); }));
       td.appendChild(row2);
+    } else if (openMode === 'toast') {
+      buildToastPanel(td, r);
     } else if (openMode === 'void') {
       var pv = el('p', null, 'Void this agreement? The link stops working right away and the client can no longer sign it. Use this for a mistake, or a booking that fell through before it was signed.');
       pv.style.margin = '0 0 10px';
@@ -1211,6 +1352,7 @@ const AGREEMENTS_SCRIPT = `
       if (r.status === 'pending') c3.appendChild(el('span', 'sub', 'Hold through ' + r.holdThrough));
       if (r.status === 'expired') c3.appendChild(el('span', 'sub', 'Hold ended ' + r.holdThrough));
       var c4 = el('td', null, r.deposit || '');
+      if (r.toastInvoice) c4.appendChild(el('span', 'sub', 'Toast invoice ' + r.toastInvoice));
       var c5 = el('td');
       var acts = el('div', 'acts');
       var link = r.link;
@@ -1232,6 +1374,12 @@ const AGREEMENTS_SCRIPT = `
       }
       if (r.status === 'awaiting') {
         acts.appendChild(actionButton('Void', 'danger', function () { openId = r.ref; openMode = 'void'; render(); }));
+      }
+      if (r.status === 'pending' || r.status === 'confirmed') {
+        acts.appendChild(actionButton('Toast invoice', r.status === 'pending' && !r.toastInvoice ? 'main' : '', function () { openId = r.ref; openMode = 'toast'; render(); }));
+        var sheet = el('a', 'b', 'Event sheet');
+        sheet.href = '/admin/event-sheet/' + tokenOf(r.link); sheet.target = '_blank'; sheet.rel = 'noopener';
+        acts.appendChild(sheet);
       }
       if (r.status === 'pending') {
         acts.appendChild(actionButton('Confirm deposit', 'main', function () { openId = r.ref; openMode = 'confirm'; render(); }));
@@ -1332,14 +1480,14 @@ const AGREEMENT_EMAILS = {
     const rows = [...eventRows(c), ['Deposit to secure the date', fmtMoney(t.deposit)], ['Date held through', fmtDateShort(c.exp)]];
     return {
       subject: 'Your event agreement | The Ivy Bar and Kitchen',
-      text: `Hi ${c.name},\n\nThanks for choosing The Ivy for your ${c.type.toLowerCase()} on ${fmtDate(c.date)}. Your event agreement is ready to review and sign:\n\n${url}\n\n${rowsToText(rows)}\n\nWe're holding the date through ${fmtDateShort(c.exp)}. To keep it, please sign and we'll follow up to collect the deposit. Credit card payments carry a 3% surcharge.\n\n${clientSignoff}`,
+      text: `Hi ${c.name},\n\nThanks for choosing The Ivy for your ${c.type.toLowerCase()} on ${fmtDate(c.date)}. Your event agreement is ready to review and sign:\n\n${url}\n\n${rowsToText(rows)}\n\nWe're holding the date through ${fmtDateShort(c.exp)}. To keep it, please sign and we'll email you a secure invoice to pay the deposit online. Credit card payments carry a 3% surcharge.\n\n${clientSignoff}`,
       html: E.emailTemplate({
         heading: 'Your event agreement',
         bodyHtml: E.emailPara(`Hi ${c.name},`)
           + E.emailPara(`Thanks for choosing The Ivy for your ${c.type.toLowerCase()} on ${fmtDate(c.date)}. Your agreement is ready to review and sign.`)
           + E.emailDetails(rows, 170)
           + E.emailButton('Review & Sign Agreement', url)
-          + E.emailPara(`We're holding the date through ${fmtDateShort(c.exp)}. To keep it, sign the agreement and we'll follow up to collect the deposit. Credit card payments carry a 3% surcharge.`)
+          + E.emailPara(`We're holding the date through ${fmtDateShort(c.exp)}. To keep it, sign the agreement and we'll email you a secure invoice to pay the deposit online. Credit card payments carry a 3% surcharge.`)
           + E.emailContact(),
       }),
     };
@@ -1351,14 +1499,14 @@ const AGREEMENT_EMAILS = {
     const rows = [...eventRows(c), ['Deposit to secure the date', fmtMoney(t.deposit)], ['Date held through', fmtDateShort(c.exp)], ['Reference', refOf(c)]];
     return {
       subject: 'Your signed agreement | The Ivy Bar and Kitchen',
-      text: `Hi ${c.name},\n\nThank you for signing your private event agreement with The Ivy Bar and Kitchen. A copy is attached, and you can view it any time here:\n${signedLink}\n\n${rowsToText(rows)}\n\nNext, we'll contact you to collect the deposit. Credit card payments carry a 3% surcharge. Your date is confirmed once we receive it.\n\n${clientSignoff}`,
+      text: `Hi ${c.name},\n\nThank you for signing your private event agreement with The Ivy Bar and Kitchen. A copy is attached, and you can view it any time here:\n${signedLink}\n\n${rowsToText(rows)}\n\nNext, we'll email you a secure invoice to pay the deposit online. Credit card payments carry a 3% surcharge. Your date is confirmed once we receive it.\n\n${clientSignoff}`,
       html: E.emailTemplate({
         heading: 'Thank you for signing',
         bodyHtml: E.emailPara(`Hi ${c.name},`)
           + E.emailPara('Thank you for signing your private event agreement. A copy is attached, and you can view it any time with the button below.')
           + E.emailDetails(rows, 170)
           + E.emailButton('View signed agreement', signedLink)
-          + E.emailCallout('What happens next', `We'll contact you to collect the ${fmtMoney(t.deposit)} deposit. Credit card payments carry a 3% surcharge. Your date is confirmed once we receive it.`)
+          + E.emailCallout('What happens next', `We'll email you a secure invoice to pay the ${fmtMoney(t.deposit)} deposit online. Credit card payments carry a 3% surcharge. Your date is confirmed once we receive it.`)
           + E.emailContact(),
       }),
     };
@@ -1431,11 +1579,11 @@ const AGREEMENT_EMAILS = {
     ];
     return {
       subject: `Agreement Signed: ${c.name}, ${c.date} (${refOf(c)})`,
-      text: `${sd.sig.name} signed the agreement for ${c.name}'s ${c.type.toLowerCase()} on ${fmtStamp(sd.sig.at)}.\n\n${rowsToText(rows)}\n\nSigned agreement: ${signedLink}\n\nThe signed copy is attached. Next: collect the ${fmtMoney(t.deposit)} deposit, then confirm it on the Agreements page: ${AGREEMENTS_URL}`,
+      text: `${sd.sig.name} signed the agreement for ${c.name}'s ${c.type.toLowerCase()} on ${fmtStamp(sd.sig.at)}.\n\n${rowsToText(rows)}\n\nSigned agreement: ${signedLink}\n\nThe signed copy is attached. Next: send the Toast invoice for the ${fmtMoney(t.deposit)} deposit (the "Toast invoice" button on the Agreements page shows what to enter), then confirm the deposit there once Toast shows it paid: ${AGREEMENTS_URL}`,
       html: E.emailTemplate({
         heading: 'Agreement signed',
         bodyHtml: E.emailPara(`${sd.sig.name} signed the agreement for ${c.name}'s ${c.type.toLowerCase()} on ${fmtStamp(sd.sig.at)}.`)
-          + E.emailCallout('Next step', `Collect the ${fmtMoney(t.deposit)} deposit, then confirm it on the Agreements page so the client gets their confirmation.`)
+          + E.emailCallout('Next step', `Send the ${fmtMoney(t.deposit)} deposit invoice in Toast (the Agreements page shows exactly what to enter), then confirm the deposit there once Toast shows it paid.`)
           + E.emailDetails(rows, 170)
           + E.emailButton('View signed agreement', signedLink)
           + E.emailLink('Open the Agreements page', AGREEMENTS_URL)
@@ -1615,10 +1763,20 @@ function createContractHandlers(deps) {
       CREATE INDEX IF NOT EXISTS agreements_event_date ON agreements (event_date);
     `);
   }
+  // Added after the first release: the Toast invoice reference for each agreement.
+  if (db) {
+    try {
+      const have = db.prepare('PRAGMA table_info(agreements)').all().map((col) => col.name);
+      if (!have.includes('toast_invoice')) db.exec('ALTER TABLE agreements ADD COLUMN toast_invoice TEXT');
+      if (!have.includes('toast_invoice_at')) db.exec('ALTER TABLE agreements ADD COLUMN toast_invoice_at TEXT');
+    } catch (err) {
+      console.error('Agreement table upgrade error:', err.message);
+    }
+  }
   const AGREEMENT_COLUMNS = new Set([
     'status', 'company', 'phone', 'email', 'link', 'emailed_at', 'signed_at', 'signed_by', 'signed_link',
     'day_of_name', 'day_of_phone', 'deposit_received', 'deposit_received_on', 'deposit_method', 'deposit_note',
-    'confirmed_at', 'cancelled_at', 'cancel_note',
+    'confirmed_at', 'cancelled_at', 'cancel_note', 'toast_invoice', 'toast_invoice_at',
   ]);
 
   // Makes sure the agreement has a row (built from the agreement data itself,
@@ -2179,6 +2337,7 @@ function createContractHandlers(deps) {
           deposit: r.deposit != null ? fmtMoney(r.deposit) : '',
           holdThrough: r.hold_through ? fmtDateShort(r.hold_through) : '',
           link: r.signed_link || r.link || '',
+          toastInvoice: r.toast_invoice || '',
         }));
       } catch (err) {
         console.error('Agreements list database error:', err.message);
@@ -2275,6 +2434,188 @@ function createContractHandlers(deps) {
     sendJson(res, 200, { ok: true });
   }
 
+  // ---- Toast invoice helper and event sheet (admin)
+  //
+  // Deposits are collected with a Toast invoice. Toast has no way for other
+  // software to create invoices, so the Agreements page shows staff exactly what
+  // to enter, and the Toast invoice number is saved back on the agreement.
+
+  function getToastInvoice(id) {
+    if (!db) return { invoice: '', at: '' };
+    try {
+      const row = db.prepare('SELECT toast_invoice, toast_invoice_at FROM agreements WHERE id = ?').get(id);
+      return { invoice: (row && row.toast_invoice) || '', at: (row && row.toast_invoice_at) || '' };
+    } catch (err) {
+      console.error('Toast invoice lookup error:', err.message);
+      return { invoice: '', at: '' };
+    }
+  }
+
+  function agreementDetails(c, data) {
+    const t = computeTotals(c);
+    const row = getAgreementRow(c.id);
+    const toast = getToastInvoice(c.id);
+    return {
+      ref: refOf(c),
+      status: row ? row.status : 'pending',
+      client: {
+        name: c.name,
+        company: data.cl.company || '',
+        phone: data.cl.phone,
+        email: data.cl.email,
+        dayName: data.cl.dayName || '',
+        dayPhone: data.cl.dayPhone || '',
+      },
+      event: {
+        type: c.type,
+        date: c.date,
+        dateLabel: fmtDate(c.date),
+        start: fmtTime(c.start),
+        end: fmtTime(c.end),
+        arrive: c.arrive ? fmtTime(c.arrive) : '',
+        space: c.space,
+        guests: c.guests,
+      },
+      lines: c.lines.map((l) => ({ label: l[0], qty: l[1], price: l[2], amount: r2(l[1] * l[2]), kind: l[3] })),
+      adjustment: t.min > t.est ? r2(t.min - t.est) : 0,
+      totals: t,
+      sel: c.sel || '',
+      notes: c.notes || '',
+      depositDueLabel: fmtDateShort(c.exp),
+      toastInvoice: toast.invoice,
+      toastInvoiceAt: toast.at,
+    };
+  }
+
+  async function handleAdminDetails(req, res) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    let body;
+    try { body = await readJsonBody(req); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+    const data = open(tokenFromLink(body.link));
+    if (!data || data.k !== 'signed') return sendJson(res, 400, { ok: false, error: 'Only a signed agreement has an invoice to create.' });
+    sendJson(res, 200, { ok: true, ...agreementDetails(data.c, data) });
+  }
+
+  async function handleAdminToastInvoice(req, res) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    let body;
+    try { body = await readJsonBody(req); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+    const data = open(tokenFromLink(body.link));
+    if (!data || data.k !== 'signed') return sendJson(res, 400, { ok: false, error: 'That is not a signed agreement.' });
+    const invoice = cleanLine(body.invoice, 200);
+    saveAgreement(data.c, { toast_invoice: invoice || null, toast_invoice_at: invoice ? new Date().toISOString() : null });
+    sendJson(res, 200, { ok: true, invoice });
+  }
+
+  const EVENT_SHEET_CSS = `
+.sheet { max-width:860px; }
+.es-actions { display:flex; gap:10px; margin:0 0 16px; }
+.es-actions a, .es-actions button { font:600 13px 'Outfit',sans-serif; padding:9px 16px; border-radius:2px; border:1px solid var(--ivy); background:var(--ivy); color:var(--cream); cursor:pointer; text-decoration:none; }
+.es-actions a { background:transparent; color:var(--ivy); }
+.es h1 { font-size:34px; margin:0 0 4px; }
+.es h2 { font-size:22px; margin:26px 0 8px; }
+.es .lede { margin:0 0 14px; }
+.es .pill { display:inline-block; padding:2px 10px; border-radius:2px; font-size:12px; font-weight:600; background:#F3E6BF; color:#6B5316; }
+.es .pill.confirmed { background:#DCEBDD; color:#1F5A34; }
+.es .pill.cancelled { background:#E7E5E0; color:#555; }
+.checks { list-style:none; padding:0; margin:0; columns:2; column-gap:28px; }
+.checks li { margin:0 0 8px; break-inside:avoid; }
+.box { display:inline-block; width:14px; height:14px; border:1.5px solid #14140F; margin-right:9px; vertical-align:-2px; }
+.blank { display:inline-block; min-width:90px; border-bottom:1px solid #14140F; }
+@media print { .es-actions { display:none; } .doc { padding:0; } body { font-size:13px; } .checks { columns:2; } }
+`;
+
+  // A one-page sheet for the kitchen and floor: what is booked, when, what is
+  // being served, and a checklist. Opens from the Agreements page.
+  function eventSheetHtml(c, data) {
+    const t = computeTotals(c);
+    const row = getAgreementRow(c.id);
+    const toast = getToastInvoice(c.id);
+    const status = row ? row.status : 'pending';
+    const statusLabel = { pending: 'Deposit pending', confirmed: 'Confirmed', cancelled: 'Cancelled' }[status] || status;
+    const cl = data.cl;
+    const bevCount = c.lines.filter((l) => l[3] === 'bev').reduce((n, l) => n + l[1], 0);
+    const foodCount = c.lines.filter((l) => l[3] === 'food').reduce((n, l) => n + l[1], 0);
+    const deadline = fmtDate(new Date(Date.parse(c.date + 'T12:00:00Z') - 7 * 86400000).toISOString().slice(0, 10));
+    const [sh, sm] = c.start.split(':').map((n) => parseInt(n, 10));
+    const setupMins = (sh * 60 + sm - 30 + 1440) % 1440;
+    const setup = fmtTime(`${String(Math.floor(setupMins / 60)).padStart(2, '0')}:${String(setupMins % 60).padStart(2, '0')}`);
+
+    const facts = [
+      factRow('Date', esc(fmtDate(c.date))),
+      factRow('Setup', esc(setup)),
+      factRow('Event', `${esc(fmtTime(c.start))} to ${esc(fmtTime(c.end))}`),
+      factRow('Guest arrival', c.arrive ? esc(fmtTime(c.arrive)) : ''),
+      factRow('Space', esc(c.space)),
+      factRow('Estimated guests', esc(c.guests), `Final count due ${esc(deadline)}`),
+      factRow('Client', esc(c.name + (cl.company ? ` (${cl.company})` : ''))),
+      factRow('Phone', esc(cl.phone)),
+      factRow('Email', esc(cl.email)),
+      factRow('Day-of contact', esc(cl.dayName ? `${cl.dayName}${cl.dayPhone ? `, ${cl.dayPhone}` : ''}` : 'Same as client')),
+    ].join('');
+
+    const linesHtml = c.lines.length
+      ? `<table class="tbl"><thead><tr><th>Qty</th><th>Item</th></tr></thead><tbody>${c.lines.map((l) => `<tr><td class="r">${esc(l[1])}</td><td>${esc(l[0])}</td></tr>`).join('')}</tbody></table>`
+      : '<p>No selections yet. Menu selections come with the final guest count.</p>';
+    const counts = [
+      foodCount ? `Buffet for ${foodCount} guests` : '',
+      bevCount ? `${bevCount} beverage wristbands` : '',
+    ].filter(Boolean).join(' &middot; ');
+
+    const money = [
+      factRow('Estimated food & beverage', esc(fmtMoney(t.est))),
+      factRow('Minimum', t.min > 0 ? esc(fmtMoney(t.min)) : ''),
+      factRow('Deposit', `${esc(fmtMoney(t.deposit))} (${status === 'confirmed' ? 'received' : status === 'cancelled' ? 'cancelled' : 'not received yet'})`),
+      factRow('Estimated balance', `${esc(fmtMoney(t.remaining))} before tax and service charge`),
+      factRow('Toast invoice', esc(toast.invoice)),
+    ].join('');
+
+    const box = (label) => `<li><span class="box"></span>${label}</li>`;
+    const body = `
+      <div class="es">
+        <div class="es-actions"><button type="button" onclick="window.print()">Print</button><a href="/admin/agreements">Back to agreements</a></div>
+        <div class="doc">
+          <span class="eyebrow">Event sheet &middot; ${esc(refOf(c))} &middot; <span class="pill ${esc(status)}">${esc(statusLabel)}</span></span>
+          <h1>${esc(c.type)}: ${esc(c.name)}</h1>
+          <p class="lede">${esc(fmtDate(c.date))} &middot; ${esc(fmtTime(c.start))} to ${esc(fmtTime(c.end))} &middot; ${esc(c.space)}</p>
+          <h2>Event</h2>
+          <table class="facts">${facts}</table>
+          <h2>Food &amp; drink</h2>
+          ${counts ? `<p><strong>${counts}</strong></p>` : ''}
+          ${linesHtml}
+          ${c.sel ? `<p><strong>Menu selections.</strong><br>${multiline(c.sel)}</p>` : '<p><strong>Menu selections.</strong> Not received yet.</p>'}
+          <h2>Notes &amp; special arrangements</h2>
+          <p>${c.notes ? multiline(c.notes) : 'None.'}</p>
+          <h2>Dietary needs</h2>
+          <p><span class="blank" style="min-width:100%">&nbsp;</span></p>
+          <h2>Money</h2>
+          <table class="facts">${money}</table>
+          <h2>Checklist</h2>
+          <ul class="checks">
+            ${box('Deposit received')}
+            ${box('Final guest count received')}
+            ${box('Menu selections received')}
+            ${box('Dietary needs noted')}
+            ${box('Wristbands counted')}
+            ${box('Decorations approved')}
+            ${box('Outside vendors approved')}
+            ${box('Space set up')}
+            ${box('Final payment taken')}
+          </ul>
+        </div>
+      </div>`;
+    return shell({ title: `Event sheet ${refOf(c)} | ${VENUE.name}`, body }).replace('</style>', () => `${EVENT_SHEET_CSS}</style>`);
+  }
+
+  function handleAdminEventSheet(req, res, token) {
+    if (!checkBasicAuth(req)) return denyAdmin(res);
+    const data = open(token);
+    if (!data || data.k !== 'signed') {
+      return sendHtml(res, 404, statusPage('Event sheet not found', 'Open the event sheet from the Agreements page. It is only available for signed agreements.'));
+    }
+    sendHtml(res, 200, eventSheetHtml(data.c, data));
+  }
+
   function cleanLine(v, max) {
     return typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, max) : '';
   }
@@ -2363,7 +2704,7 @@ function createContractHandlers(deps) {
     };
   }
 
-  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, handleAdminVoid, previewEmails, _buildCalendarEvent: buildCalendarEvent };
+  return { handleView, handleSign, handleAdminPage, handleAdminCreate, handleAdminEmail, handleAdminLookup, handleAdminConfirmDeposit, handleAdminAgreementsPage, handleAdminAgreementsData, handleAdminCancel, handleAdminVoid, handleAdminDetails, handleAdminToastInvoice, handleAdminEventSheet, previewEmails, _eventSheetHtml: eventSheetHtml, _agreementDetails: agreementDetails, _buildCalendarEvent: buildCalendarEvent };
 }
 
 module.exports = {
