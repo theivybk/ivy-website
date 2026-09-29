@@ -17,21 +17,42 @@ const jsonLd = {
   }
 };
 
-const bottles = [
-  { name: "Blanton's Single Barrel", size: '750ml', price: 105 },
-  { name: 'Weller 12 Year', size: '1L', price: 80 },
-  { name: 'Weller Full Proof', size: '750ml', price: 75 },
-  { name: 'E.H. Taylor Small Batch', size: '750ml', price: 65 },
-  { name: 'Eagle Rare 10 Year', size: '750ml', price: 55 },
-  { name: 'Weller Special Reserve', size: '1L', price: 45 },
-  { name: 'Buffalo Trace', size: '1L', price: 35 },
+const categories = [
+  {
+    label: 'Bourbon',
+    bottles: [
+      { name: "Blanton's Single Barrel", size: '750ml', price: 105 },
+      { name: 'Weller 12 Year', size: '1L', price: 80 },
+      { name: 'Weller Full Proof', size: '750ml', price: 75 },
+      { name: 'E.H. Taylor Small Batch', size: '750ml', price: 65 },
+      { name: 'Eagle Rare 10 Year', size: '750ml', price: 55 },
+      { name: 'Weller Special Reserve', size: '1L', price: 45 },
+      { name: 'Buffalo Trace', size: '1L', price: 35 },
+    ],
+  },
+  {
+    label: 'Wine',
+    bottles: [
+      { name: 'Austin Hope Cabernet', size: '1L', price: 46 },
+      { name: 'Maison Saint Aix Rosé', size: '750ml', price: 23 },
+      { name: 'Rombauer Sauvignon Blanc', size: '750ml', price: 22 },
+      { name: 'Raeburn Pinot Noir', size: '750ml', price: 19 },
+      { name: 'Forever Summer Rosé', size: '750ml', price: 16 },
+      { name: 'Flora Lisa Pinot Grigio', size: '750ml', price: 16 },
+      { name: 'Liberty School Cabernet', size: '750ml', price: 16 },
+      { name: 'Troublemaker Red Blend', size: '750ml', price: 16 },
+      { name: 'Villa Maria Sauvignon Blanc', size: '750ml', price: 16 },
+      { name: 'Barnard Griffin Chardonnay', size: '750ml', price: 15 },
+      { name: 'Zardetto Spumante Brut', size: '750ml', price: 14 },
+    ],
+  },
 ];
 ---
 <Layout
   title="Bottles To-Go | The Ivy Bar and Kitchen"
-  description="Allocated bourbon to take home from The Ivy Bar and Kitchen in Lakeview, Chicago: Blanton's, Weller, Eagle Rare, E.H. Taylor and more, while supplies last."
+  description="Allocated bourbon and wine to take home from The Ivy Bar and Kitchen in Lakeview, Chicago: Blanton's, Weller, Eagle Rare and a short wine list, while supplies last."
   ogTitle="Bottles To-Go | The Ivy Bar and Kitchen"
-  ogDescription="Allocated bourbon to take home: Blanton's, Weller, Eagle Rare, E.H. Taylor and more, while supplies last."
+  ogDescription="Allocated bourbon and wine to take home, while supplies last."
   ogImage="https://theivybk.com/assets/img/gallery/DSC_0648.webp"
   canonicalPath="/bottles-to-go"
   jsonLd={jsonLd}
@@ -47,21 +68,24 @@ const bottles = [
   <div class="wrap">
     <span class="eyebrow">Take Home</span>
     <h1>Bottles To-Go</h1>
-    <p>The bottles everyone's hunting for. We hold a few back to sell by the bottle, first come, first served.</p>
+    <p>Allocated bourbon and a short wine list, ready to take home. Sold by the bottle, first come, first served.</p>
   </div>
 </section>
 
 <section class="bottles-section">
   <div class="wrap">
-    <div class="bottles-list">
-      {bottles.map((b) => (
-        <div class="bottle-row">
-          <span class="name">{b.name}<span class="size">{b.size}</span></span>
-          <span class="leader"></span>
-          <span class="price">${b.price}</span>
-        </div>
-      ))}
-    </div>
+    {categories.map((cat) => (
+      <div class="bottles-list">
+        <h2 class="subhead">{cat.label}</h2>
+        {cat.bottles.map((b) => (
+          <div class="bottle-row">
+            <span class="name">{b.name}<span class="size">{b.size}</span></span>
+            <span class="leader"></span>
+            <span class="price">${b.price}</span>
+          </div>
+        ))}
+      </div>
+    ))}
     <p class="bottles-note">Stock changes week to week. Call ahead to see what's in before you make the trip. Must be 21 or older with valid ID — limit one bottle per customer while supplies last.</p>
     <a href="tel:+17737998160" class="btn btn--primary">Call (773) 799-8160</a>
   </div>
@@ -78,7 +102,12 @@ const bottles = [
   .page-hero p { color: var(--fg-2); max-width: 480px; margin: 0 auto; }
 
   .bottles-section { padding: var(--sp-9) 0 var(--sp-11); text-align: center; }
-  .bottles-list { max-width: 520px; margin: 0 auto var(--sp-7); text-align: left; }
+  .bottles-list { max-width: 520px; margin: 0 auto var(--sp-8); text-align: left; }
+  .bottles-list .subhead {
+    font-family: var(--font-ui); font-size: var(--fs-2xs); font-weight: 600;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--ivy);
+    margin: 0 0 var(--sp-3); padding-bottom: 6px; border-bottom: 1px solid var(--border-hair);
+  }
   .bottle-row { display: flex; align-items: baseline; gap: 8px; padding: var(--sp-4) 0; border-bottom: 1px solid var(--border-hair); }
   .bottle-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-xl); }
   .bottle-row .size { font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--brass-deep); margin-left: 8px; }
