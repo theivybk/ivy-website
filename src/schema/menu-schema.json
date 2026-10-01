@@ -537,24 +537,6 @@
               "hasMenuItem": [
                 {
                   "@type": "MenuItem",
-                  "name": "Revolution Oktoberfest",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Bell's Octoberfest",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
                   "name": "Paulaner Oktoberfest",
                   "offers": {
                     "@type": "Offer",
@@ -594,7 +576,7 @@
               "hasMenuItem": [
                 {
                   "@type": "MenuItem",
-                  "name": "Bells Oberon Ale",
+                  "name": "Bell's Oberon Eclipse",
                   "offers": {
                     "@type": "Offer",
                     "price": "7",
@@ -636,7 +618,16 @@
                 },
                 {
                   "@type": "MenuItem",
-                  "name": "Lagunitas A Little Sumpin' Sumpin'",
+                  "name": "Half Acre Sunset Vallejo",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Lagunitas Trooper IPA",
                   "offers": {
                     "@type": "Offer",
                     "price": "7",
@@ -685,6 +676,21 @@
                 {
                   "@type": "MenuItem",
                   "name": "Phase Three P3 Amber",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "Sour",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Revolution Freedom of Speach",
                   "offers": {
                     "@type": "Offer",
                     "price": "7",
@@ -820,6 +826,16 @@
                 "price": "6",
                 "priceCurrency": "USD"
               }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Upland Hoosier Gameday Lager",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
             }
           ]
         },
@@ -858,15 +874,6 @@
             {
               "@type": "MenuItem",
               "name": "Florida Seltzer Orange Yuzu",
-              "offers": {
-                "@type": "Offer",
-                "price": "7",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Florida Seltzer Strawberry Kiwi",
               "offers": {
                 "@type": "Offer",
                 "price": "7",
@@ -983,16 +990,6 @@
             {
               "@type": "MenuItem",
               "name": "Schilling Cider Moon Berries",
-              "description": "Can",
-              "offers": {
-                "@type": "Offer",
-                "price": "6",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Schilling Cider Yuzu Peach",
               "description": "Can",
               "offers": {
                 "@type": "Offer",
@@ -1179,7 +1176,7 @@
                   "description": "Tequila, Gran Gala orange liqueur, fresh lime juice, agave nectar — classic, mango, or spicy",
                   "offers": {
                     "@type": "Offer",
-                    "price": "14",
+                    "price": "15",
                     "priceCurrency": "USD"
                   }
                 },
