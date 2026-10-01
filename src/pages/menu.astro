@@ -607,7 +607,7 @@ const jsonLd = {
   .item .opts { font-family: var(--font-ui); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--brass-deep); margin-top: 2px; }
 
   .beer-row { display: flex; align-items: baseline; gap: 6px; margin: 3px 0; }
-  .beer-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); min-width: 0; }
+  .beer-row .name { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .beer-row .name em { font-style: normal; font-family: var(--font-ui); font-size: 10px; color: var(--fg-3); margin-left: 6px; text-transform: uppercase; }
   .beer-row .leader { flex: 1; height: 1px; border-bottom: 1px dotted var(--border-strong); transform: translateY(-3px); min-width: 10px; }
   .beer-row .price { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-sm); color: var(--brass-deep); }
