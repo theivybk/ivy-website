@@ -1347,6 +1347,23 @@
 <script>
   (async () => {
     try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+
+    // A handful of item names are too long for their column at full size.
+    // Rather than wrap to a second line or truncate with an ellipsis, shrink
+    // just that name's font a little at a time until it fits on one line, so
+    // the dotted leader and price still land in the same place as every
+    // other row. Most rows never touch this; only the few long outliers do.
+    document.querySelectorAll('.brow .name').forEach((el) => {
+      let size = parseFloat(getComputedStyle(el).fontSize);
+      const min = 12.5;
+      let guard = 0;
+      while (el.scrollWidth > el.clientWidth + 0.5 && size > min && guard < 30) {
+        size -= 0.25;
+        el.style.fontSize = size + 'px';
+        guard++;
+      }
+    });
+
     setTimeout(() => window.print(), 800);
   })();
 </script>
