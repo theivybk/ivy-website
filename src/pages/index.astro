@@ -321,6 +321,12 @@ const jsonLd = {
     <span class="eyebrow" style="color:var(--brass-light)">Game Day &amp; Concert Nights</span>
     <h2>Three blocks from Wrigley Field</h2>
     <p>Catch the game or grab a bite before the show — TVs throughout the bar, dining room, and rooftop, plus Chicago Tavern &amp; Detroit Pan pizza, smash burgers, and drinks to fuel the walk over. Reserve ahead on game days and concert nights, since we fill up fast.</p>
+    <div class="gameday-posts">
+      <figure class="gameday-post">
+        <img src="/assets/img/gameday/bears-bingo.webp?v=20261011" alt="Bears Bingo at The Ivy: Bears at Packers, Sunday at noon. First bingo wins a $100 gift card." width="1080" height="1350" loading="lazy">
+        <figcaption>Bears Bingo this Sunday, Bears at Packers at noon. Free cards at the bar, and the first bingo wins a $100 gift card.</figcaption>
+      </figure>
+    </div>
     <div class="gameday-ctas">
       <a href="#reserve" class="btn btn--primary">Reserve a Table</a>
       <a href="/menu" class="btn btn--brass-outline">View Menus</a>
@@ -748,6 +754,10 @@ const jsonLd = {
   }
   .gameday-teaser h2 { color: var(--cream); font-size: var(--fs-5xl); font-style: italic; margin-top: var(--sp-2); }
   .gameday-teaser p { max-width: 620px; margin: 0 auto var(--sp-7); color: rgba(245,239,227,.85); }
+  .gameday-posts { display: flex; gap: var(--sp-6); justify-content: center; flex-wrap: wrap; margin: 0 auto var(--sp-7); }
+  .gameday-post { margin: 0; width: 100%; max-width: 420px; }
+  .gameday-post img { display: block; width: 100%; height: auto; border-radius: var(--r-sm); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  .gameday-post figcaption { margin-top: var(--sp-3); color: rgba(245,239,227,.8); font-size: var(--fs-sm); }
   .gameday-ctas { display: flex; gap: var(--sp-4); justify-content: center; flex-wrap: wrap; }
 
   /* ── TRIVIA TEASER ───────────────────────────────────── */
