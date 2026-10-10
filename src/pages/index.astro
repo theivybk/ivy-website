@@ -105,6 +105,14 @@ const faqLd = {
     },
     {
       "@type": "Question",
+      "name": "What are the rooftop hours?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The rooftop is open Monday through Thursday 3pm to 10pm, Friday and Saturday 11am to 11pm, and Sunday 11am to 10pm, weather permitting. Call (773) 799-8160 if you want to check conditions before you head over."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "Is the rooftop 21 and over?",
       "acceptedAnswer": {
         "@type": "Answer",
@@ -493,6 +501,12 @@ const jsonLd = {
         <tr><td><span class="status-dot"></span>Saturday</td><td>11am – 1am</td></tr>
         <tr><td><span class="status-dot"></span>Sunday</td><td>11am – 12am</td></tr>
       </table>
+      <h3 class="hours-sub">Rooftop <span>· weather permitting</span></h3>
+      <table class="hours-table">
+        <tr><td><span class="status-dot"></span>Monday – Thursday</td><td>3pm – 10pm</td></tr>
+        <tr><td><span class="status-dot"></span>Friday &amp; Saturday</td><td>11am – 11pm</td></tr>
+        <tr><td><span class="status-dot"></span>Sunday</td><td>11am – 10pm</td></tr>
+      </table>
     </div>
     <div id="contact">
       <span class="eyebrow">Location</span>
@@ -543,6 +557,10 @@ const jsonLd = {
       <details class="faq-item">
         <summary>Can kids eat here?</summary>
         <p>Absolutely. We have a full kids menu for guests twelve and under, plus activity pages to keep them busy while the food comes out.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What are the rooftop hours?</summary>
+        <p>The rooftop is open Monday through Thursday 3pm to 10pm, Friday and Saturday 11am to 11pm, and Sunday 11am to 10pm, weather permitting. Call <a href="tel:+17737998160" style="border-bottom:1px solid var(--brass);">(773) 799-8160</a> if you want to check conditions before you head over.</p>
       </details>
       <details class="faq-item">
         <summary>Is the rooftop 21 and over?</summary>
@@ -773,6 +791,8 @@ const jsonLd = {
   .hours-table tr { border-bottom: 1px solid var(--border-hair); }
   .hours-table td { padding: var(--sp-3) 0; font-family: var(--font-ui); font-size: var(--fs-sm); }
   .hours-table td:last-child { text-align: right; color: var(--fg-2); }
+  .hours-sub { margin: var(--sp-7) 0 var(--sp-2); font-size: var(--fs-2xl); font-style: italic; }
+  .hours-sub span { font-family: var(--font-ui); font-style: normal; font-size: var(--fs-sm); color: var(--fg-3); }
   .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: var(--r-pill); background: var(--status-open); margin-right: 8px; }
   .addr-block p { font-family: var(--font-ui); font-size: var(--fs-sm); color: var(--fg-2); margin-bottom: var(--sp-3); }
   .map-embed { border: 1px solid var(--border-hair); border-radius: var(--r-sm); overflow: hidden; height: 280px; margin-top: var(--sp-5); }
