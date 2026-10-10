@@ -321,21 +321,6 @@ const jsonLd = {
     <span class="eyebrow" style="color:var(--brass-light)">Game Day &amp; Concert Nights</span>
     <h2>Three blocks from Wrigley Field</h2>
     <p>Catch the game or grab a bite before the show — TVs throughout the bar, dining room, and rooftop, plus Chicago Tavern &amp; Detroit Pan pizza, smash burgers, and drinks to fuel the walk over. Reserve ahead on game days and concert nights, since we fill up fast.</p>
-    <div class="gameday-promos">
-      <div class="gameday-promo">
-        <h3>Bears Bingo</h3>
-        <p>Free bingo cards at the bar every Bears game. First bingo wins a prize.</p>
-      </div>
-      <div class="gameday-promo">
-        <h3>IU Game Days</h3>
-        <p>The Hoosier menu, and 15% of its sales go to the IUAA Chicago Chapter Scholarship Fund.</p>
-        <ul class="hoosier-menu">
-          <li><span><span class="hm-name">Hoosierita</span><span class="hm-desc">Tequila, Sarti, lime, agave, Aperol float</span></span><span class="hm-price">$15</span></li>
-          <li><span><span class="hm-name">Hoosier Pizza</span><span class="hm-desc">Tavern-style, red sauce, chopped pepperoni, green peppers, onions</span></span><span class="hm-price">$27</span></li>
-          <li><span><span class="hm-name">Upland Hoosier Gameday Lager</span><span class="hm-desc">16 oz can</span></span><span class="hm-price">$7</span></li>
-        </ul>
-      </div>
-    </div>
     <div class="gameday-ctas">
       <a href="#reserve" class="btn btn--primary">Reserve a Table</a>
       <a href="/menu" class="btn btn--brass-outline">View Menus</a>
@@ -763,27 +748,6 @@ const jsonLd = {
   }
   .gameday-teaser h2 { color: var(--cream); font-size: var(--fs-5xl); font-style: italic; margin-top: var(--sp-2); }
   .gameday-teaser p { max-width: 620px; margin: 0 auto var(--sp-7); color: rgba(245,239,227,.85); }
-  .gameday-promos {
-    display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4);
-    max-width: 760px; margin: 0 auto var(--sp-7);
-  }
-  .gameday-promo {
-    background: rgba(245,239,227,.08); border: 1px solid rgba(245,239,227,.22);
-    border-radius: var(--r-sm); padding: var(--sp-6) var(--sp-6);
-  }
-  .gameday-promo h3 { color: var(--cream); font-style: italic; font-size: var(--fs-2xl); margin: 0 0 var(--sp-2); }
-  .gameday-teaser .gameday-promo p { max-width: none; margin: 0; font-size: var(--fs-sm); }
-  .hoosier-menu { list-style: none; margin: var(--sp-5) 0 0; padding: 0; text-align: left; }
-  .hoosier-menu li {
-    display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-4);
-    padding: var(--sp-3) 0; border-top: 1px solid rgba(245,239,227,.18);
-  }
-  .hoosier-menu .hm-name { display: block; color: var(--cream); font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); }
-  .hoosier-menu .hm-desc { display: block; color: rgba(245,239,227,.7); font-size: var(--fs-sm); }
-  .hoosier-menu .hm-price { color: var(--brass-light); font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); white-space: nowrap; }
-  @media (max-width: 640px) {
-    .gameday-promos { grid-template-columns: 1fr; }
-  }
   .gameday-ctas { display: flex; gap: var(--sp-4); justify-content: center; flex-wrap: wrap; }
 
   /* ── TRIVIA TEASER ───────────────────────────────────── */
