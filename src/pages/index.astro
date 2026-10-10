@@ -329,6 +329,11 @@ const jsonLd = {
       <div class="gameday-promo">
         <h3>IU Game Days</h3>
         <p>The Hoosier menu, and 15% of its sales go to the IUAA Chicago Chapter Scholarship Fund.</p>
+        <ul class="hoosier-menu">
+          <li><span><span class="hm-name">Hoosierita</span><span class="hm-desc">Tequila, Sarti, lime, agave, Aperol float</span></span><span class="hm-price">$15</span></li>
+          <li><span><span class="hm-name">Hoosier Pizza</span><span class="hm-desc">Tavern-style, red sauce, chopped pepperoni, green peppers, onions</span></span><span class="hm-price">$27</span></li>
+          <li><span><span class="hm-name">Upland Hoosier Gameday Lager</span><span class="hm-desc">16 oz can</span></span><span class="hm-price">$7</span></li>
+        </ul>
       </div>
     </div>
     <div class="gameday-ctas">
@@ -768,6 +773,14 @@ const jsonLd = {
   }
   .gameday-promo h3 { color: var(--cream); font-style: italic; font-size: var(--fs-2xl); margin: 0 0 var(--sp-2); }
   .gameday-teaser .gameday-promo p { max-width: none; margin: 0; font-size: var(--fs-sm); }
+  .hoosier-menu { list-style: none; margin: var(--sp-5) 0 0; padding: 0; text-align: left; }
+  .hoosier-menu li {
+    display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-4);
+    padding: var(--sp-3) 0; border-top: 1px solid rgba(245,239,227,.18);
+  }
+  .hoosier-menu .hm-name { display: block; color: var(--cream); font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); }
+  .hoosier-menu .hm-desc { display: block; color: rgba(245,239,227,.7); font-size: var(--fs-sm); }
+  .hoosier-menu .hm-price { color: var(--brass-light); font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lg); white-space: nowrap; }
   @media (max-width: 640px) {
     .gameday-promos { grid-template-columns: 1fr; }
   }
