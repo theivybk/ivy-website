@@ -1794,7 +1794,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.method === 'POST' && urlPath === '/admin/host-sheet') {
+  if (urlPath === '/admin/host-sheet' && (req.method === 'POST' || (req.method === 'GET' && new URL(req.url, 'http://localhost').searchParams.get('preview') === '1'))) {
     if (!checkBasicAuth(req)) {
       res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
       res.end('Unauthorized');
