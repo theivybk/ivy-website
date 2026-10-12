@@ -10,6 +10,12 @@ const {
   weeklyReportEmail, backupEmail, applicationEmail, menusEmail, emailPreviewPage,
 } = require('./emails.cjs');
 const { DatabaseSync } = require('node:sqlite');
+let hostsheet = null;
+try {
+  hostsheet = require('./hostsheet.cjs');
+} catch (err) {
+  console.error('hostsheet.cjs failed to load:', err.message);
+}
 
 const PORT = process.env.PORT || 3000;
 const ROOT = path.join(__dirname, 'dist');
@@ -411,6 +417,118 @@ async function maybeSendWeeklyBackup() {
     console.log('Weekly database backup sent:', JSON.stringify(r));
   } catch (err) {
     console.error('Weekly database backup failed:', err.message);
+  }
+}
+
+// ---- Daily host sheet -------------------------------------------------------
+// On days with enough reservations, the host sheet (that day's table list) is
+// emailed to the restaurant mailbox in the morning, Central time. The window
+// ends mid afternoon so a restart late in the evening never sends a stale sheet.
+const HOST_SHEET_TO_EMAIL = 'info@theivybk.com';
+const HOST_SHEET_MIN_RESERVATIONS = 5; // "more than 4 reservations"
+const HOST_SHEET_FROM_HOUR = 8;
+const HOST_SHEET_UNTIL_HOUR = 15;
+
+function getHostSheetReservations(dateStr) {
+  const all = dedupeReservations(db.prepare('SELECT * FROM reservations ORDER BY id DESC').all().filter((r) => !isTestReservation(r)));
+  return all.filter((r) => r.date === dateStr);
+}
+
+// "-05:00" or "-06:00" for a Chicago calendar date (daylight saving aware).
+function chicagoOffsetFor(dateStr) {
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', timeZoneName: 'longOffset' }).formatToParts(new Date(dateStr + 'T12:00:00Z'));
+    const tz = (parts.find((p) => p.type === 'timeZoneName') || {}).value || '';
+    const m = /GMT([+-]\d{2}):?(\d{2})?/.exec(tz);
+    if (m) return m[1] + ':' + (m[2] || '00');
+  } catch {}
+  return '-05:00';
+}
+
+// Entries on the events calendar for one day that are not website reservations
+// (private events, anything staff added by hand). Empty when the calendar is
+// not configured. Failures are the caller's to catch: the sheet still sends.
+async function listCalendarEntriesForDay(dateStr) {
+  if (!GOOGLE_CALENDAR_CLIENT_ID || !GOOGLE_CALENDAR_CLIENT_SECRET || !GOOGLE_CALENDAR_REFRESH_TOKEN) return [];
+  const accessToken = await getGoogleCalendarAccessToken();
+  const next = new Date(Date.parse(dateStr + 'T12:00:00Z') + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const qs = new URLSearchParams({
+    timeMin: dateStr + 'T00:00:00' + chicagoOffsetFor(dateStr),
+    timeMax: next + 'T00:00:00' + chicagoOffsetFor(next),
+    singleEvents: 'true',
+    orderBy: 'startTime',
+    maxResults: '100',
+  }).toString();
+  const result = await new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: 'www.googleapis.com',
+        path: '/calendar/v3/calendars/' + encodeURIComponent(GOOGLE_CALENDAR_ID) + '/events?' + qs,
+        method: 'GET',
+        headers: { Authorization: 'Bearer ' + accessToken },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
+          let parsed = {};
+          try { parsed = JSON.parse(data); } catch {}
+          resolve({ status: res.statusCode, body: parsed });
+        });
+      }
+    );
+    req.on('error', reject);
+    req.end();
+  });
+  if (result.status >= 300) throw new Error('Calendar list failed: ' + result.status);
+  const timeFmt = (iso) => new Date(iso).toLocaleTimeString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit' }).replace(/\u202f/g, ' ');
+  return (result.body.items || [])
+    .filter((e) => e.status !== 'cancelled' && !/^Reservation\s+[\u2014-]/.test(e.summary || ''))
+    .map((e) => {
+      const start = e.start && e.start.dateTime;
+      const end = e.end && e.end.dateTime;
+      const when = start ? (end && end !== start ? timeFmt(start) + ' to ' + timeFmt(end) : timeFmt(start)) : 'All day';
+      const detail = String(e.description || '').split('\n').map((s) => s.trim()).filter(Boolean).slice(0, 3).join(' | ').slice(0, 220);
+      return { summary: e.summary || '', when, detail };
+    });
+}
+
+async function buildHostSheetFor(dateStr) {
+  if (!hostsheet) throw new Error('Host sheet module is not loaded.');
+  const reservations = getHostSheetReservations(dateStr);
+  const count = hostsheet.collapseSamePhone(reservations).rows.length;
+  return { reservations, count };
+}
+
+async function sendHostSheet(dateStr, { force = false } = {}) {
+  if (!RESEND_API_KEY) throw new Error('Email is not configured.');
+  const { reservations, count } = await buildHostSheetFor(dateStr);
+  if (!force && count < HOST_SHEET_MIN_RESERVATIONS) {
+    return { sent: false, count, reason: count + ' reservation(s) on ' + dateStr + ', fewer than ' + HOST_SHEET_MIN_RESERVATIONS };
+  }
+  let calendarItems = [];
+  try {
+    calendarItems = await listCalendarEntriesForDay(dateStr);
+  } catch (err) {
+    console.error('Host sheet calendar lookup failed (sending without it):', err.message);
+  }
+  const sheet = hostsheet.buildHostSheet({ date: dateStr, reservations, calendarItems, minReservations: HOST_SHEET_MIN_RESERVATIONS });
+  const result = await resendSendEmail({ to: HOST_SHEET_TO_EMAIL, subject: sheet.subject, text: sheet.text, html: sheet.html });
+  if (result.status < 200 || result.status >= 300) throw new Error('Resend status ' + result.status);
+  db.prepare('INSERT OR REPLACE INTO app_state (key, value) VALUES (?, ?)').run('host_sheet_sent_date', dateStr);
+  return { sent: true, count, guests: sheet.stats.guests, emailId: result.body && result.body.id };
+}
+
+async function maybeSendHostSheet() {
+  try {
+    const now = chicagoNow();
+    if (now.hour < HOST_SHEET_FROM_HOUR || now.hour >= HOST_SHEET_UNTIL_HOUR) return;
+    const last = db.prepare("SELECT value FROM app_state WHERE key = 'host_sheet_sent_date'").get();
+    if (last && last.value === now.date) return;
+    const r = await sendHostSheet(now.date);
+    if (r.sent) console.log('Host sheet sent:', JSON.stringify(r));
+  } catch (err) {
+    console.error('Host sheet failed:', err.message);
   }
 }
 
@@ -1676,6 +1794,41 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/admin/host-sheet') {
+    if (!checkBasicAuth(req)) {
+      res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
+      res.end('Unauthorized');
+      return;
+    }
+    const q = new URL(req.url, 'http://localhost').searchParams;
+    const dateStr = /^\d{4}-\d{2}-\d{2}$/.test(q.get('date') || '') ? q.get('date') : chicagoNow().date;
+    (async () => {
+      try {
+        if (q.get('send') === '1') {
+          const r = await sendHostSheet(dateStr, { force: q.get('force') === '1' });
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true, date: dateStr, ...r }));
+          return;
+        }
+        const { reservations, count } = await buildHostSheetFor(dateStr);
+        let calendarItems = [];
+        try { calendarItems = await listCalendarEntriesForDay(dateStr); } catch (err) { console.error('Host sheet preview calendar error:', err.message); }
+        const sheet = hostsheet.buildHostSheet({ date: dateStr, reservations, calendarItems, minReservations: HOST_SHEET_MIN_RESERVATIONS });
+        if (q.get('preview') === '1') {
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+          res.end(sheet.html);
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, date: dateStr, count, wouldSend: count >= HOST_SHEET_MIN_RESERVATIONS, subject: sheet.subject, stats: sheet.stats, calendarItems: calendarItems.length }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: err.message }));
+      }
+    })();
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/admin/backup-now') {
     if (!checkBasicAuth(req)) {
       res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="Reservations"', 'Content-Type': 'text/plain' });
@@ -1927,6 +2080,9 @@ server.listen(PORT, () => {
   };
   setTimeout(runEventReminders, 3 * 60 * 1000).unref();
   setInterval(runEventReminders, 60 * 60 * 1000).unref();
+  // Daily host sheet email (see HOST_SHEET_* above).
+  setTimeout(maybeSendHostSheet, 4 * 60 * 1000).unref();
+  setInterval(maybeSendHostSheet, 10 * 60 * 1000).unref();
 });
 
 // Railway stops the old container with SIGTERM on every deploy. Exit cleanly so
