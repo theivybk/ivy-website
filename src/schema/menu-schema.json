@@ -114,7 +114,7 @@
             {
               "@type": "MenuItem",
               "name": "Nachos",
-              "description": "Poblano cheese, red onions, tomatoes, lettuce, jalapeños, black beans, guacamole, sour cream & chihuahua cheese. Add: Ground Beef +6, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
+              "description": "Poblano cheese, red onions, tomatoes, lettuce, jalapeños, black beans, guacamole, sour cream & chihuahua cheese. Add: Ground Beef +6, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4, Chili +4",
               "offers": {
                 "@type": "Offer",
                 "price": "17",
@@ -151,7 +151,7 @@
             {
               "@type": "MenuItem",
               "name": "Chili",
-              "description": "Ground beef, black beans, green peppers, onions, jalapeños & cilantro, topped with red onions, sour cream & chihuahua cheese. With tortilla chips",
+              "description": "Hearty ground beef & black bean chili loaded with green peppers, onions, jalapeños & cilantro. Topped with red onions, sour cream & chihuahua cheese. Served with tortilla chips for scooping",
               "offers": {
                 "@type": "Offer",
                 "price": "7",
