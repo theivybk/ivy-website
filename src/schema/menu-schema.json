@@ -63,7 +63,7 @@
             {
               "@type": "MenuItem",
               "name": "Acorn Squash",
-              "description": "Roasted with parmesan, thyme, basil, oregano & garlic powder. Drizzled with honey and topped with parsley",
+              "description": "Roasted golden with parmesan, thyme, basil, oregano & garlic. Drizzled with honey, finished with parsley",
               "offers": {
                 "@type": "Offer",
                 "price": "12",
@@ -150,7 +150,7 @@
             {
               "@type": "MenuItem",
               "name": "Chili",
-              "description": "Ground beef, topped with red onions, sour cream & chihuahua cheese. Served with a side of tortilla chips",
+              "description": "Ground beef chili topped with red onions, sour cream & chihuahua cheese. Served with a side of tortilla chips",
               "offers": {
                 "@type": "Offer",
                 "price": "7",
@@ -160,7 +160,7 @@
             {
               "@type": "MenuItem",
               "name": "Tomato Soup",
-              "description": "Roasted tomatoes, garlic & onions. Drizzled with basil oil",
+              "description": "Roasted tomatoes, garlic & onions, drizzled with basil oil",
               "offers": {
                 "@type": "Offer",
                 "price": "7",
@@ -224,7 +224,7 @@
             {
               "@type": "MenuItem",
               "name": "Fall Harvest",
-              "description": "Kale, butternut squash, cranberries, roasted chickpeas, red onions & honey apple cider vinaigrette",
+              "description": "Kale tossed with butternut squash, cranberries, roasted chickpeas & red onions in a honey apple cider vinaigrette",
               "offers": {
                 "@type": "Offer",
                 "price": "19",
@@ -298,7 +298,7 @@
             {
               "@type": "MenuItem",
               "name": "Grilled Cheese & Tomato Soup",
-              "description": "Yellow cheddar & American cheese. Served with tomato soup drizzled with basil oil, in place of fries",
+              "description": "Yellow cheddar & American cheese, grilled until melty. Served with tomato soup drizzled with basil oil, in place of fries",
               "offers": {
                 "@type": "Offer",
                 "price": "18",
@@ -315,7 +315,7 @@
             {
               "@type": "MenuItem",
               "name": "Brownie à la Mode",
-              "description": "Vanilla ice cream, drizzled with chocolate syrup and topped with chocolate chips",
+              "description": "Brownie topped with vanilla ice cream, drizzled with chocolate syrup & finished with chocolate chips",
               "offers": {
                 "@type": "Offer",
                 "price": "13",
@@ -325,7 +325,7 @@
             {
               "@type": "MenuItem",
               "name": "Salted Caramel Brownie à la Mode",
-              "description": "Vanilla ice cream & toasted coconut flakes, drizzled with salted caramel",
+              "description": "Brownie topped with vanilla ice cream & toasted coconut flakes, drizzled with salted caramel",
               "offers": {
                 "@type": "Offer",
                 "price": "13",
