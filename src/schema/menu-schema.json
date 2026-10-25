@@ -1206,6 +1206,16 @@
                 },
                 {
                   "@type": "MenuItem",
+                  "name": "Espresso Martini",
+                  "description": "Vodka, cold brew, coffee liqueur, demerara",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
                   "name": "Whiskey Sour",
                   "description": "Bourbon, lemon juice, simple syrup",
                   "offers": {
@@ -1300,16 +1310,6 @@
                   "@type": "MenuItem",
                   "name": "Blueberry Pineapple Sour",
                   "description": "Vodka, pineapple juice, lemon juice, blueberry syrup",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "15",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Espresso Martini",
-                  "description": "Vodka, cold brew, coffee liqueur, demerara",
                   "offers": {
                     "@type": "Offer",
                     "price": "15",
