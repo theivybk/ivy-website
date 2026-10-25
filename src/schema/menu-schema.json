@@ -34,6 +34,7 @@
             {
               "@type": "MenuItem",
               "name": "Cheesy Garlic Bread",
+              "description": "Baked in our Detroit pan for crisp, cheesy corners",
               "offers": {
                 "@type": "Offer",
                 "price": "16",
