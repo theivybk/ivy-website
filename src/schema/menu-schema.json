@@ -33,6 +33,15 @@
             },
             {
               "@type": "MenuItem",
+              "name": "Cheesy Garlic Bread",
+              "offers": {
+                "@type": "Offer",
+                "price": "16",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
               "name": "Cheese Curds",
               "description": "Served with spicy ranch",
               "offers": {
@@ -53,11 +62,11 @@
             },
             {
               "@type": "MenuItem",
-              "name": "Green Beans",
-              "description": "Blistered in lemon butter, finished with grated parmesan & crispy fried onions",
+              "name": "Acorn Squash",
+              "description": "Roasted with parmesan, thyme, basil, oregano & garlic powder. Drizzled with honey and topped with parsley",
               "offers": {
                 "@type": "Offer",
-                "price": "11",
+                "price": "12",
                 "priceCurrency": "USD"
               }
             },
@@ -88,16 +97,6 @@
               "offers": {
                 "@type": "Offer",
                 "price": "14",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Grilled Shrimp",
-              "description": "Cajun-garlic butter, jalapeño coleslaw tossed in agave lime vinaigrette & a side of honey sriracha, garnished with parsley",
-              "offers": {
-                "@type": "Offer",
-                "price": "16",
                 "priceCurrency": "USD"
               }
             },
@@ -145,13 +144,40 @@
         },
         {
           "@type": "MenuSection",
+          "name": "Soups",
+          "description": "something warm",
+          "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "Chili",
+              "description": "Ground beef, topped with red onions, sour cream & chihuahua cheese. Served with a side of tortilla chips",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Tomato Soup",
+              "description": "Roasted tomatoes, garlic & onions. Drizzled with basil oil",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "MenuSection",
           "name": "Entrées",
           "description": "from the kitchen",
           "hasMenuItem": [
             {
               "@type": "MenuItem",
               "name": "Pan-Seared Walleye",
-              "description": "Lemon butter, capers & parsley. Served with green beans",
+              "description": "Lemon butter, capers & parsley. Served with acorn squash",
               "offers": {
                 "@type": "Offer",
                 "price": "28",
@@ -187,16 +213,6 @@
             },
             {
               "@type": "MenuItem",
-              "name": "House Salad",
-              "description": "Mixed greens, onions, grape tomatoes, shredded carrots, agave lime vinaigrette",
-              "offers": {
-                "@type": "Offer",
-                "price": "17",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
               "name": "Crispy Chicken Chopped",
               "description": "Crisp romaine, avocado, bacon, tomatoes, red onions & bleu cheese dressing",
               "offers": {
@@ -207,11 +223,11 @@
             },
             {
               "@type": "MenuItem",
-              "name": "Summer Salad",
-              "description": "Mixed greens tossed with sweet strawberries, grape tomatoes & red onion, crumbled feta & toasted almonds in a honey-lemon vinaigrette",
+              "name": "Fall Harvest",
+              "description": "Kale, butternut squash, cranberries, roasted chickpeas, red onions & honey apple cider vinaigrette",
               "offers": {
                 "@type": "Offer",
-                "price": "20",
+                "price": "19",
                 "priceCurrency": "USD"
               }
             }
@@ -220,7 +236,7 @@
         {
           "@type": "MenuSection",
           "name": "Smash Burgers",
-          "description": "double-smashed, served with fries. Sub truffle fries, brussel sprouts, green beans or a salad — +1. Gluten-free bun available. Beyond patty available",
+          "description": "double-smashed, served with fries. Sub truffle fries, brussel sprouts or a salad — +1. Gluten-free bun available. Beyond patty available",
           "hasMenuItem": [
             {
               "@type": "MenuItem",
@@ -236,16 +252,6 @@
               "@type": "MenuItem",
               "name": "Five Alarm",
               "description": "Two smash patties, house sauce, pickles, caramelized onions, jalapeños & pepper jack, potato bun",
-              "offers": {
-                "@type": "Offer",
-                "price": "20",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "The Works",
-              "description": "Two smash patties, house sauce, pickles, onions, tomatoes, lettuce & white American cheese, potato bun",
               "offers": {
                 "@type": "Offer",
                 "price": "20",
@@ -288,6 +294,16 @@
                 "price": "20",
                 "priceCurrency": "USD"
               }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Grilled Cheese & Tomato Soup",
+              "description": "Yellow cheddar & American cheese. Served with tomato soup drizzled with basil oil, in place of fries",
+              "offers": {
+                "@type": "Offer",
+                "price": "18",
+                "priceCurrency": "USD"
+              }
             }
           ]
         },
@@ -298,11 +314,21 @@
           "hasMenuItem": [
             {
               "@type": "MenuItem",
-              "name": "Cheesecake",
-              "description": "Raspberry & blackberry compote",
+              "name": "Brownie à la Mode",
+              "description": "Vanilla ice cream, drizzled with chocolate syrup and topped with chocolate chips",
               "offers": {
                 "@type": "Offer",
-                "price": "12",
+                "price": "13",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Salted Caramel Brownie à la Mode",
+              "description": "Vanilla ice cream & toasted coconut flakes, drizzled with salted caramel",
+              "offers": {
+                "@type": "Offer",
+                "price": "13",
                 "priceCurrency": "USD"
               }
             },
@@ -336,31 +362,6 @@
       "hasMenuSection": [
         {
           "@type": "MenuSection",
-          "name": "From the Oven",
-          "description": "to start",
-          "hasMenuItem": [
-            {
-              "@type": "MenuItem",
-              "name": "Garlic Bread",
-              "offers": {
-                "@type": "Offer",
-                "price": "14",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Cheesy Garlic Bread",
-              "offers": {
-                "@type": "Offer",
-                "price": "16",
-                "priceCurrency": "USD"
-              }
-            }
-          ]
-        },
-        {
-          "@type": "MenuSection",
           "name": "Chicago Tavern Pizza",
           "description": "thin, crisp, cut in squares — 12\" x 12\"",
           "hasMenuItem": [
@@ -386,16 +387,6 @@
             },
             {
               "@type": "MenuItem",
-              "name": "Fowl Play",
-              "description": "Chicken sausage, BBQ sauce, green pepper, caramelized onions",
-              "offers": {
-                "@type": "Offer",
-                "price": "28",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
               "name": "White Out",
               "description": "Olive oil, ricotta, spinach, mushrooms, green olives, garlic",
               "offers": {
@@ -411,16 +402,6 @@
           "name": "Detroit Pan Pizza",
           "description": "golden crust, crispy corners — 8\" x 10\"",
           "hasMenuItem": [
-            {
-              "@type": "MenuItem",
-              "name": "The Standard 313",
-              "description": "Cheese, tomato sauce",
-              "offers": {
-                "@type": "Offer",
-                "price": "19",
-                "priceCurrency": "USD"
-              }
-            },
             {
               "@type": "MenuItem",
               "name": "Pep In Your Step",

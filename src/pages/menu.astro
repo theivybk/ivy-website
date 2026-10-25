@@ -72,12 +72,13 @@ const jsonLd = {
           <div class="desc">Whipped silky, drizzled with EVOO, sumac &amp; parsley. Served with cucumbers, red bell peppers, Greek &amp; Kalamata marinated olives, roasted chickpeas &amp; warm pita</div></div>
         <div class="item"><div class="row"><div class="name">Pretzel Twist</div><span class="leader"></span><div class="price">14</div></div>
           <div class="desc">Served with whole grain mustard &amp; cheese sauce</div></div>
+        <div class="item"><div class="row"><div class="name">Cheesy Garlic Bread</div><span class="leader"></span><div class="price">16</div></div></div>
         <div class="item"><div class="row"><div class="name">Cheese Curds</div><span class="leader"></span><div class="price">12</div></div>
           <div class="desc">Served with spicy ranch</div></div>
         <div class="item"><div class="row"><div class="name">Fries</div><span class="leader"></span><div class="price">9</div></div>
           <div class="desc">Go truffle, topped with parmesan &amp; parsley — +1</div></div>
-        <div class="item"><div class="row"><div class="name">Green Beans</div><span class="leader"></span><div class="price">11</div></div>
-          <div class="desc">Blistered in lemon butter, finished with grated parmesan &amp; crispy fried onions</div></div>
+        <div class="item"><div class="row"><div class="name">Acorn Squash</div><span class="leader"></span><div class="price">12</div></div>
+          <div class="desc">Roasted with parmesan, thyme, basil, oregano &amp; garlic powder. Drizzled with honey and topped with parsley</div></div>
         <div class="item"><div class="row"><div class="name">Brussel Sprouts</div><span class="leader"></span><div class="price">11</div></div>
           <div class="desc">Crisped in a honey-sriracha glaze, dusted with tuxedo sesame seeds</div></div>
         <div class="item"><div class="row"><div class="name">Crispy Wings</div><span class="leader"></span><div class="price">16</div></div>
@@ -85,8 +86,6 @@ const jsonLd = {
           <div class="desc">Served with ranch or bleu cheese</div></div>
         <div class="item"><div class="row"><div class="name">Chicken Tenders</div><span class="leader"></span><div class="price">14</div></div>
           <div class="opts">Ranch · Bleu Cheese · BBQ · Buffalo · Dijon Honey Mustard</div></div>
-        <div class="item"><div class="row"><div class="name">Grilled Shrimp</div><span class="leader"></span><div class="price">16</div></div>
-          <div class="desc">Cajun-garlic butter, jalapeño coleslaw tossed in agave lime vinaigrette &amp; a side of honey sriracha, garnished with parsley</div></div>
         <div class="item"><div class="row"><div class="name">Crispy Pork Belly Bites</div><span class="leader"></span><div class="price">16</div></div>
           <div class="desc">Honey sriracha glaze, agave lime vinaigrette jalapeño cole slaw</div></div>
         <div class="item"><div class="row"><div class="name">Nachos</div><span class="leader"></span><div class="price">17</div></div>
@@ -101,9 +100,17 @@ const jsonLd = {
       </div>
 
       <div class="menu-section">
+        <h2>Soups</h2><span class="seclabel">something warm</span>
+        <div class="item"><div class="row"><div class="name">Chili</div><span class="leader"></span><div class="price">7</div></div>
+          <div class="desc">Ground beef, topped with red onions, sour cream &amp; chihuahua cheese. Served with a side of tortilla chips</div></div>
+        <div class="item"><div class="row"><div class="name">Tomato Soup</div><span class="leader"></span><div class="price">7</div></div>
+          <div class="desc">Roasted tomatoes, garlic &amp; onions. Drizzled with basil oil</div></div>
+      </div>
+
+      <div class="menu-section">
         <h2>Entrées</h2><span class="seclabel">from the kitchen</span>
         <div class="item"><div class="row"><div class="name">Pan-Seared Walleye</div><span class="leader"></span><div class="price">28</div></div>
-          <div class="desc">Lemon butter, capers &amp; parsley. Served with green beans</div></div>
+          <div class="desc">Lemon butter, capers &amp; parsley. Served with acorn squash</div></div>
         <div class="item"><div class="row"><div class="name">Grilled Steak</div><span class="leader"></span><div class="price">30</div></div>
           <div class="desc">Marinated Bavette, chimichurri. Served with brussels sprouts</div></div>
       </div>
@@ -113,23 +120,19 @@ const jsonLd = {
         <p class="item desc" style="font-size:12px;">Add — Grilled Shrimp +8 · Steak +12 · Grilled Chicken +6 · Fried Chicken +6 · Bacon +4</p>
         <div class="item"><div class="row"><div class="name">Caesar</div><span class="leader"></span><div class="price">18</div></div>
           <div class="desc">Crisp romaine, house croutons &amp; parmesan · grilled or fried chicken — buffalo on either</div></div>
-        <div class="item"><div class="row"><div class="name">House Salad</div><span class="leader"></span><div class="price">17</div></div>
-          <div class="desc">Mixed greens, onions, grape tomatoes, shredded carrots, agave lime vinaigrette</div></div>
         <div class="item"><div class="row"><div class="name">Crispy Chicken Chopped</div><span class="leader"></span><div class="price">21</div></div>
           <div class="desc">Crisp romaine, avocado, bacon, tomatoes, red onions &amp; bleu cheese dressing</div></div>
-        <div class="item"><div class="row"><div class="name">Summer Salad</div><span class="leader"></span><div class="price">20</div></div>
-          <div class="desc">Mixed greens tossed with sweet strawberries, grape tomatoes &amp; red onion, crumbled feta &amp; toasted almonds in a honey-lemon vinaigrette</div></div>
+        <div class="item"><div class="row"><div class="name">Fall Harvest</div><span class="leader"></span><div class="price">19</div></div>
+          <div class="desc">Kale, butternut squash, cranberries, roasted chickpeas, red onions &amp; honey apple cider vinaigrette</div></div>
       </div>
 
       <div class="menu-section">
         <h2>Smash Burgers</h2><span class="seclabel">double-smashed · served with fries</span>
-        <p class="item desc" style="font-size:12px;">Sub truffle fries, brussel sprouts, green beans or a salad — +1 · Gluten-free bun available · Beyond patty available</p>
+        <p class="item desc" style="font-size:12px;">Sub truffle fries, brussel sprouts or a salad — +1 · Gluten-free bun available · Beyond patty available</p>
         <div class="item"><div class="row"><div class="name">The Original</div><span class="leader"></span><div class="price">20</div></div>
           <div class="desc">Two smash patties, house sauce, pickles, caramelized onions &amp; white American cheese, potato bun</div></div>
         <div class="item"><div class="row"><div class="name">Five Alarm</div><span class="leader"></span><div class="price">20</div></div>
           <div class="desc">Two smash patties, house sauce, pickles, caramelized onions, jalapeños &amp; pepper jack, potato bun</div></div>
-        <div class="item"><div class="row"><div class="name">The Works</div><span class="leader"></span><div class="price">20</div></div>
-          <div class="desc">Two smash patties, house sauce, pickles, onions, tomatoes, lettuce &amp; white American cheese, potato bun</div></div>
       </div>
 
       <div class="menu-section">
@@ -140,12 +143,16 @@ const jsonLd = {
           <div class="desc">Bavette, chimichurri, provolone, caramelized onions, ciabatta</div></div>
         <div class="item"><div class="row"><div class="name">Caesar Wrap</div><span class="leader"></span><div class="price">20</div></div>
           <div class="desc">Crisp romaine, house caesar, croutons &amp; parmesan · grilled or fried chicken — buffalo on either</div></div>
+        <div class="item"><div class="row"><div class="name">Grilled Cheese &amp; Tomato Soup</div><span class="leader"></span><div class="price">18</div></div>
+          <div class="desc">Yellow cheddar &amp; American cheese. Served with tomato soup drizzled with basil oil, in place of fries</div></div>
       </div>
 
       <div class="menu-section">
         <h2>Dessert</h2><span class="seclabel">a sweet finish</span>
-        <div class="item"><div class="row"><div class="name">Cheesecake</div><span class="leader"></span><div class="price">12</div></div>
-          <div class="desc">Raspberry &amp; blackberry compote</div></div>
+        <div class="item"><div class="row"><div class="name">Brownie à la Mode</div><span class="leader"></span><div class="price">13</div></div>
+          <div class="desc">Vanilla ice cream, drizzled with chocolate syrup and topped with chocolate chips</div></div>
+        <div class="item"><div class="row"><div class="name">Salted Caramel Brownie à la Mode</div><span class="leader"></span><div class="price">13</div></div>
+          <div class="desc">Vanilla ice cream &amp; toasted coconut flakes, drizzled with salted caramel</div></div>
         <div class="item"><div class="row"><div class="name">Gelato</div><span class="leader"></span><div class="price">7</div></div>
           <div class="desc">Vanilla bean, strawberry cheesecake, double dark chocolate or mango sorbet</div></div>
         <div class="item"><div class="row"><div class="name">Gelato Trio</div><span class="leader"></span><div class="price">15</div></div>
@@ -163,20 +170,13 @@ const jsonLd = {
   <div class="wrap">
     <div class="menu-sections">
       <div class="menu-section">
-        <h2>From the Oven</h2><span class="seclabel">to start</span>
-        <div class="item"><div class="row"><div class="name">Garlic Bread</div><span class="leader"></span><div class="price">14</div></div></div>
-        <div class="item"><div class="row"><div class="name">Cheesy Garlic Bread</div><span class="leader"></span><div class="price">16</div></div></div>
-      </div>
-      <div class="menu-section">
         <h2>Chicago Tavern</h2><span class="seclabel">thin, crisp · 12" × 12"</span>
         <div class="item"><div class="row"><div class="name">Chi-City GOAT</div><span class="leader"></span><div class="price">28</div></div><div class="desc">Italian sausage, giardiniera</div></div>
         <div class="item"><div class="row"><div class="name">Red Ivy</div><span class="leader"></span><div class="price">27</div></div><div class="desc">Pepperoni, hot honey</div></div>
-        <div class="item"><div class="row"><div class="name">Fowl Play</div><span class="leader"></span><div class="price">28</div></div><div class="desc">Chicken sausage, BBQ sauce, green pepper, caramelized onions</div></div>
         <div class="item"><div class="row"><div class="name">White Out</div><span class="leader"></span><div class="price">28</div></div><div class="desc">Olive oil, ricotta, spinach, mushrooms, green olives, garlic</div></div>
       </div>
       <div class="menu-section">
         <h2>Detroit Pan</h2><span class="seclabel">golden crust, crisp corners · 8" × 10"</span>
-        <div class="item"><div class="row"><div class="name">The Standard 313</div><span class="leader"></span><div class="price">19</div></div><div class="desc">Cheese, tomato sauce</div></div>
         <div class="item"><div class="row"><div class="name">Pep In Your Step</div><span class="leader"></span><div class="price">25</div></div><div class="desc">Pepperoni and pepperoni — with some pepperoni on top</div></div>
         <div class="item"><div class="row"><div class="name">The Bad Boys 5</div><span class="leader"></span><div class="price">25</div></div><div class="desc">Italian sausage, jalapeños, mushrooms, caramelized onions, basil</div></div>
         <div class="item"><div class="row"><div class="name">Green Assembly Line</div><span class="leader"></span><div class="price">23</div></div><div class="desc">Green peppers, mushrooms, red onions, black olives</div></div>
