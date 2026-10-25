@@ -533,6 +533,21 @@
             },
             {
               "@type": "MenuSection",
+              "name": "Kölsch",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Middle Brow Yard Work",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
               "name": "Wheat Ale",
               "hasMenuItem": [
                 {
@@ -547,6 +562,24 @@
                 {
                   "@type": "MenuItem",
                   "name": "Cali Squeeze Blood Orange",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Goose Island 312",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Lagunitas Little Sumpin' Sumpin'",
                   "offers": {
                     "@type": "Offer",
                     "price": "7",
@@ -579,7 +612,25 @@
                 },
                 {
                   "@type": "MenuItem",
+                  "name": "Begyle Hophazardly",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
                   "name": "Half Acre Sunset Vallejo",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Sierra Nevada Celebration",
                   "offers": {
                     "@type": "Offer",
                     "price": "7",
@@ -668,57 +719,6 @@
                   "offers": {
                     "@type": "Offer",
                     "price": "8",
-                    "priceCurrency": "USD"
-                  }
-                }
-              ]
-            },
-            {
-              "@type": "MenuSection",
-              "name": "New on Tap",
-              "hasMenuItem": [
-                {
-                  "@type": "MenuItem",
-                  "name": "Begyle Hophazardly",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Goose Island 312",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Lagunitas Little Sumpin' Sumpin'",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Middle Brow Yard Work",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Sierra Nevada Celebration",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
                     "priceCurrency": "USD"
                   }
                 }
