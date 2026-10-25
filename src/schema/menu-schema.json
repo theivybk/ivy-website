@@ -533,45 +533,6 @@
             },
             {
               "@type": "MenuSection",
-              "name": "Oktoberfest",
-              "hasMenuItem": [
-                {
-                  "@type": "MenuItem",
-                  "name": "Paulaner Oktoberfest",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Urban Chestnut O-Katz",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                }
-              ]
-            },
-            {
-              "@type": "MenuSection",
-              "name": "Kölsch",
-              "hasMenuItem": [
-                {
-                  "@type": "MenuItem",
-                  "name": "Goose Island Summertime",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                }
-              ]
-            },
-            {
-              "@type": "MenuSection",
               "name": "Wheat Ale",
               "hasMenuItem": [
                 {
@@ -624,15 +585,6 @@
                     "price": "7",
                     "priceCurrency": "USD"
                   }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Lagunitas Trooper IPA",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
                 }
               ]
             },
@@ -652,15 +604,6 @@
                 {
                   "@type": "MenuItem",
                   "name": "Phase Three Rotating Hazy IPA",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "7",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
-                  "name": "Sierra Nevada Hazy Little Thing IPA",
                   "offers": {
                     "@type": "Offer",
                     "price": "7",
@@ -725,6 +668,57 @@
                   "offers": {
                     "@type": "Offer",
                     "price": "8",
+                    "priceCurrency": "USD"
+                  }
+                }
+              ]
+            },
+            {
+              "@type": "MenuSection",
+              "name": "New on Tap",
+              "hasMenuItem": [
+                {
+                  "@type": "MenuItem",
+                  "name": "Begyle Hophazardly",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Goose Island 312",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Lagunitas Little Sumpin' Sumpin'",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Middle Brow Yard Work",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Sierra Nevada Celebration",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "7",
                     "priceCurrency": "USD"
                   }
                 }
@@ -1009,7 +1003,7 @@
             },
             {
               "@type": "MenuItem",
-              "name": "Wölffer Estate Watermelon Sea Salt",
+              "name": "Wölffer Estate Cranberry Spiced Cider",
               "description": "Bottle",
               "offers": {
                 "@type": "Offer",
@@ -1324,8 +1318,18 @@
                 },
                 {
                   "@type": "MenuItem",
-                  "name": "Lychee Mojito",
-                  "description": "White rum, lychee syrup, fresh lime, muddled mint, club soda",
+                  "name": "Pumpkin Spice Espresso",
+                  "description": "Wheatley vodka, espresso, pumpkin spice, aquafaba",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "15",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "MenuItem",
+                  "name": "Caramel Apple Martini",
+                  "description": "Wheatley vodka, apple cider, caramel, lemon juice, aquafaba",
                   "offers": {
                     "@type": "Offer",
                     "price": "15",
