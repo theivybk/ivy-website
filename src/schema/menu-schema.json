@@ -113,7 +113,7 @@
             {
               "@type": "MenuItem",
               "name": "Nachos",
-              "description": "Poblano cheese, red onions, tomatoes, lettuce, jalapeños, black beans, guacamole, sour cream & chihuahua cheese. Add: Ground Beef +6, Grilled Shrimp +8, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
+              "description": "Poblano cheese, red onions, tomatoes, lettuce, jalapeños, black beans, guacamole, sour cream & chihuahua cheese. Add: Ground Beef +6, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
               "offers": {
                 "@type": "Offer",
                 "price": "17",
@@ -123,7 +123,7 @@
             {
               "@type": "MenuItem",
               "name": "Quesadilla",
-              "description": "Pico de gallo, sour cream, guacamole & chihuahua cheese. Add: Ground Beef +6, Grilled Shrimp +8, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4, Black Beans +4",
+              "description": "Pico de gallo, sour cream, guacamole & chihuahua cheese. Add: Ground Beef +6, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4, Black Beans +4",
               "offers": {
                 "@type": "Offer",
                 "price": "15",
@@ -133,7 +133,7 @@
             {
               "@type": "MenuItem",
               "name": "Mac n' Cheese",
-              "description": "Cavatappi swirls in a velvety cheese. Add: Ground Beef +6, Grilled Shrimp +8, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
+              "description": "Cavatappi swirls in a velvety cheese. Add: Ground Beef +6, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
               "offers": {
                 "@type": "Offer",
                 "price": "12",
@@ -199,7 +199,7 @@
         {
           "@type": "MenuSection",
           "name": "Salads",
-          "description": "crisp, simple, generous. Add: Grilled Shrimp +8, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
+          "description": "crisp, simple, generous. Add: Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4",
           "hasMenuItem": [
             {
               "@type": "MenuItem",
