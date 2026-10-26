@@ -438,7 +438,7 @@
         {
           "@type": "MenuSection",
           "name": "Build Your Own Pizza",
-          "description": "Pick a crust, choose a sauce, then add up to five toppings. Sauces (included): Tomato, BBQ, Butter Chicken, Olive Oil. Meats +5: Italian Sausage, Pepperoni, Chicken Sausage, Bacon. Toppings +3: Green Peppers, Mushrooms, Red Onions, Caramelized Onions, Black Olives, Green Olives, Fresh Jalapeños, Giardiniera, Spinach, Garlic, Basil, Ricotta Dollops",
+          "description": "Pick a crust, choose a sauce, then add up to five toppings. Sauces (included): Tomato, BBQ, Butter Chicken, Olive Oil. Meats +5: Italian Sausage, Pepperoni, Bacon. Toppings +3: Green Peppers, Mushrooms, Red Onions, Caramelized Onions, Black Olives, Green Olives, Fresh Jalapeños, Giardiniera, Spinach, Garlic, Basil, Ricotta Dollops",
           "hasMenuItem": [
             {
               "@type": "MenuItem",
