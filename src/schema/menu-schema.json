@@ -237,7 +237,7 @@
         {
           "@type": "MenuSection",
           "name": "Smash Burgers",
-          "description": "double-smashed, served with fries. Sub truffle fries, brussel sprouts or a salad — +1. Sub soup or chili — +2. Gluten-free bun available. Beyond patty available",
+          "description": "double-smashed, served with fries. Sub truffle fries, brussel sprouts, acorn squash or a salad — +1. Sub soup or chili — +2. Gluten-free bun available. Beyond patty available",
           "hasMenuItem": [
             {
               "@type": "MenuItem",
@@ -264,7 +264,7 @@
         {
           "@type": "MenuSection",
           "name": "Sandwiches & Wraps",
-          "description": "served with fries. Sub truffle fries, brussel sprouts or a salad — +1. Sub soup or chili — +2",
+          "description": "served with fries. Sub truffle fries, brussel sprouts, acorn squash or a salad — +1. Sub soup or chili — +2",
           "hasMenuItem": [
             {
               "@type": "MenuItem",
