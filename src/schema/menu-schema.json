@@ -299,7 +299,7 @@
             {
               "@type": "MenuItem",
               "name": "Grilled Cheese & Tomato Soup",
-              "description": "Yellow cheddar & American cheese, grilled until melty. Served with tomato soup drizzled with basil oil, in place of fries",
+              "description": "Yellow cheddar & American cheese, grilled on sourdough until melty. Served with tomato soup drizzled with basil oil, in place of fries",
               "offers": {
                 "@type": "Offer",
                 "price": "18",
