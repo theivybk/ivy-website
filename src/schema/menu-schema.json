@@ -1301,7 +1301,7 @@
                 {
                   "@type": "MenuItem",
                   "name": "Pumpkin Spice Espresso",
-                  "description": "Wheatley vodka, espresso, pumpkin spice",
+                  "description": "Vodka, espresso, pumpkin spice",
                   "offers": {
                     "@type": "Offer",
                     "price": "15",
@@ -1311,7 +1311,7 @@
                 {
                   "@type": "MenuItem",
                   "name": "Caramel Apple Martini",
-                  "description": "Wheatley vodka, apple cider, caramel, lemon juice",
+                  "description": "Vodka, apple cider, caramel, lemon juice",
                   "offers": {
                     "@type": "Offer",
                     "price": "15",
