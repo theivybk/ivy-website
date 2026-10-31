@@ -345,32 +345,56 @@ const jsonLd = {
       <div class="specials-card">
         <span class="specials-day">Monday</span>
         <h3>Monday Night Pizza</h3>
-        <p>Half off pizza with the purchase of a drink</p>
+        <p>50% off pizza with the purchase of a drink</p>
+        <div class="specials-beer">
+          <div class="specials-logo">
+            <img src="/assets/img/partners/lagunitas.webp" alt="Lagunitas Brewing Co." width="480" height="130" loading="lazy">
+          </div>
+          <p>$5 Lagunitas beers</p>
+        </div>
         <p class="specials-note">*Dine-in only</p>
       </div>
       <div class="specials-card">
         <span class="specials-day">Tuesday</span>
-        <h3>Taco Tuesday</h3>
-        <p>$3 tacos · $6 Modelos · $9 margaritas</p>
+        <h3>Wing Fling Tuesday</h3>
+        <p>6 wings for $10</p>
+        <div class="specials-beer">
+          <div class="specials-logo">
+            <img src="/assets/img/partners/three-floyds.webp" alt="Three Floyds Brewing" width="237" height="240" class="logo-tall" loading="lazy">
+          </div>
+          <p>$5 Three Floyds beers</p>
+        </div>
         <p class="specials-note">*Dine-in only</p>
       </div>
       <div class="specials-card">
         <span class="specials-day">Wednesday</span>
-        <h3>Burger &amp; Brew</h3>
-        <p>Burger and beer combo, $20</p>
+        <h3>Trivia &amp; Burgers</h3>
+        <p>$15 burgers &middot; trivia 7&ndash;9pm</p>
+        <div class="specials-beer">
+          <div class="specials-logo">
+            <img src="/assets/img/partners/krombacher.webp" alt="Krombacher" width="480" height="111" loading="lazy">
+          </div>
+          <p>$5 Krombacher</p>
+        </div>
         <p class="specials-note">*Dine-in only</p>
       </div>
       <div class="specials-card">
         <span class="specials-day">Thursday</span>
-        <h3>Girl Dinner Thursday</h3>
-        <p>Salad, truffle fries &amp; a glass of wine, $30</p>
-        <p class="specials-note">*Select wines · Dine-in only</p>
+        <h3>Nachos &amp; Quesadillas</h3>
+        <p>$10 each &middot; proteins extra</p>
+        <div class="specials-beer">
+          <div class="specials-logo">
+            <img src="/assets/img/partners/half-acre.webp" alt="Half Acre Beer Company" width="480" height="89" loading="lazy">
+          </div>
+          <p>$5 Half Acre drafts</p>
+        </div>
+        <p class="specials-note">*Dine-in only</p>
       </div>
     </div>
     <div class="happy-hour-bar">
       <div>
         <span class="eyebrow" style="color:var(--brass-light)">Happy Hour</span>
-        <h3>Monday – Thursday <span class="hh-time">· 3pm – 5pm</span></h3>
+        <h3>Monday – Thursday <span class="hh-time">· 3pm – 6pm</span></h3>
       </div>
       <p>$1 off draft, cans &amp; bottles &nbsp;·&nbsp; $2 off wine &nbsp;·&nbsp; $3 off cocktails</p>
     </div>
@@ -716,6 +740,12 @@ const jsonLd = {
   .specials-card h3 { font-size: var(--fs-2xl); margin-bottom: var(--sp-2); }
   .specials-card p { color: var(--fg-2); font-size: var(--fs-sm); margin: 0; }
   .specials-card .specials-note { font-style: italic; color: var(--fg-3); font-size: 11px; margin-top: var(--sp-2); }
+  .specials-card { display: flex; flex-direction: column; }
+  .specials-card > p:not(.specials-note) { margin-bottom: var(--sp-4); }
+  .specials-beer { margin-top: auto; padding-top: var(--sp-4); border-top: 1px solid var(--border-hair); }
+  .specials-logo { height: 64px; display: flex; align-items: center; justify-content: center; margin-bottom: var(--sp-2); }
+  .specials-logo img { display: block; height: 30px; width: auto; max-width: 80%; }
+  .specials-logo img.logo-tall { height: 62px; }
   .happy-hour-bar {
     display: flex; align-items: center; justify-content: space-between; gap: var(--sp-6); flex-wrap: wrap;
     background: var(--ivy); color: var(--cream); border-radius: var(--r-sm); padding: var(--sp-7) var(--sp-8);
