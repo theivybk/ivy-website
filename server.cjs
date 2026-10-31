@@ -2036,6 +2036,13 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Social posts and the weekly packages link to /specials; the specials live on the home page.
+  if (req.method === 'GET' && (urlPath === '/specials' || urlPath === '/specials/')) {
+    res.writeHead(302, { Location: '/#specials' });
+    res.end();
+    return;
+  }
+
   if (urlPath === '/') urlPath = '/index.html';
   const filePath = path.join(ROOT, urlPath);
 
