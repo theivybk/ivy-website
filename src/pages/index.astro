@@ -332,35 +332,49 @@ const jsonLd = {
         {"date":"2026-11-08","img":"/assets/img/gameday/bears-bingo-20261108.webp?v=691048","alt":"Bears Bingo scratch-off ticket at The Ivy: Sunday Nov 8, 7:20pm kickoff against Tampa Bay, free bingo cards, and the first bingo wins a $100 Ivy gift card.","caption":"Bears Bingo Sunday night: Bears vs. Buccaneers, Sunday Night Football, 7:20pm CT. Free cards at the bar. First bingo wins a $100 Ivy gift card."}
       ]</script>
       <!-- bingo:end -->
+      <!-- iu:start -->
+      <figure class="gameday-post" id="iu-post">
+        <img id="iu-img" src="/assets/img/gameday/iu-game-20261114.webp?v=c16cf8" alt="Game-day info card for Indiana vs. USC at The Ivy Bar + Kitchen, 1625 W Irving Park Rd: Saturday, Nov 14, kickoff 2:30pm Central on CBS, on every screen, wear crimson, with the pledge that 15% of Hoosier menu sales goes to the IUAA Chicago Chapter Scholarship Fund." width="1080" height="1350" loading="lazy">
+        <figcaption id="iu-caption">IU vs. USC, Saturday, Nov 14, kickoff 2:30pm CT on CBS, on every screen at The Ivy. The Hoosier menu runs all game: Hoosierita $15, Hoosier Pizza $27 and Upland Hoosier Gameday Lager $7. 15% of Hoosier menu sales goes to the IUAA Chicago Chapter Scholarship Fund.</figcaption>
+      </figure>
+      <script type="application/json" id="iu-games" is:inline>[
+        {"date":"2026-11-14","img":"/assets/img/gameday/iu-game-20261114.webp?v=c16cf8","alt":"Game-day info card for Indiana vs. USC at The Ivy Bar + Kitchen, 1625 W Irving Park Rd: Saturday, Nov 14, kickoff 2:30pm Central on CBS, on every screen, wear crimson, with the pledge that 15% of Hoosier menu sales goes to the IUAA Chicago Chapter Scholarship Fund.","caption":"IU vs. USC, Saturday, Nov 14, kickoff 2:30pm CT on CBS, on every screen at The Ivy. The Hoosier menu runs all game: Hoosierita $15, Hoosier Pizza $27 and Upland Hoosier Gameday Lager $7. 15% of Hoosier menu sales goes to the IUAA Chicago Chapter Scholarship Fund."}
+      ]</script>
+      <!-- iu:end -->
     </div>
     <script is:inline>
       (function () {
-        var data = document.getElementById('bingo-games');
-        var fig = document.getElementById('bingo-post');
-        var cap = document.getElementById('bingo-caption');
-        if (!data || !fig || !cap) return;
-        var games;
-        try { games = JSON.parse(data.textContent); } catch (e) { return; }
         var parts = {};
         new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' })
           .formatToParts(new Date()).forEach(function (p) { parts[p.type] = p.value; });
         var today = parts.year + '-' + parts.month + '-' + parts.day;
-        var next = null;
-        games.forEach(function (g) { if (g.date >= today && (!next || g.date < next.date)) next = g; });
-        var img = document.getElementById('bingo-img');
-        if (next) {
-          if (!img) {
-            img = document.createElement('img');
-            img.id = 'bingo-img'; img.width = 1080; img.height = 1350; img.loading = 'lazy';
-            fig.insertBefore(img, cap);
+        ['bingo', 'iu'].forEach(function (k) {
+          var data = document.getElementById(k + '-games');
+          var fig = document.getElementById(k + '-post');
+          var cap = document.getElementById(k + '-caption');
+          if (!data || !fig || !cap) return;
+          var games;
+          try { games = JSON.parse(data.textContent); } catch (e) { return; }
+          var next = null;
+          games.forEach(function (g) { if (g.date >= today && (!next || g.date < next.date)) next = g; });
+          var img = document.getElementById(k + '-img');
+          var generic = fig.getAttribute('data-generic');
+          if (next) {
+            if (!img) {
+              img = document.createElement('img');
+              img.id = k + '-img'; img.width = 1080; img.height = 1350; img.loading = 'lazy';
+              fig.insertBefore(img, cap);
+            }
+            if (img.getAttribute('src') !== next.img) img.setAttribute('src', next.img);
+            img.alt = next.alt;
+            cap.textContent = next.caption;
+          } else if (generic) {
+            if (img) img.remove();
+            cap.textContent = generic;
+          } else {
+            fig.hidden = true;
           }
-          if (img.getAttribute('src') !== next.img) img.setAttribute('src', next.img);
-          img.alt = next.alt;
-          cap.textContent = next.caption;
-        } else {
-          if (img) img.remove();
-          cap.textContent = fig.getAttribute('data-generic') || '';
-        }
+        });
       })();
     </script>
     <div class="gameday-ctas">
