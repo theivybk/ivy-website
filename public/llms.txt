@@ -10,10 +10,15 @@ Price range: $$
 
 ## Hours
 
-- Monday–Wednesday: 3:00 PM – Midnight
-- Thursday: 11:00 AM – Midnight
+- Monday–Wednesday: 3:00 PM – 11:00 PM
+- Thursday: 11:00 AM – 11:00 PM
 - Friday–Saturday: 11:00 AM – 1:00 AM
-- Sunday: 11:00 AM – Midnight
+- Sunday: 11:00 AM – 11:00 PM
+
+Kitchen hours (the kitchen closes before the bar):
+
+- Sunday–Thursday: kitchen closes 10:00 PM
+- Friday–Saturday: kitchen closes 12:00 AM (midnight)
 
 Rooftop hours (weather permitting):
 
@@ -34,8 +39,8 @@ Rooftop hours (weather permitting):
 
 - Monday (Monday Night Pizza): 50% off pizza with a drink purchase, $5 Lagunitas beers (dine-in only)
 - Tuesday (Wing Fling Tuesday): 6 wings for $10, $5 Three Floyds beers (dine-in only)
-- Wednesday: $15 burgers, $5 Krombacher, trivia 7–9pm (dine-in only)
-- Thursday: $10 nachos & quesadillas (proteins extra), $5 Half Acre drafts (dine-in only)
+- Wednesday (KromBurger Night): $15 burgers, $5 Krombacher, trivia 7–9pm (dine-in only)
+- Thursday (Nacho Average Thursday): $10 nachos & quesadillas (proteins extra), $5 Half Acre drafts (dine-in only)
 - Happy Hour Monday–Thursday, 3–6pm: $1 off draft/cans/bottles, $2 off wine, $3 off cocktails
 - Night Caps Friday & Saturday, 10pm–12am: $10 signature cocktails
 - Trivia Night every Wednesday, 7–9pm, hosted by Geeks Who Drink

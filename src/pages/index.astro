@@ -25,10 +25,10 @@ const restaurantLd = {
   },
   "areaServed": ["Lakeview, Chicago", "Wrigleyville, Chicago", "Chicago, IL"],
   "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday"], "opens": "15:00", "closes": "23:59" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Thursday", "opens": "11:00", "closes": "23:59" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday"], "opens": "15:00", "closes": "23:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Thursday", "opens": "11:00", "closes": "23:00" },
     { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Friday", "Saturday"], "opens": "11:00", "closes": "01:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "23:59" }
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "11:00", "closes": "23:00" }
   ],
   "menu": "https://theivybk.com/menu",
   "acceptsReservations": "True",
@@ -368,7 +368,7 @@ const jsonLd = {
       </div>
       <div class="specials-card">
         <span class="specials-day">Wednesday</span>
-        <h3>Trivia &amp; Burgers</h3>
+        <h3>KromBurger Night</h3>
         <p>$15 burgers &middot; trivia 7&ndash;9pm</p>
         <div class="specials-beer">
           <div class="specials-logo">
@@ -380,8 +380,8 @@ const jsonLd = {
       </div>
       <div class="specials-card">
         <span class="specials-day">Thursday</span>
-        <h3>Nachos &amp; Quesadillas</h3>
-        <p>$10 each &middot; proteins extra</p>
+        <h3>Nacho Average Thursday</h3>
+        <p>$10 nachos &amp; quesadillas &middot; proteins extra</p>
         <div class="specials-beer">
           <div class="specials-logo">
             <img src="/assets/img/partners/half-acre.webp" alt="Half Acre Beer Company" width="480" height="89" loading="lazy">
@@ -513,13 +513,18 @@ const jsonLd = {
       <span class="eyebrow">Hours</span>
       <h2 style="margin-top:8px;">When to find us</h2>
       <table class="hours-table">
-        <tr><td><span class="status-dot"></span>Monday</td><td>3pm – 12am</td></tr>
-        <tr><td><span class="status-dot"></span>Tuesday</td><td>3pm – 12am</td></tr>
-        <tr><td><span class="status-dot"></span>Wednesday</td><td>3pm – 12am</td></tr>
-        <tr><td><span class="status-dot"></span>Thursday</td><td>11am – 12am</td></tr>
+        <tr><td><span class="status-dot"></span>Monday</td><td>3pm – 11pm</td></tr>
+        <tr><td><span class="status-dot"></span>Tuesday</td><td>3pm – 11pm</td></tr>
+        <tr><td><span class="status-dot"></span>Wednesday</td><td>3pm – 11pm</td></tr>
+        <tr><td><span class="status-dot"></span>Thursday</td><td>11am – 11pm</td></tr>
         <tr><td><span class="status-dot"></span>Friday</td><td>11am – 1am</td></tr>
         <tr><td><span class="status-dot"></span>Saturday</td><td>11am – 1am</td></tr>
-        <tr><td><span class="status-dot"></span>Sunday</td><td>11am – 12am</td></tr>
+        <tr><td><span class="status-dot"></span>Sunday</td><td>11am – 11pm</td></tr>
+      </table>
+      <h3 class="hours-sub">Kitchen</h3>
+      <table class="hours-table">
+        <tr><td><span class="status-dot"></span>Sunday – Thursday</td><td>closes 10pm</td></tr>
+        <tr><td><span class="status-dot"></span>Friday &amp; Saturday</td><td>closes 12am</td></tr>
       </table>
       <h3 class="hours-sub">Rooftop <span>· weather permitting</span></h3>
       <table class="hours-table">

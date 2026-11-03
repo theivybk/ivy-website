@@ -273,8 +273,8 @@ function welcomeEmail(email) {
     `Weekly Specials`,
     `Monday — Monday Night Pizza: 50% off pizza with the purchase of a drink, $5 Lagunitas beers`,
     `Tuesday — Wing Fling Tuesday: 6 wings for $10, $5 Three Floyds beers`,
-    `Wednesday — Trivia & Burgers: $15 burgers, $5 Krombacher, trivia 7-9pm`,
-    `Thursday — Nachos & Quesadillas: $10 each (proteins extra), $5 Half Acre drafts`,
+    `Wednesday — KromBurger Night: $15 burgers, $5 Krombacher, trivia 7-9pm`,
+    `Thursday — Nacho Average Thursday: $10 nachos & quesadillas (proteins extra), $5 Half Acre drafts`,
     `Friday & Saturday — Night Caps: $10 signature cocktails, 10pm-12am`,
     ``,
     `HAPPY HOUR — Monday–Thursday, 3-6pm`,
@@ -302,8 +302,8 @@ function welcomeEmail(email) {
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 16px; font-size:14px;">
         <tr><td style="padding:4px 0; font-weight:bold; width:90px; vertical-align:top;">Mon</td><td style="padding:4px 0;">Monday Night Pizza — 50% off pizza with a drink, $5 Lagunitas beers</td></tr>
         <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Tue</td><td style="padding:4px 0;">Wing Fling Tuesday — 6 wings for $10, $5 Three Floyds beers</td></tr>
-        <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Wed</td><td style="padding:4px 0;">Trivia &amp; Burgers — $15 burgers, $5 Krombacher, trivia 7&ndash;9pm</td></tr>
-        <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Thu</td><td style="padding:4px 0;">Nachos &amp; Quesadillas — $10 each (proteins extra), $5 Half Acre drafts</td></tr>
+        <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Wed</td><td style="padding:4px 0;">KromBurger Night — $15 burgers, $5 Krombacher, trivia 7&ndash;9pm</td></tr>
+        <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Thu</td><td style="padding:4px 0;">Nacho Average Thursday — $10 nachos &amp; quesadillas (proteins extra), $5 Half Acre drafts</td></tr>
         <tr><td style="padding:4px 0; font-weight:bold; vertical-align:top;">Fri &amp; Sat</td><td style="padding:4px 0;">Night Caps — $10 signature cocktails, 10pm&ndash;12am</td></tr>
       </table>
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; margin:0 0 24px;">

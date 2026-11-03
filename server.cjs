@@ -996,13 +996,13 @@ const RESERVATION_DURATION_MS = 2 * 60 * 60 * 1000;
 // openingHoursSpecification and hours table) -- keep both in sync if hours
 // change. `close` runs past 24:00 for nights that close after midnight.
 const RESERVATION_HOURS = {
-  0: { open: 11 * 60, close: 24 * 60 }, // Sunday    11am - 12am
-  1: { open: 15 * 60, close: 24 * 60 }, // Monday     3pm - 12am
-  2: { open: 15 * 60, close: 24 * 60 }, // Tuesday    3pm - 12am
-  3: { open: 15 * 60, close: 24 * 60 }, // Wednesday  3pm - 12am
-  4: { open: 11 * 60, close: 24 * 60 }, // Thursday  11am - 12am
-  5: { open: 11 * 60, close: 25 * 60 }, // Friday    11am - 1am (next day)
-  6: { open: 11 * 60, close: 25 * 60 }, // Saturday  11am - 1am (next day)
+  0: { open: 11 * 60, close: 23 * 60 }, // Sunday    11am - 11pm (kitchen closes 10pm)
+  1: { open: 15 * 60, close: 23 * 60 }, // Monday     3pm - 11pm (kitchen closes 10pm)
+  2: { open: 15 * 60, close: 23 * 60 }, // Tuesday    3pm - 11pm (kitchen closes 10pm)
+  3: { open: 15 * 60, close: 23 * 60 }, // Wednesday  3pm - 11pm (kitchen closes 10pm)
+  4: { open: 11 * 60, close: 23 * 60 }, // Thursday  11am - 11pm (kitchen closes 10pm)
+  5: { open: 11 * 60, close: 25 * 60 }, // Friday    11am - 1am (next day; kitchen closes 12am)
+  6: { open: 11 * 60, close: 25 * 60 }, // Saturday  11am - 1am (next day; kitchen closes 12am)
 };
 
 // Parses "7:30 PM" (as produced by the reservation form's time <select>) into { hour24, minute }.
