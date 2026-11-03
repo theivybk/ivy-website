@@ -322,11 +322,47 @@ const jsonLd = {
     <h2>Three blocks from Wrigley Field</h2>
     <p>Catch the game or grab a bite before the show — TVs throughout the bar, dining room, and rooftop, plus Chicago Tavern &amp; Detroit Pan pizza, smash burgers, and drinks to fuel the walk over. Reserve ahead on game days and concert nights, since we fill up fast.</p>
     <div class="gameday-posts">
-      <figure class="gameday-post">
-        <img src="/assets/img/gameday/bears-bingo.webp?v=20261102-285178" alt="Bears Bingo at The Ivy on a split-flap departure board: Bears at Seattle, Monday Night Football, 7:15pm. Free bingo cards at the bar, and the first bingo wins a $100 Ivy gift card." width="1080" height="1350" loading="lazy">
-        <figcaption>Bears Bingo Monday night: Bears at Seahawks, Monday Night Football, 7:15pm CT. Free cards at the bar. First bingo wins a $100 Ivy gift card.</figcaption>
+      <!-- bingo:start -->
+      <figure class="gameday-post" id="bingo-post" data-generic="Bears Bingo at every Bears game: free cards at the bar, and the first bingo wins a prize.">
+        <img id="bingo-img" src="/assets/img/gameday/bears-bingo-20261102.webp?v=285178" alt="Bears Bingo at The Ivy on a split-flap departure board: Bears at Seattle, Monday Night Football, 7:15pm. Free bingo cards at the bar, and the first bingo wins a $100 Ivy gift card." width="1080" height="1350" loading="lazy">
+        <figcaption id="bingo-caption">Bears Bingo Monday night: Bears at Seahawks, Monday Night Football, 7:15pm CT. Free cards at the bar. First bingo wins a $100 Ivy gift card.</figcaption>
       </figure>
+      <script type="application/json" id="bingo-games" is:inline>[
+        {"date":"2026-11-02","img":"/assets/img/gameday/bears-bingo-20261102.webp?v=285178","alt":"Bears Bingo at The Ivy on a split-flap departure board: Bears at Seattle, Monday Night Football, 7:15pm. Free bingo cards at the bar, and the first bingo wins a $100 Ivy gift card.","caption":"Bears Bingo Monday night: Bears at Seahawks, Monday Night Football, 7:15pm CT. Free cards at the bar. First bingo wins a $100 Ivy gift card."},
+        {"date":"2026-11-08","img":"/assets/img/gameday/bears-bingo-20261108.webp?v=691048","alt":"Bears Bingo scratch-off ticket at The Ivy: Sunday Nov 8, 7:20pm kickoff against Tampa Bay, free bingo cards, and the first bingo wins a $100 Ivy gift card.","caption":"Bears Bingo Sunday night: Bears vs. Buccaneers, Sunday Night Football, 7:20pm CT. Free cards at the bar. First bingo wins a $100 Ivy gift card."}
+      ]</script>
+      <!-- bingo:end -->
     </div>
+    <script is:inline>
+      (function () {
+        var data = document.getElementById('bingo-games');
+        var fig = document.getElementById('bingo-post');
+        var cap = document.getElementById('bingo-caption');
+        if (!data || !fig || !cap) return;
+        var games;
+        try { games = JSON.parse(data.textContent); } catch (e) { return; }
+        var parts = {};
+        new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' })
+          .formatToParts(new Date()).forEach(function (p) { parts[p.type] = p.value; });
+        var today = parts.year + '-' + parts.month + '-' + parts.day;
+        var next = null;
+        games.forEach(function (g) { if (g.date >= today && (!next || g.date < next.date)) next = g; });
+        var img = document.getElementById('bingo-img');
+        if (next) {
+          if (!img) {
+            img = document.createElement('img');
+            img.id = 'bingo-img'; img.width = 1080; img.height = 1350; img.loading = 'lazy';
+            fig.insertBefore(img, cap);
+          }
+          if (img.getAttribute('src') !== next.img) img.setAttribute('src', next.img);
+          img.alt = next.alt;
+          cap.textContent = next.caption;
+        } else {
+          if (img) img.remove();
+          cap.textContent = fig.getAttribute('data-generic') || '';
+        }
+      })();
+    </script>
     <div class="gameday-ctas">
       <a href="#reserve" class="btn btn--primary">Reserve a Table</a>
       <a href="/menu" class="btn btn--brass-outline">View Menus</a>
