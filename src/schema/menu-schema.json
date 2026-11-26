@@ -103,16 +103,6 @@
             },
             {
               "@type": "MenuItem",
-              "name": "Crispy Pork Belly Bites",
-              "description": "Honey sriracha glaze, agave lime vinaigrette jalapeño cole slaw",
-              "offers": {
-                "@type": "Offer",
-                "price": "16",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
               "name": "Nachos",
               "description": "Poblano cheese, red onions, tomatoes, lettuce, jalapeños, black beans, guacamole, sour cream & chihuahua cheese. Add: Ground Beef +6, Steak +12, Grilled Chicken +6, Fried Chicken +6, Bacon +4, Chili +4",
               "offers": {
