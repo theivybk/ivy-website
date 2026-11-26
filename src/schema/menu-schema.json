@@ -74,7 +74,7 @@
             {
               "@type": "MenuItem",
               "name": "Broccolini",
-              "description": "Sautéed in garlic lemon butter and topped with thinly sliced Fresno chilis",
+              "description": "Sautéed in garlic lemon butter, finished with nutty Parmesan and thinly sliced Fresno chilis",
               "offers": {
                 "@type": "Offer",
                 "price": "11",
@@ -782,16 +782,6 @@
                 "price": "6",
                 "priceCurrency": "USD"
               }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Upland Hoosier Gameday Lager",
-              "description": "Can",
-              "offers": {
-                "@type": "Offer",
-                "price": "7",
-                "priceCurrency": "USD"
-              }
             }
           ]
         },
@@ -800,6 +790,15 @@
           "name": "Seltzers",
           "description": "hard seltzer, vodka soda, spiked tea",
           "hasMenuItem": [
+            {
+              "@type": "MenuItem",
+              "name": "CarBliss Apple",
+              "offers": {
+                "@type": "Offer",
+                "price": "7",
+                "priceCurrency": "USD"
+              }
+            },
             {
               "@type": "MenuItem",
               "name": "CarBliss Black Raspberry",
@@ -811,7 +810,7 @@
             },
             {
               "@type": "MenuItem",
-              "name": "CarBliss Lemon Lime",
+              "name": "CarBliss Blood Orange",
               "offers": {
                 "@type": "Offer",
                 "price": "7",
@@ -820,7 +819,7 @@
             },
             {
               "@type": "MenuItem",
-              "name": "Florida Seltzer Blackberry Agave",
+              "name": "CarBliss Lemon Lime",
               "offers": {
                 "@type": "Offer",
                 "price": "7",
@@ -935,6 +934,16 @@
           "hasMenuItem": [
             {
               "@type": "MenuItem",
+              "name": "Angry Orchard Crisp Apple",
+              "description": "Can",
+              "offers": {
+                "@type": "Offer",
+                "price": "6",
+                "priceCurrency": "USD"
+              }
+            },
+            {
+              "@type": "MenuItem",
               "name": "Right Bee Cider Semi-Dry",
               "description": "Can",
               "offers": {
@@ -991,15 +1000,6 @@
             },
             {
               "@type": "MenuItem",
-              "name": "Athletic Run Wild IPA",
-              "offers": {
-                "@type": "Offer",
-                "price": "6",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
               "name": "Guinness Zero Draught",
               "offers": {
                 "@type": "Offer",
@@ -1020,42 +1020,6 @@
         },
         {
           "@type": "MenuSection",
-          "name": "CBD/THC",
-          "description": "hemp-infused sparkling",
-          "hasMenuItem": [
-            {
-              "@type": "MenuItem",
-              "name": "Goodwell CBD Sparkling Water Blackberry",
-              "offers": {
-                "@type": "Offer",
-                "price": "6",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Toke Cosmic Berry",
-              "description": "THC 2mg",
-              "offers": {
-                "@type": "Offer",
-                "price": "9",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Toke Star Crusher",
-              "description": "THC 2mg",
-              "offers": {
-                "@type": "Offer",
-                "price": "9",
-                "priceCurrency": "USD"
-              }
-            }
-          ]
-        },
-        {
-          "@type": "MenuSection",
           "name": "Gluten Free",
           "description": "dedicated gluten-free brewery",
           "hasMenuItem": [
@@ -1066,16 +1030,6 @@
               "offers": {
                 "@type": "Offer",
                 "price": "8",
-                "priceCurrency": "USD"
-              }
-            },
-            {
-              "@type": "MenuItem",
-              "name": "Ghostfish Peak Buster",
-              "description": "Can",
-              "offers": {
-                "@type": "Offer",
-                "price": "10",
                 "priceCurrency": "USD"
               }
             },
