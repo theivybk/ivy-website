@@ -440,16 +440,16 @@ function menusEmail() {
     bodyHtml: `
       ${emailPara('Attached are the latest print-ready menu PDFs:')}
       <ul style="margin:0 0 16px; padding-left:20px;">
-        <li style="margin:0 0 6px;">Beer &amp; Cocktails</li>
+        <li style="margin:0 0 6px;">Beer</li>
+        <li style="margin:0 0 6px;">Cocktails, Wine &amp; Spirits</li>
         <li style="margin:0 0 6px;">Food &amp; Pizza</li>
-        <li style="margin:0 0 6px;">Spirits</li>
       </ul>
       ${emailFine('Print on legal paper (8.5 x 14 in).')}
     `,
   });
   return {
     subject: 'Updated Print Menus',
-    text: 'Attached are the latest print-ready menu PDFs: Beer & Cocktails, Food & Pizza, and Spirits.',
+    text: 'Attached are the latest print-ready menu PDFs: Beer, Cocktails, Wine & Spirits, and Food & Pizza.',
     html,
   };
 }

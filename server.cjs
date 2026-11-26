@@ -1863,7 +1863,7 @@ const server = http.createServer((req, res) => {
     }
     (async () => {
       try {
-        const menuFiles = ['Beer-Cocktails-Menu.pdf', 'Food-Pizza-Menu.pdf', 'Spirits-Menu.pdf'];
+        const menuFiles = ['Beer-Menu.pdf', 'Cocktails-Wine-Spirits-Menu.pdf', 'Food-Pizza-Menu.pdf'];
         const attachments = menuFiles.map((filename) => ({
           filename,
           content: fs.readFileSync(path.join(__dirname, 'print-menus', filename)).toString('base64'),
