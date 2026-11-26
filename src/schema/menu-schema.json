@@ -1425,6 +1425,25 @@
             },
             {
               "@type": "MenuItem",
+              "name": "Austin Chardonnay",
+              "description": "Paso Robles, CA",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "35",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
               "name": "Rombauer Sauvignon Blanc",
               "description": "Sonoma County, CA",
               "offers": [
@@ -1547,6 +1566,38 @@
                   "@type": "Offer",
                   "name": "Bottle",
                   "price": "35",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Catena Vista Flores Malbec",
+              "description": "Mendoza, Argentina",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Glass",
+                  "price": "12",
+                  "priceCurrency": "USD"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "35",
+                  "priceCurrency": "USD"
+                }
+              ]
+            },
+            {
+              "@type": "MenuItem",
+              "name": "Orin Swift 8 Years in the Desert",
+              "description": "California",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Bottle",
+                  "price": "75",
                   "priceCurrency": "USD"
                 }
               ]
