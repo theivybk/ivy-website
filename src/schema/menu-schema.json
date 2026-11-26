@@ -1234,16 +1234,6 @@
                 },
                 {
                   "@type": "MenuItem",
-                  "name": "Pumpkin Spice Espresso",
-                  "description": "Vodka, espresso, pumpkin spice",
-                  "offers": {
-                    "@type": "Offer",
-                    "price": "15",
-                    "priceCurrency": "USD"
-                  }
-                },
-                {
-                  "@type": "MenuItem",
                   "name": "Caramel Apple Martini",
                   "description": "Vodka, apple cider, caramel, lemon juice",
                   "offers": {
