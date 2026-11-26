@@ -74,7 +74,7 @@
             {
               "@type": "MenuItem",
               "name": "Broccolini",
-              "description": "Sautéed in garlic lemon butter and topped with Fresno chili",
+              "description": "Sautéed in garlic lemon butter and topped with thinly sliced Fresno chilis",
               "offers": {
                 "@type": "Offer",
                 "price": "11",
@@ -168,7 +168,7 @@
             {
               "@type": "MenuItem",
               "name": "Atlantic Salmon",
-              "description": "Honey sriracha glaze, lemon cauliflower rice, topped with parsley & Fresno chili",
+              "description": "Honey sriracha glaze, lemon cauliflower rice, topped with parsley & thinly sliced Fresno chilis",
               "offers": {
                 "@type": "Offer",
                 "price": "28",
