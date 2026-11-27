@@ -558,54 +558,16 @@ function checkBasicAuth(req) {
   return user === ADMIN_USER && pass === ADMIN_PASS;
 }
 
-// ---- Staff pages (separate login from admin) ----
-// Staff sign in with STAFF_USER / STAFF_PASS (set in Railway). The admin login
-// also works. If STAFF_PASS is not set, only the admin login gets in.
-const STAFF_USER = (process.env.STAFF_USER || 'staff').trim();
-const STAFF_PASS = (process.env.STAFF_PASS || '').trim();
+// ---- Staff pages ----
+// Open to anyone with the link (owner decision 2026-11-27), but not linked
+// from the site and marked noindex so search engines leave it out.
 const STAFF_PAGES = { '/staff': 'bar-notes.html', '/staff/': 'bar-notes.html', '/staff/bar-notes': 'bar-notes.html' };
-const staffFailures = new Map(); // ip -> { count, resetAt }
-
-function safeEqual(a, b) {
-  const ha = crypto.createHash('sha256').update(String(a)).digest();
-  const hb = crypto.createHash('sha256').update(String(b)).digest();
-  return crypto.timingSafeEqual(ha, hb);
-}
-
-function checkStaffAuth(req) {
-  if (checkBasicAuth(req)) return true;
-  if (!STAFF_PASS) return false;
-  const match = (req.headers['authorization'] || '').match(/^Basic (.+)$/);
-  if (!match) return false;
-  const decoded = Buffer.from(match[1], 'base64').toString('utf8');
-  const sepIdx = decoded.indexOf(':');
-  if (sepIdx === -1) return false;
-  const userOk = safeEqual(decoded.slice(0, sepIdx), STAFF_USER);
-  const passOk = safeEqual(decoded.slice(sepIdx + 1), STAFF_PASS);
-  return userOk && passOk;
-}
 
 function handleStaffPage(req, res, urlPath) {
-  const ip = getClientIp(req);
-  const now = Date.now();
-  let f = staffFailures.get(ip);
-  if (f && now > f.resetAt) { staffFailures.delete(ip); f = null; }
-  if (f && f.count >= 20) return rejectRateLimited(res);
-  if (!checkStaffAuth(req)) {
-    // Browsers send one unauthenticated request before showing the login box,
-    // so only count requests that actually carried a username and password.
-    if (req.headers['authorization']) {
-      if (!f) { f = { count: 0, resetAt: now + 15 * 60 * 1000 }; staffFailures.set(ip, f); }
-      f.count++;
-    }
-    res.writeHead(401, { 'WWW-Authenticate': 'Basic realm="The Ivy Staff", charset="UTF-8"', 'Content-Type': 'text/plain', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' });
-    res.end('Staff login required');
-    return;
-  }
   fs.readFile(path.join(__dirname, 'staff', STAFF_PAGES[urlPath]), (err, html) => {
     if (err) { res.writeHead(500, { 'Content-Type': 'text/plain' }); res.end('Page missing'); return; }
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' });
-    res.end(html);
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache', 'X-Robots-Tag': 'noindex, nofollow' });
+    res.end(req.method === 'HEAD' ? undefined : html);
   });
 }
 
