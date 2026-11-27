@@ -70,6 +70,11 @@ h3.group { font-family: var(--display); font-style: italic; font-weight: 500; fo
 .expr dt { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--brass); font-weight: 600; }
 .expr dd { margin: 0; min-width: 0; }
 .expr .p { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.winenote { margin: 0; font-size: 14px; }
+.pair { margin-top: auto; padding-top: 9px; border-top: 1px solid var(--rule); font-family: var(--display); font-style: italic; font-size: 17px; line-height: 1.3; color: var(--ivy); }
+.pair b { font-family: var(--body); font-style: normal; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--brass); margin-right: 4px; }
+.meta .flag { color: var(--ink); font-weight: 500; }
+.newtag { font-family: var(--body); font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ivy); border: 1px solid var(--ivy); border-radius: 2px; padding: 1px 5px 0; vertical-align: 4px; margin-left: 4px; }
 h5 { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 26px; color: var(--ivy); margin: 32px 0 10px; }
 .tablewrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
@@ -84,13 +89,13 @@ td:last-child { color: var(--ivy); font-weight: 500; }
 
 <header class="top wrap">
   <div class="eyebrow">Staff reference &middot; Back bar</div>
-  <h1>Scotch, Bourbon &amp; Tequila</h1>
-  <p class="lede">Every scotch, bourbon, rye and tequila on our menu: what it tastes like, what it costs and one line to say to the guest. Prices are for a 1.5 oz / 2 oz pour.</p>
+  <h1>Spirits &amp; Wine</h1>
+  <p class="lede">Every scotch, bourbon, rye, tequila and wine on our menu: what it tastes like, what it costs and what to say to the guest. Spirit prices are for a 1.5 oz / 2 oz pour. Wine prices are glass / bottle.</p>
   <p class="note">Taken from the spirits list on our website menu. Barrel-proof bottles change strength from batch to batch, so check the label. If a note doesn't match the bottle we have open, trust your own taste and tell the bar manager.</p>
 </header>
 
 <nav class="tabs" aria-label="Spirits"><div class="wrap">
-  <a href="#scotch">Scotch</a><a href="#bourbon">Bourbon &amp; Rye</a><a href="#tequila">Tequila</a><a href="#service">Pouring</a>
+  <a href="#scotch">Scotch</a><a href="#bourbon">Bourbon &amp; Rye</a><a href="#tequila">Tequila</a><a href="#wine">Wine</a><a href="#service">Pouring</a>
 </div></nav>
 
 <main class="wrap">
@@ -173,6 +178,20 @@ td:last-child { color: var(--ivy); font-weight: 500; }
       <tr><td>"The best you have"</td><td>Top of our list</td><td>Mijenta Añejo</td></tr>
     </tbody>
   </table></div>
+</section>
+
+<section class="spirit" id="wine">
+  <div class="eyebrow">By the glass &amp; bottle &middot; 15 wines</div>
+  <h2>Wine</h2>
+  <p class="groupnote" style="margin-top:12px">Notes describe each wine's style. Exact flavors shift a little from one vintage to the next.</p>
+  <h3 class="group">Sparkling</h3>
+  <div class="cards" data-wine="Sparkling"></div>
+  <h3 class="group">White</h3>
+  <div class="cards" data-wine="White"></div>
+  <h3 class="group">Ros&eacute;</h3>
+  <div class="cards" data-wine="Rosé"></div>
+  <h3 class="group">Red</h3>
+  <div class="cards" data-wine="Red"></div>
 </section>
 
 <section class="service" id="service">
@@ -258,6 +277,24 @@ const T = [
  ["Patrón", "Highlands. Well known.", "Familiar and bright. The 100 proof silver is a strong margarita.", [["Blanco","Citrus, agave, pepper","14/19"],["Reposado","Vanilla, honey, light oak","16/21"],["Silver 100","Bolder agave, pepper, heat","16/21"]]],
  ["Lost Lore", "Jalisco. Newer brand.", "A newer label on our list. Taste it before describing it to guests.", [["Blanco","Bright agave, citrus","14/19"],["Reposado","Agave, vanilla, soft oak","16/21"],["Añejo","Caramel, oak, spice","22/28"]]]
 ];
+// Wine (from the Nov 26 preshift Wine Guide): [group, name, region, flag, price, notes, try with, isNew]
+const W = [
+ ["Sparkling","Zardetto Prosecco Rosé","Veneto, Italy","187 ml single-serve bottle","11","Pale pink Prosecco with strawberry, white peach and a hint of mandarin. Fresh, lively bubbles and a crisp finish.","Cheese Curds, Pretzel Twist or the Brownie à la Mode",0],
+ ["Sparkling","Zardetto Brut","Veneto, Italy","","10 / 35","Dry, crisp Italian sparkling in the Prosecco style: green apple, pear and white blossom with bright, lively bubbles.","Crispy Wings, Chicken Tenders or Fries",0],
+ ["White","Barnard Griffin Chardonnay","Columbia Valley, Washington","","10 / 30","Medium-bodied, with green apple and pear and a hint of toasty French oak. Creamy, but the oak stays in the background.","Mac n' Cheese or Cheesy Garlic Bread",0],
+ ["White","Flora Lisa Pinot Grigio","Abruzzo, Italy · Organic grapes","","10 / 30","Rounder and riper than a typical Pinot Grigio: pear, ripe peach and honeydew with a bright Meyer-lemon snap and a salty, mineral finish. A little local Pecorino and Trebbiano in the blend adds texture.","the Caesar or the Crispy Chicken Chopped",0],
+ ["White","Villa Maria Sauvignon Blanc","Private Bin · Marlborough, New Zealand","","10 / 30","Bright, zesty and aromatic: passionfruit, fresh lime and grapefruit with a green, herbal edge. Crisp and very refreshing.","Hummus or the Fall Harvest salad",0],
+ ["White","Austin Chardonnay","Paso Robles, California","","12 / 35","Golden and ripe, with bright tropical fruit and a touch of cream from aging on the lees, balanced by a snap of lemon-zest acidity.","the White Out pizza or the Acorn Squash",1],
+ ["White","Rombauer Sauvignon Blanc","Sonoma County, California","","15 / 45","A rounder, richer Sauvignon Blanc: yellow peach and ripe melon with bright citrus, and a creamy vanilla note on a long finish. Mostly made in stainless steel, so it stays fresh.","the Atlantic Salmon or the Broccolini",0],
+ ["Rosé","Forever Summer by Mirabeau","Provence, France","","10 / 30","Pale pink and easy to drink: wild strawberry and red summer fruit with a touch of citrus and soft, gentle acidity. A lighter, lower-alcohol rosé.","Chicken Tenders or the Quesadilla",0],
+ ["Rosé","Maison Saint AIX Rosé","Provence, France","","15 / 45","A dry, elegant Provence rosé in pale copper: wild strawberry, pink grapefruit and white peach with a rose-petal lift and a clean, mineral finish. A blend of Grenache, Cinsault and Syrah.","the Red Ivy pizza or Cheese Curds",0],
+ ["Red","Liberty School Cabernet Sauvignon","Paso Robles, California","","10 / 30","Medium to full bodied and fruit-forward: blackcurrant and dark cherry with vanilla and spice. Smooth, approachable tannins make it an easy everyday red.","The Original burger or the Five Alarm",0],
+ ["Red","Troublemaker Red Blend","Central Coast, California","","10 / 30","A bold, juicy Rhône-style blend of Syrah, Petite Sirah, Mourvèdre, Grenache and Zinfandel: ripe blackberry and cherry, cocoa and coffee, a little vanilla. Big flavor with a smooth finish.","the Steak Sandwich or The Bad Boys 5 pizza",0],
+ ["Red","Raeburn Pinot Noir","Sonoma County, California","","12 / 35","Lighter bodied and silky: red cherry and raspberry with baking spice, a little vanilla and a floral, earthy edge.","the Atlantic Salmon or the Acorn Squash",0],
+ ["Red","Catena Vista Flores Malbec","Mendoza, Argentina","","12 / 35","A deep violet Malbec with ripe plum and blackberry, violet and lavender, mocha and sweet spice. Rich and full, with a hint of leather.","the Grilled Steak or the Steak Sandwich",1],
+ ["Red","Orin Swift 8 Years in the Desert","California","Bottle only","75","A big, plush, Zinfandel-led blend with Petite Sirah and Syrah: blackberry, black cherry, black pepper and allspice, with a chocolate-covered espresso bean note. Full-bodied and silky, with soft tannins.","the Grilled Steak, The Original or the Five Alarm",1],
+ ["Red","Austin Hope Cabernet Sauvignon","Paso Robles, California","Bottle only","95","Full-bodied and ripe: black currant and blackberry with violets, mocha and dried spice. A dark, juicy Paso Robles Cabernet with plush tannins.","the Grilled Steak or the Steak Sandwich",0]
+];
 const dots = n => '<span class="dots">' + [1,2,3,4,5].map(i => '<i class="' + (i <= n ? 'on' : '') + '"></i>').join('') + '</span>';
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 for (const [key, set] of Object.entries(D)) {
@@ -272,4 +309,10 @@ document.querySelector('[data-list="tequila"]').innerHTML = T.map(t => `<article
   <div class="meta"><span class="style">${esc(t[1])}</span></div>
   <dl class="expr">${t[3].map(e => `<div><dt>${esc(e[0])}</dt><dd>${esc(e[1])}</dd><span class="p">$${esc(e[2])}</span></div>`).join('')}</dl>
   <div class="say">&ldquo;${esc(t[2])}&rdquo;</div></article>`).join('');
+document.querySelectorAll('[data-wine]').forEach(el => {
+  el.innerHTML = W.filter(w => w[0] === el.dataset.wine).map(w => `<article class="card"><h4>${esc(w[1])}${w[7] ? ' <span class="newtag">New</span>' : ''}</h4>
+    <div class="meta"><span class="style">${esc(w[2])}</span>${w[3] ? `<span class="flag">${esc(w[3])}</span>` : ''}<span class="price">$${esc(w[4])}</span></div>
+    <p class="winenote">${esc(w[5])}</p>
+    <div class="pair"><b>Try with</b> ${esc(w[6])}.</div></article>`).join('');
+});
 </script>
