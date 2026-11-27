@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>The Ivy Back Bar Notes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: staff reference. Sticky spirit tabs, a short primer per spirit, bottle cards grouped as on the menu, then an "if they like" table. */
+:root {
+  --cream: #F5EFE3;
+  --paper: #FBF7EE;
+  --ivy: #1F3D2A;
+  --ink: #2A2A24;
+  --muted: #6B6A5C;
+  --brass: #B8923D;
+  --rule: #DDD3BF;
+  --display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --body: "Work Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cream: #121C16; --paper: #1A271F; --ivy: #E6DCC6; --ink: #E9E3D6;
+    --muted: #A7A391; --brass: #D2AD5C; --rule: #2E3D33; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --cream: #121C16; --paper: #1A271F; --ivy: #E6DCC6; --ink: #E9E3D6;
+  --muted: #A7A391; --brass: #D2AD5C; --rule: #2E3D33; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--cream); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.top { padding-block: 40px 20px; }
+.eyebrow { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--brass); font-weight: 600; }
+h1 { font-family: var(--display); font-style: italic; font-weight: 500; color: var(--ivy); font-size: clamp(38px, 6vw, 60px); line-height: 1; margin: 8px 0 12px; letter-spacing: -.01em; text-wrap: balance; }
+.lede { max-width: 64ch; color: var(--muted); margin: 0; }
+nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--cream); border-bottom: 1px solid var(--rule); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--cream); }
+nav.tabs .wrap { display: flex; gap: 24px; overflow-x: auto; }
+nav.tabs a { font-family: var(--display); font-style: italic; font-size: 22px; color: var(--ivy); text-decoration: none; padding-block: 10px; border-bottom: 2px solid transparent; white-space: nowrap; }
+nav.tabs a:hover, nav.tabs a:focus-visible { border-bottom-color: var(--brass); outline: none; }
+section.spirit { padding-block: 40px 16px; scroll-margin-top: 56px; }
+h2 { font-family: var(--display); font-style: italic; font-weight: 500; color: var(--ivy); font-size: 40px; line-height: 1.05; margin: 0 0 6px; }
+h3.group { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 26px; color: var(--ivy); margin: 32px 0 4px; }
+.groupnote { font-size: 13px; color: var(--muted); margin: 0 0 14px; }
+.primer { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0 32px; margin: 20px 0 8px; padding-block: 16px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.primer div { min-width: 0; padding-block: 6px; }
+.primer dt { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 2px; }
+.primer dd { margin: 0; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+.card { background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.card h4 { font-family: var(--display); font-weight: 600; font-size: 23px; line-height: 1.1; color: var(--ivy); margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.meta .style { color: var(--brass); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.meta .price { margin-left: auto; color: var(--ink); font-weight: 500; }
+.notes { display: grid; grid-template-columns: 58px 1fr; gap: 3px 10px; margin: 0; font-size: 14px; }
+.notes dt { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.notes dd { margin: 0; min-width: 0; }
+.scale { display: grid; grid-template-columns: 58px auto 1fr auto; gap: 4px 10px; font-size: 11px; color: var(--muted); align-items: center; }
+.scale .k { letter-spacing: .1em; text-transform: uppercase; }
+.dots { display: flex; gap: 4px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--brass); display: block; }
+.dots i.on { background: var(--brass); }
+.say { margin-top: auto; padding-top: 9px; border-top: 1px solid var(--rule); font-family: var(--display); font-style: italic; font-size: 18px; line-height: 1.3; color: var(--ivy); }
+.expr { display: grid; gap: 8px; margin: 0; }
+.expr div { display: grid; grid-template-columns: 74px 1fr auto; gap: 2px 10px; font-size: 14px; align-items: baseline; }
+.expr dt { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--brass); font-weight: 600; }
+.expr dd { margin: 0; min-width: 0; }
+.expr .p { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+h5 { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 26px; color: var(--ivy); margin: 32px 0 10px; }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
+th, td { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td:last-child { color: var(--ivy); font-weight: 500; }
+.service { padding-block: 32px 56px; }
+.service ul { margin: 12px 0 0; padding-left: 18px; max-width: 72ch; display: grid; gap: 6px; }
+.note { font-size: 12px; color: var(--muted); margin-top: 10px; max-width: 72ch; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<header class="top wrap">
+  <div class="eyebrow">Staff reference &middot; Back bar</div>
+  <h1>Scotch, Bourbon &amp; Tequila</h1>
+  <p class="lede">Every scotch, bourbon, rye and tequila on our menu: what it tastes like, what it costs and one line to say to the guest. Prices are for a 1.5 oz / 2 oz pour.</p>
+  <p class="note">Taken from the spirits list on our website menu. Barrel-proof bottles change strength from batch to batch, so check the label. If a note doesn't match the bottle we have open, trust your own taste and tell the bar manager.</p>
+</header>
+
+<nav class="tabs" aria-label="Spirits"><div class="wrap">
+  <a href="#scotch">Scotch</a><a href="#bourbon">Bourbon &amp; Rye</a><a href="#tequila">Tequila</a><a href="#service">Pouring</a>
+</div></nav>
+
+<main class="wrap">
+
+<section class="spirit" id="scotch">
+  <div class="eyebrow">Scotland &middot; 8 bottles</div>
+  <h2>Scotch</h2>
+  <dl class="primer">
+    <div><dt>The rules</dt><dd>Made in Scotland, aged at least 3 years in oak. "Single malt" means one distillery, 100% malted barley. "Blended" mixes malt and grain whisky.</dd></div>
+    <div><dt>Regions, in one word</dt><dd>Speyside: fruity. Highland: rounded. Islay: smoky.</dd></div>
+    <div><dt>Peat</dt><dd>Barley dried over peat smoke. It tastes like a campfire, bandages or the sea. Always warn a guest before pouring Ardbeg or Lagavulin.</dd></div>
+    <div><dt>Cask words</dt><dd>Sherry cask: dried fruit, raisin, nuts. Bourbon cask: vanilla, honey.</dd></div>
+  </dl>
+  <div class="cards" data-list="scotch"></div>
+  <h5>If they like&hellip;</h5>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Guest says</th><th>Why</th><th>Pour</th></tr></thead>
+    <tbody>
+      <tr><td>"Something easy, not smoky"</td><td>Light Speyside, orchard fruit</td><td>Glenfiddich 12</td></tr>
+      <tr><td>"Scotch on a budget" or "for a highball"</td><td>Soft blends that mix well</td><td>Dewar's White Label or Monkey Shoulder</td></tr>
+      <tr><td>"I usually drink bourbon"</td><td>Honey and vanilla from bourbon casks</td><td>Balvenie 12 DoubleWood</td></tr>
+      <tr><td>"Something rich, for dessert"</td><td>All sherry cask</td><td>Glendronach 12</td></tr>
+      <tr><td>"I want to try smoky"</td><td>A little coastal smoke, low risk</td><td>Oban 14</td></tr>
+      <tr><td>"The smokiest you've got"</td><td>Heavy Islay peat</td><td>Ardbeg 10, or Lagavulin 16 for richer</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="spirit" id="bourbon">
+  <div class="eyebrow">United States &middot; 34 bottles</div>
+  <h2>Bourbon &amp; Rye</h2>
+  <dl class="primer">
+    <div><dt>The rules</dt><dd>Bourbon: made in the US, at least 51% corn, aged in new charred oak, at least 80 proof. "Bottled in bond" means one distillery, one season, 4+ years, exactly 100 proof.</dd></div>
+    <div><dt>Wheated</dt><dd>Wheat in place of rye makes it softer and sweeter. All our Weller and Maker's Mark are wheated.</dd></div>
+    <div><dt>Rye</dt><dd>At least 51% rye. Drier and spicier than bourbon: pepper, clove, mint. The Manhattan whiskey.</dd></div>
+    <div><dt>Proof</dt><dd>Proof is ABV doubled. Above 100 proof, offer a few drops of water or one big rock.</dd></div>
+  </dl>
+  <h3 class="group">Bourbon &amp; American</h3>
+  <p class="groupnote">2 oz cocktail pour available as an Old Fashioned, Manhattan or Whiskey Sour, add $4.</p>
+  <div class="cards" data-list="bourbon"></div>
+  <h3 class="group">Reserve</h3>
+  <p class="groupnote">1.5 oz pour only. These are allocated bottles, so mention them to guests who ask for "something special".</p>
+  <div class="cards" data-list="reserve"></div>
+  <h3 class="group">Rye</h3>
+  <div class="cards" data-list="rye"></div>
+  <h5>If they like&hellip;</h5>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Guest says</th><th>Why</th><th>Pour</th></tr></thead>
+    <tbody>
+      <tr><td>"Smooth, nothing harsh"</td><td>Wheated, lower proof</td><td>Weller Special Reserve or Maker's Mark</td></tr>
+      <tr><td>"Your house bourbon"</td><td>Classic Kentucky, good value</td><td>Buffalo Trace</td></tr>
+      <tr><td>"Something a step up"</td><td>Older, more depth, same family</td><td>Eagle Rare 10 or E.H. Taylor Small Batch</td></tr>
+      <tr><td>"Big and bold"</td><td>High proof</td><td>Weller Antique 107, Old Forester 1920 or Rare Breed</td></tr>
+      <tr><td>"Something I can't get anywhere"</td><td>Allocated reserve list</td><td>Weller 12, Blanton's Gold, E.H. Taylor Barrel Proof</td></tr>
+      <tr><td>"I like spicy" or "for a Manhattan"</td><td>Rye</td><td>Sazerac Rye, or Rare Breed Rye neat</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="spirit" id="tequila">
+  <div class="eyebrow">Mexico &middot; 11 brands, 30 pours</div>
+  <h2>Tequila</h2>
+  <dl class="primer">
+    <div><dt>The rules</dt><dd>Made from blue Weber agave, mostly in Jalisco. Every tequila we pour is 100% agave.</dd></div>
+    <div><dt>Blanco</dt><dd>Unaged or under 2 months. Bright agave, citrus, pepper. The truest taste of the plant.</dd></div>
+    <div><dt>Reposado</dt><dd>"Rested" 2 to 12 months in oak. Agave plus vanilla and caramel.</dd></div>
+    <div><dt>A&ntilde;ejo</dt><dd>Aged 1 to 3 years. Sip it like whiskey. A good pick for bourbon drinkers.</dd></div>
+  </dl>
+  <p class="groupnote" style="margin-top:12px">2 oz cocktail pour available as a Margarita or Paloma, add $4.</p>
+  <div class="cards" data-list="tequila"></div>
+  <h5>If they like&hellip;</h5>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Guest says</th><th>Why</th><th>Pour</th></tr></thead>
+    <tbody>
+      <tr><td>"Your well tequila" or "a good value"</td><td>Clean, easy, lowest price</td><td>Corazón Blanco</td></tr>
+      <tr><td>"Something I know"</td><td>Familiar names</td><td>Don Julio or Patrón</td></tr>
+      <tr><td>"Something real, to sip"</td><td>Traditional, agave-forward blancos</td><td>Siete Leguas, G4 or Lalo Blanco</td></tr>
+      <tr><td>"I'm a whiskey drinker"</td><td>Oak-aged, caramel</td><td>Siete Leguas or Don Fulano Añejo</td></tr>
+      <tr><td>"Strong" or "a better margarita"</td><td>Higher proof holds up to lime</td><td>Cazcanes No. 7 Blanco or Patrón Silver 100</td></tr>
+      <tr><td>"The best you have"</td><td>Top of our list</td><td>Mijenta Añejo</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="service" id="service">
+  <div class="eyebrow">Behind the bar</div>
+  <h2>Pouring and talking</h2>
+  <ul>
+    <li><b>Ask before you suggest.</b> "Do you like it sweet, spicy or smoky?" One answer narrows the shelf to two bottles.</li>
+    <li><b>Neat, a few drops of water or one big rock.</b> Water opens up high-proof whiskey like the Weller Full Proof or Rare Breed.</li>
+    <li><b>Offer a taste</b> of Ardbeg, Lagavulin or anything barrel proof before pouring a full measure.</li>
+    <li><b>Use the guest's words back.</b> If they say "smooth", reply with "smooth", not "wheated" or "low proof".</li>
+    <li><b>Reposado and añejo are for sipping.</b> Serve them in a rocks or tasting glass, not as a shot.</li>
+    <li><b>Upsell one step at a time:</b> Buffalo Trace to Eagle Rare. Weller Special Reserve to Antique 107. Glenfiddich to Balvenie. Don Julio Blanco to Siete Leguas Añejo.</li>
+  </ul>
+</section>
+
+</main>
+
+<script>
+// [name, style, abv, price, nose, palate, finish, body 1-5, accent 1-5, guest line]
+const D = {
+scotch: { k: "Smoke", rows: [
+ ["Glenfiddich 12", "Speyside", "40%", "11/16", "Fresh pear, green apple", "Butterscotch, cream, light oak", "Short, clean, mellow", 2, 0, "Pear and apple, no smoke. An easy first scotch."],
+ ["Dewar's White Label", "Blended", "40%", "8/13", "Honey, heather, vanilla", "Light malt, soft fruit", "Short, gentle", 1, 0, "Light and smooth. Ideal with soda."],
+ ["Monkey Shoulder", "Blended malt", "40%", "8/13", "Orange, vanilla, honey", "Malty, creamy, a little spice", "Medium, spiced oak", 2, 0, "Smooth and a bit sweet. Made for cocktails."],
+ ["Balvenie 12 DoubleWood", "Speyside", "43%", "20/25", "Honey, vanilla, a little sherry", "Cinnamon, nutty sweetness", "Warm, medium length", 3, 0, "Honey and cinnamon. Bourbon drinkers like this one."],
+ ["Glendronach 12", "Highland", "43%", "20/25", "Raisin, sherry, orange peel", "Dried fruit, ginger, milk chocolate", "Long, nutty, sweet spice", 4, 0, "All sherry cask. Rich, like fruitcake in a glass."],
+ ["Oban 14", "Highland", "43%", "27/35", "Orange, sea air, a wisp of smoke", "Honey, dried fig, a little salt", "Long, dry, gently smoky", 3, 1, "Halfway between sweet and smoky. A good second step."],
+ ["Ardbeg 10", "Islay", "46%", "17/23", "Peat smoke, lemon, tar", "Smoke, espresso, sweet vanilla", "Very long, smoky", 4, 5, "Big smoke with lemon and sweetness underneath. Offer a taste first."],
+ ["Lagavulin 16", "Islay", "43%", "34/44", "Deep peat smoke, iodine, sherry", "Smoke, dried fruit, sweet malt", "Very long, figs and oak", 5, 4, "A big smoky fire, but rich and sweet. Our top scotch."]
+]},
+bourbon: { k: "Spice", rows: [
+ ["Jim Beam", "Kentucky", "40%", "7/12", "Vanilla, corn, light oak", "Sweet corn, caramel", "Short, light", 1, 1, "Simple and familiar. Good with cola."],
+ ["Jack Daniel's", "Tennessee", "40%", "8/13", "Banana, caramel, vanilla", "Sweet, charcoal-mellowed, light oak", "Short, smooth", 2, 1, "Tennessee whiskey, filtered through charcoal. Sweet and easy."],
+ ["Jack Daniel's Tennessee Honey", "Honey liqueur", "35%", "8/13", "Honey, vanilla", "Sweet honey, light whiskey", "Short, sweet", 1, 0, "Whiskey with honey. Sweet, great as a shot."],
+ ["Old Forester 86 Proof", "Kentucky", "43%", "8/13", "Banana, caramel, vanilla", "Brown sugar, light spice", "Medium, soft oak", 2, 2, "Louisville's original. Banana bread and caramel."],
+ ["Buffalo Trace", "Kentucky", "45%", "8/13", "Vanilla, brown sugar, mint", "Caramel, toffee, light oak", "Medium, a little spice", 3, 2, "Classic Kentucky. Caramel, vanilla and a hint of mint."],
+ ["Weller Special Reserve", "Wheated", "45%", "8/13", "Honey, butterscotch, vanilla", "Soft caramel, sweet bread", "Short, smooth", 2, 1, "Soft and sweet with no rye bite. Easy to love."],
+ ["Wild Turkey 101", "High rye", "50.5%", "8/13", "Vanilla, orange, pepper", "Bold caramel, rye spice, oak", "Long, hot, spicy", 4, 4, "Bold and spicy. Holds up in an Old Fashioned."],
+ ["Maker's Mark", "Wheated", "45%", "9/14", "Caramel, vanilla, red fruit", "Soft, sweet, baking spice", "Smooth, buttery", 2, 1, "Soft and sweet. A great first bourbon."],
+ ["Knob Creek", "Small batch", "50%", "10/15", "Toasted nuts, oak, brown sugar", "Deep caramel, maple, rye spice", "Long, warm, oaky", 4, 3, "100 proof. Big oak and caramel. Try it with one rock."],
+ ["Woodford Reserve", "High rye", "45.2%", "10/15", "Dried fruit, cocoa, orange", "Toffee, cinnamon, toasted oak", "Long, silky, peppery", 3, 3, "Rich and polished, with chocolate and a little spice."],
+ ["Eagle Rare 10 Year", "Single barrel", "45%", "12/18", "Toffee, orange peel, leather", "Honey, dark fruit, oak", "Long, dry, elegant", 3, 2, "Ten years old. Toffee and orange, very balanced."],
+ ["Heaven Hill 7 Year", "Bottled in bond", "50%", "12/17", "Caramel, cinnamon, peanut brittle", "Brown sugar, oak, baking spice", "Medium-long, warm", 4, 3, "A lot of whiskey for the price. Caramel and cinnamon."],
+ ["Old Forester 1897", "Bottled in bond", "50%", "14/19", "Vanilla, cinnamon, sweet oak", "Caramel, clove, dark fruit", "Long, spicy", 4, 3, "Bottled in bond at 100 proof. Vanilla and cinnamon."],
+ ["Old Forester 1910", "Double barreled", "46.5%", "14/19", "Dark chocolate, toasted marshmallow", "Coffee, toffee, cherry", "Long, sweet, smoky oak", 4, 2, "Aged in two barrels. Tastes like chocolate and campfire."],
+ ["Wild Turkey Rare Breed", "Barrel proof", "~58%", "14/19", "Orange, honey, tobacco", "Rich caramel, rye spice, mint", "Very long, warming", 5, 4, "Straight from the barrel. Orange and honey. Add a drop of water."],
+ ["Blanton's Single Barrel", "Single barrel", "46.5%", "15/20", "Citrus, caramel, nutmeg", "Honey, orange, toasted corn", "Medium-long, sweet spice", 3, 2, "Every bottle comes from one barrel. Citrus, honey, very smooth."],
+ ["E.H. Taylor Small Batch", "Bottled in bond", "50%", "15/20", "Caramel, butterscotch, licorice", "Toffee, black pepper, oak", "Long, sweet then spicy", 4, 3, "A step up from Buffalo Trace. Butterscotch and pepper."],
+ ["Weller Antique 107", "Wheated", "53.5%", "15/19", "Cinnamon, caramel, dark cherry", "Rich toffee, baked bread, spice", "Long, warm", 4, 2, "Wheated but strong. Sweet, rich and warming."],
+ ["Old Forester 1920", "Prohibition style", "57.5%", "16/22", "Dark cherry, chocolate, caramel", "Rich, bold, brown sugar, oak", "Very long", 5, 3, "115 proof and packed with dark cherry and chocolate."]
+]},
+reserve: { k: "Spice", rows: [
+ ["Hancock Reserve", "Single barrel", "44.5%", "15", "Honey, citrus, light toffee", "Butterscotch, orange, soft oak", "Medium, clean", 2, 2, "Light and bright for a reserve. Honey and citrus."],
+ ["E.H. Taylor Rye", "Bottled in bond", "50%", "20", "Rye spice, black pepper, citrus", "Caramel, clove, dry oak", "Long, peppery", 3, 5, "Rye and barley, no corn. Spicy and dry."],
+ ["Weller 12 Year", "Wheated", "45%", "20", "Honey, vanilla, cherry", "Butterscotch, oak, soft spice", "Long, smooth", 3, 1, "Twelve years and wheated. Soft, sweet and hard to find."],
+ ["Weller Full Proof", "Wheated", "57%", "20", "Caramel, cherry, cinnamon", "Rich toffee, oak, brown sugar", "Long, warming", 5, 2, "Unfiltered and strong. All the sweetness of Weller, turned up."],
+ ["Elmer T. Lee", "Single barrel", "45%", "25", "Honey, ripe fruit, vanilla", "Caramel, light spice, cream", "Medium, very smooth", 3, 2, "A collector's bourbon. Honey and fruit, very smooth."],
+ ["Blanton's Gold", "Single barrel", "51.5%", "30", "Honey, orange, dark caramel", "Rich toffee, spice, oak", "Long, warm", 4, 3, "The richer, stronger Blanton's. Mostly sold outside the US."],
+ ["Blanton's Straight From The Barrel", "Barrel proof", "Varies, ~63%+", "30", "Dark caramel, cherry, oak", "Intense toffee, baking spice", "Very long", 5, 3, "Blanton's uncut and unfiltered. Add water a drop at a time."],
+ ["E.H. Taylor Barrel Proof", "Barrel proof", "Varies, ~64%+", "30", "Molasses, dark caramel, cinnamon", "Dense toffee, leather, oak", "Very long, hot", 5, 3, "Full strength and very rich. For the serious bourbon drinker."],
+ ["Weller C.Y.P.B.", "Wheated", "47.5%", "30", "Honey, vanilla, bright fruit", "Light caramel, soft oak", "Medium, clean", 3, 1, "Wheated and bright. A recipe chosen by fans. Rare."],
+ ["E.H. Taylor Cured Oak", "Bottled in bond", "50%", "35", "Honey, cinnamon, cedar", "Dried fruit, oak, baking spice", "Long, woody", 4, 3, "Aged in barrels air-dried for over a year. Woody and spiced. Our rarest pour."]
+]},
+rye: { k: "Spice", rows: [
+ ["Sazerac Rye", "Rye", "45%", "7/12", "Anise, clove, citrus", "Light spice, vanilla, candied fruit", "Medium, clean", 2, 3, "Light, spicy rye from New Orleans. Made for a Sazerac or Manhattan."],
+ ["Old Forester Rye", "Rye", "50%", "8/13", "Banana, cinnamon, mint", "Rye spice, caramel, dark fruit", "Long, spicy", 3, 4, "Spicy, with a sweet banana note. Great in a Manhattan."],
+ ["Sazerac Rye 100 Proof", "Rye", "50%", "8/13", "Clove, pepper, citrus", "Bolder spice, caramel", "Long, warm", 3, 4, "The same rye, with more punch."],
+ ["Sazerac Rye 125 Proof", "Rye", "62.5%", "10/15", "Cinnamon, dark fruit, anise", "Intense spice, toffee, oak", "Very long, hot", 5, 5, "Full-strength rye. Huge spice. Add water."],
+ ["Wild Turkey Rare Breed Rye", "Barrel proof", "~56%", "16/21", "Mint, orange, baking spice", "Rich caramel, pepper, cocoa", "Very long", 5, 5, "Barrel-proof rye. Spice and mint with a rich middle. Sip it."]
+]}
+};
+// Tequila: [brand, note, guest line, [[style, notes, price], ...]]
+const T = [
+ ["Corazón", "Highlands. Value.", "Our value pour. Clean and easy, good in a margarita.", [["Blanco","Citrus, pepper, sweet agave","7/9"],["Reposado","Caramel, vanilla, cooked agave","8/10"],["Añejo","Vanilla, oak, butterscotch","9/11"]]],
+ ["Lalo", "Highlands. Additive-free.", "Only agave, water and yeast. Bright and sweet.", [["Blanco","Sweet cooked agave, citrus, white pepper","10/15"]]],
+ ["G4", "Highlands. Additive-free, traditional.", "A bartender favorite. Earthy and mineral, made the old way.", [["Blanco","Wet stone, cooked agave, black pepper","10/15"],["Reposado","Agave first, light vanilla and caramel","14/19"]]],
+ ["Mijenta", "Highlands. Small-batch.", "Floral and elegant. The añejo is the top of our list.", [["Blanco","Honeyed agave, pear, florals","10/15"],["Reposado","Vanilla, apricot, toasted oak","17/22"],["Añejo","Cocoa, coffee, dried fruit, oak","42/48"]]],
+ ["Alma del Jaguar", "Highlands. Additive-free.", "Clean agave with citrus. Good for guests who sip.", [["Blanco","Citrus, cooked agave, pepper","11/14"],["Reposado","Agave, vanilla, light oak","13/17"],["Añejo","Caramel, baking spice, oak","17/23"]]],
+ ["Siete Leguas", "Highlands. Classic, traditional.", "One of Mexico's classic distilleries. Pure agave flavor.", [["Blanco","Earthy cooked agave, lime, pepper","11/16"],["Reposado","Butter, vanilla, agave","12/18"],["Añejo","Caramel, dried fruit, cinnamon","14/19"]]],
+ ["Cazcanes No. 7", "Lowlands. Additive-free, higher proof.", "Bolder and stronger than most. Makes a serious margarita.", [["Blanco","Rich agave, citrus, black pepper","13/18"],["Reposado","Vanilla, cinnamon, agave","15/25"],["Añejo","Toffee, cocoa, oak","25/35"]]],
+ ["Don Fulano", "Highlands. Family-made.", "Herbal and crisp. The añejo is great for whiskey drinkers.", [["Blanco","Herbs, citrus, mineral","13/18"],["Reposado","Lemongrass, vanilla, light spice","15/19"],["Añejo","Dried fruit, dark caramel, oak","20/25"]]],
+ ["Don Julio", "Highlands. Well known.", "The name people know. Clean, balanced, reliable.", [["Blanco","Fresh agave, citrus, light pepper","14/18"],["Reposado","Caramel, cinnamon, cooked agave","15/20"],["Añejo","Vanilla, butterscotch, oak","17/22"]]],
+ ["Patrón", "Highlands. Well known.", "Familiar and bright. The 100 proof silver is a strong margarita.", [["Blanco","Citrus, agave, pepper","14/19"],["Reposado","Vanilla, honey, light oak","16/21"],["Silver 100","Bolder agave, pepper, heat","16/21"]]],
+ ["Lost Lore", "Jalisco. Newer brand.", "A newer label on our list. Taste it before describing it to guests.", [["Blanco","Bright agave, citrus","14/19"],["Reposado","Agave, vanilla, soft oak","16/21"],["Añejo","Caramel, oak, spice","22/28"]]]
+];
+const dots = n => '<span class="dots">' + [1,2,3,4,5].map(i => '<i class="' + (i <= n ? 'on' : '') + '"></i>').join('') + '</span>';
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+for (const [key, set] of Object.entries(D)) {
+  const el = document.querySelector('[data-list="' + key + '"]');
+  el.innerHTML = set.rows.map(r => `<article class="card"><h4>${esc(r[0])}</h4>
+    <div class="meta"><span class="style">${esc(r[1])}</span><span>${esc(r[2])} ABV</span><span class="price">$${esc(r[3])}</span></div>
+    <dl class="notes"><dt>Nose</dt><dd>${esc(r[4])}</dd><dt>Palate</dt><dd>${esc(r[5])}</dd><dt>Finish</dt><dd>${esc(r[6])}</dd></dl>
+    <div class="scale"><span class="k">Body</span>${dots(r[7])}<span class="k" style="text-align:right">${set.k}</span>${dots(r[8])}</div>
+    <div class="say">&ldquo;${esc(r[9])}&rdquo;</div></article>`).join('');
+}
+document.querySelector('[data-list="tequila"]').innerHTML = T.map(t => `<article class="card"><h4>${esc(t[0])}</h4>
+  <div class="meta"><span class="style">${esc(t[1])}</span></div>
+  <dl class="expr">${t[3].map(e => `<div><dt>${esc(e[0])}</dt><dd>${esc(e[1])}</dd><span class="p">$${esc(e[2])}</span></div>`).join('')}</dl>
+  <div class="say">&ldquo;${esc(t[2])}&rdquo;</div></article>`).join('');
+</script>
