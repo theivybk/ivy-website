@@ -88,6 +88,9 @@ th { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: v
 td:last-child { color: var(--ivy); font-weight: 500; }
 .service { padding-block: 32px 56px; }
 .service ul { margin: 12px 0 0; padding-left: 18px; max-width: 72ch; display: grid; gap: 6px; }
+.callout { margin-top: 16px; max-width: 72ch; padding: 12px 14px; border: 1px solid var(--brass); border-left-width: 3px; border-radius: 2px; background: var(--paper); font-size: 15px; }
+.callout b { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--brass); margin-bottom: 2px; }
+.callout strong { color: var(--ivy); font-weight: 600; }
 .note { font-size: 12px; color: var(--muted); margin-top: 10px; max-width: 72ch; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 </style>
@@ -97,6 +100,7 @@ td:last-child { color: var(--ivy); font-weight: 500; }
   <h1>Beer, Wine &amp; Spirits</h1>
   <p class="lede">Every beer, scotch, bourbon, rye, tequila and wine on our menu: what it tastes like, what it costs and what to say to the guest. Spirit prices are for a 1.5 oz / 2 oz pour. Wine prices are glass / bottle.</p>
   <p class="note">Taken from the spirits list on our website menu. Barrel-proof bottles change strength from batch to batch, so check the label. If a note doesn't match the bottle we have open, trust your own taste and tell the bar manager.</p>
+  <div class="callout" role="note"><b>Ringing in cocktails</b> Every cocktail is rung in at the <strong>2 oz price</strong>. In Toast, that's the <strong>Double</strong>.</div>
 </header>
 
 <nav class="tabs" aria-label="Spirits"><div class="wrap">
@@ -172,7 +176,7 @@ td:last-child { color: var(--ivy); font-weight: 500; }
     <div><dt>Proof</dt><dd>Proof is ABV doubled. Above 100 proof, offer a few drops of water or one big rock.</dd></div>
   </dl>
   <h3 class="group">Bourbon &amp; American</h3>
-  <p class="groupnote">2 oz cocktail pour available as an Old Fashioned, Manhattan or Whiskey Sour, add $4.</p>
+  <p class="groupnote">2 oz cocktail pour available as an Old Fashioned, Manhattan or Whiskey Sour, add $4. Ring every cocktail in at the 2 oz price (the Double in Toast).</p>
   <div class="cards" data-list="bourbon"></div>
   <h3 class="group">Reserve</h3>
   <p class="groupnote">1.5 oz pour only. These are allocated bottles, so mention them to guests who ask for "something special".</p>
@@ -202,7 +206,7 @@ td:last-child { color: var(--ivy); font-weight: 500; }
     <div><dt>Reposado</dt><dd>"Rested" 2 to 12 months in oak. Agave plus vanilla and caramel.</dd></div>
     <div><dt>A&ntilde;ejo</dt><dd>Aged 1 to 3 years. Sip it like whiskey. A good pick for bourbon drinkers.</dd></div>
   </dl>
-  <p class="groupnote" style="margin-top:12px">2 oz cocktail pour available as a Margarita or Paloma, add $4.</p>
+  <p class="groupnote" style="margin-top:12px">2 oz cocktail pour available as a Margarita or Paloma, add $4. Ring every cocktail in at the 2 oz price (the Double in Toast).</p>
   <div class="cards" data-list="tequila"></div>
   <h5>If they like&hellip;</h5>
   <div class="tablewrap"><table>
@@ -236,6 +240,7 @@ td:last-child { color: var(--ivy); font-weight: 500; }
   <div class="eyebrow">Behind the bar</div>
   <h2>Pouring and talking</h2>
   <ul>
+    <li><b>Ring every cocktail in at the 2 oz price.</b> In Toast, choose the Double.</li>
     <li><b>Ask before you suggest.</b> "Do you like it sweet, spicy or smoky?" One answer narrows the shelf to two bottles.</li>
     <li><b>Neat, a few drops of water or one big rock.</b> Water opens up high-proof whiskey like the Weller Full Proof or Rare Breed.</li>
     <li><b>Offer a taste</b> of Ardbeg, Lagavulin or anything barrel proof before pouring a full measure.</li>
