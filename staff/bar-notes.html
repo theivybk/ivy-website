@@ -71,6 +71,11 @@ h3.group { font-family: var(--display); font-style: italic; font-weight: 500; fo
 .expr dd { margin: 0; min-width: 0; }
 .expr .p { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .winenote { margin: 0; font-size: 14px; }
+.beerlist td:last-child { color: var(--ink); font-weight: 400; }
+.beerlist td b { font-weight: 500; color: var(--ivy); }
+.beerlist .fmt { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-left: 4px; white-space: nowrap; }
+.beerlist .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.beerlist .grouprow td { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--brass); font-weight: 600; padding-top: 18px; border-bottom: 1px solid var(--brass); }
 .pair { margin-top: auto; padding-top: 9px; border-top: 1px solid var(--rule); font-family: var(--display); font-style: italic; font-size: 17px; line-height: 1.3; color: var(--ivy); }
 .pair b { font-family: var(--body); font-style: normal; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--brass); margin-right: 4px; }
 .meta .flag { color: var(--ink); font-weight: 500; }
@@ -89,16 +94,48 @@ td:last-child { color: var(--ivy); font-weight: 500; }
 
 <header class="top wrap">
   <div class="eyebrow">Staff reference &middot; Back bar</div>
-  <h1>Spirits &amp; Wine</h1>
-  <p class="lede">Every scotch, bourbon, rye, tequila and wine on our menu: what it tastes like, what it costs and what to say to the guest. Spirit prices are for a 1.5 oz / 2 oz pour. Wine prices are glass / bottle.</p>
+  <h1>Beer, Wine &amp; Spirits</h1>
+  <p class="lede">Every beer, scotch, bourbon, rye, tequila and wine on our menu: what it tastes like, what it costs and what to say to the guest. Spirit prices are for a 1.5 oz / 2 oz pour. Wine prices are glass / bottle.</p>
   <p class="note">Taken from the spirits list on our website menu. Barrel-proof bottles change strength from batch to batch, so check the label. If a note doesn't match the bottle we have open, trust your own taste and tell the bar manager.</p>
 </header>
 
 <nav class="tabs" aria-label="Spirits"><div class="wrap">
-  <a href="#scotch">Scotch</a><a href="#bourbon">Bourbon &amp; Rye</a><a href="#tequila">Tequila</a><a href="#wine">Wine</a><a href="#service">Pouring</a>
+  <a href="#beer">Beer</a><a href="#scotch">Scotch</a><a href="#bourbon">Bourbon &amp; Rye</a><a href="#tequila">Tequila</a><a href="#wine">Wine</a><a href="#service">Pouring</a>
 </div></nav>
 
 <main class="wrap">
+
+<section class="spirit" id="beer">
+  <div class="eyebrow">Draft, cans &amp; more &middot; 54 options</div>
+  <h2>Beer</h2>
+  <dl class="primer">
+    <div><dt>Lager &amp; pilsner</dt><dd>Clean, crisp and light. The safe pick for anyone who says "something light" or names a big domestic brand.</dd></div>
+    <div><dt>Wheat</dt><dd>Soft and hazy, often with citrus or orange. Low bitterness. Good for guests who don't like hoppy beer.</dd></div>
+    <div><dt>IPA</dt><dd>West Coast: clear, piney, bitter. Hazy: cloudy, juicy, tropical, softer bitterness.</dd></div>
+    <div><dt>Dark</dt><dd>Brown ale and stout taste roasty: toffee, chocolate, coffee. Dark doesn't mean heavy. Guinness is lighter than most lagers.</dd></div>
+  </dl>
+  <h3 class="group">Draft</h3>
+  <p class="groupnote">16 oz pour unless noted. ABV only where it's fixed; rotating and seasonal taps change, so check the tap list.</p>
+  <div class="cards" data-list="draft"></div>
+  <h3 class="group">Cans, bottles &amp; more</h3>
+  <div class="tablewrap"><table class="beerlist">
+    <thead><tr><th>Beer</th><th>What it is</th><th>Price</th></tr></thead>
+    <tbody id="beer-other"></tbody>
+  </table></div>
+  <h5>If they like&hellip;</h5>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Guest says</th><th>Why</th><th>Pour</th></tr></thead>
+    <tbody>
+      <tr><td>"Something light" or "a Bud Light"</td><td>Crisp, low bitterness</td><td>Miller Lite, Modelo or Krombacher Pils on draft</td></tr>
+      <tr><td>"Not hoppy"</td><td>Wheat or honey, soft and smooth</td><td>Central Waters Honey Blonde or Goose Island 312</td></tr>
+      <tr><td>"Something fruity"</td><td>Citrus wheat or cider</td><td>Cali Squeeze Blood Orange or the Schilling cider</td></tr>
+      <tr><td>"Your best IPA"</td><td>Chicago-area classic</td><td>3 Floyds Zombie Dust</td></tr>
+      <tr><td>"Juicy, not bitter"</td><td>Hazy IPA</td><td>Half Acre Waybird or the Phase Three hazy</td></tr>
+      <tr><td>"Something dark"</td><td>Roasty but easy</td><td>Guinness, or AleSmith Nut Brown for sweeter</td></tr>
+      <tr><td>"I'm not drinking" or "gluten-free"</td><td>NA and dedicated GF brewery</td><td>Athletic Free Wave, Guinness Zero, or Ghostfish</td></tr>
+    </tbody>
+  </table></div>
+</section>
 
 <section class="spirit" id="scotch">
   <div class="eyebrow">Scotland &middot; 8 bottles</div>
@@ -277,6 +314,56 @@ const T = [
  ["Patrón", "Highlands. Well known.", "Familiar and bright. The 100 proof silver is a strong margarita.", [["Blanco","Citrus, agave, pepper","14/19"],["Reposado","Vanilla, honey, light oak","16/21"],["Silver 100","Bolder agave, pepper, heat","16/21"]]],
  ["Lost Lore", "Jalisco. Newer brand.", "A newer label on our list. Taste it before describing it to guests.", [["Blanco","Bright agave, citrus","14/19"],["Reposado","Agave, vanilla, soft oak","16/21"],["Añejo","Caramel, oak, spice","22/28"]]]
 ];
+// Beer (from the website menu, 2026-11-27)
+D.draft = { k: "Hops", rows: [
+ ["Krombacher Pils", "German pilsner", "4.8%", "7", "Bread, floral hops", "Crisp malt, light bitterness", "Dry, clean", 2, 2, "A proper German pils. Crisp and clean."],
+ ["Central Waters Honey Blonde", "Honey blonde ale", "4.75%", "7", "Honey, light grain", "Soft, lightly sweet malt", "Smooth, short", 2, 1, "Brewed with Wisconsin honey. Soft and easy."],
+ ["Miller Lite", "Light lager", "4.2%", "6", "Light grain", "Crisp, very light", "Clean, quick", 1, 1, "The classic light beer."],
+ ["Modelo Especial", "Mexican lager", "4.4%", "7", "Light malt, a little corn", "Crisp, slightly sweet", "Clean", 1, 1, "Light and crisp. Great with tacos or wings."],
+ ["3 Floyds Deluxe Lager", "Lager", "", "7", "Bready malt, light hops", "Crisp, clean, a touch of bitterness", "Dry", 2, 2, "An easy lager from the Zombie Dust brewery."],
+ ["Middle Brow Yard Work", "Kölsch", "", "7", "Light grain, a little fruit", "Crisp, delicate, slightly fruity", "Clean, dry", 1, 1, "A Chicago kölsch. Light like a lager, a little fruity like an ale."],
+ ["Bell's Oberon Eclipse", "Wheat ale", "", "7", "Citrus, bread", "Soft wheat, orange, light spice", "Smooth", 2, 1, "A seasonal take on Bell's Oberon. Soft wheat and citrus."],
+ ["Cali Squeeze Blood Orange", "Hefeweizen with fruit", "5.4%", "7", "Blood orange, wheat", "Juicy citrus, soft wheat", "Bright, short", 2, 1, "Wheat beer with real blood orange. Fruity, not sweet."],
+ ["Goose Island 312", "Urban wheat ale", "4.2%", "7", "Lemon, wheat", "Light, citrusy, crisp", "Clean", 1, 1, "Chicago's wheat beer. Light and lemony."],
+ ["Lagunitas Little Sumpin' Sumpin'", "Wheat pale ale", "7.5%", "7", "Citrus, pine, wheat", "Soft body, hoppy, grapefruit", "Medium, bitter", 3, 3, "A hoppy wheat ale. Smooth but stronger than it tastes."],
+ ["Revolution Fist City", "Pale ale", "5.5%", "7", "Citrus, pine", "Crisp malt, bright hops", "Dry, lightly bitter", 2, 3, "A Chicago pale ale. Hoppy but easy-drinking."],
+ ["3 Floyds Zombie Dust", "Hoppy pale ale", "6.2%", "7", "Citra hops, grapefruit, tropical fruit", "Juicy citrus, firm bitterness", "Dry, bitter", 3, 4, "A cult favorite from Munster, Indiana. Big citrus hops."],
+ ["Begyle Hophazardly", "West Coast IPA", "", "7", "Pine, citrus", "Bitter hops, light malt", "Dry", 3, 4, "A Chicago IPA, piney and bitter."],
+ ["Half Acre Sunset Vallejo", "West Coast IPA", "", "7", "Grapefruit, pine, resin", "Clear, bitter, crisp malt", "Long, bitter", 3, 4, "A clean, bitter West Coast IPA from Chicago's Half Acre."],
+ ["Sierra Nevada Celebration", "Fresh-hop IPA (seasonal)", "6.8%", "7", "Pine, citrus, caramel", "Hoppy, toasted malt", "Long, bitter", 4, 4, "The holiday IPA. Pine and citrus with a malty backbone."],
+ ["Half Acre Waybird", "Hazy IPA", "", "7", "Tropical fruit, citrus", "Juicy, soft, low bitterness", "Smooth", 3, 2, "Juicy and soft. For IPA fans who don't want bitter."],
+ ["Phase Three Rotating Hazy IPA", "Hazy IPA (rotating)", "", "7", "Changes by batch", "Juicy, tropical, soft", "Smooth", 3, 2, "Rotating hazy IPA from Phase Three. Check today's tap."],
+ ["AleSmith Nut Brown Ale", "Brown ale", "5%", "7", "Toffee, toasted nuts", "Caramel, light chocolate", "Smooth, slightly sweet", 3, 1, "Toffee and nuts. Dark but easy to drink."],
+ ["Schilling Strawberry Rhubarb Awakening", "Cider", "", "7", "Strawberry, tart rhubarb", "Fruity, tart, lightly sweet", "Crisp", 1, 0, "A fruity cider on draft. Tart strawberry and rhubarb."],
+ ["Guinness Draught (20 oz)", "Irish stout", "4.2%", "8", "Roasted barley, coffee", "Creamy, roasty, dry", "Smooth, dry", 2, 1, "Creamy and roasty, and lighter than it looks. Poured as a 20 oz pint."]
+]};
+// Other beer: [group, name, format, note, price]
+const B = [
+ ["Cans & bottles","Bud Light","Bottle","Light American lager","5"],
+ ["Cans & bottles","Busch Light","Can","Light American lager","5"],
+ ["Cans & bottles","Coors Banquet","Bottle","Classic full-flavor American lager","5"],
+ ["Cans & bottles","Coors Light","Bottle","Light American lager","5"],
+ ["Cans & bottles","Goose Island 312","Can","Light, lemony Chicago wheat ale","5"],
+ ["Cans & bottles","Michelob Ultra","Bottle","Low-calorie light lager","5"],
+ ["Cans & bottles","Miller High Life","Bottle","Crisp, classic American lager","5"],
+ ["Cans & bottles","Old Style","Can","Chicago's classic lager","5"],
+ ["Cans & bottles","Pacifico","Bottle","Light Mexican lager, good with lime","6"],
+ ["Seltzers","CarBliss (Apple, Black Raspberry, Blood Orange, Lemon Lime)","Can","Wine-based seltzer, gluten-free","7"],
+ ["Seltzers","Florida Seltzer Orange Yuzu","Can","Hard seltzer, bright citrus","7"],
+ ["Seltzers","High Noon (Black Cherry, Grapefruit, Peach, Pineapple, Watermelon)","Can","Vodka, soda water and real juice","7"],
+ ["Seltzers","Lucky One Vodka Lemonade","Can","Vodka lemonade","7"],
+ ["Seltzers","Sun Cruiser (Classic Iced Tea, Iced Tea Lemonade, Lemonade, Pink Lemonade)","Can","Vodka iced tea and lemonades","7"],
+ ["Ciders","Angry Orchard Crisp Apple","Can","Sweet-tart, easy apple cider","6"],
+ ["Ciders","Right Bee Cider Semi-Dry","Can","Chicago cider, crisp apple, not too sweet","6"],
+ ["Ciders","Schilling Cider Moon Berries","Can","Berry cider, fruity and tart","6"],
+ ["Ciders","Wölffer Estate Dry Cider Rosé","Bottle","Dry, pink, wine-like cider","8"],
+ ["Ciders","Wölffer Estate Cranberry Spiced","Bottle","Cranberry and warm spice, seasonal","8"],
+ ["Non-alcoholic","Athletic Free Wave Hazy IPA","Can","NA hazy IPA, juicy and hoppy","6"],
+ ["Non-alcoholic","Guinness Zero Draught","Draft","NA Guinness, creamy and roasty","8"],
+ ["Non-alcoholic","Krombacher Pilsner NA","Bottle","NA German pils, crisp","8"],
+ ["Gluten-free","Ghostfish Meteor Shower","Can","From a dedicated gluten-free brewery","8"],
+ ["Gluten-free","Ghostfish Shrouded Summit","Can","From a dedicated gluten-free brewery","8"]
+];
 // Wine (from the Nov 26 preshift Wine Guide): [group, name, region, flag, price, notes, try with, isNew]
 const W = [
  ["Sparkling","Zardetto Prosecco Rosé","Veneto, Italy","187 ml single-serve bottle","11","Pale pink Prosecco with strawberry, white peach and a hint of mandarin. Fresh, lively bubbles and a crisp finish.","Cheese Curds, Pretzel Twist or the Brownie à la Mode",0],
@@ -300,7 +387,7 @@ const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 for (const [key, set] of Object.entries(D)) {
   const el = document.querySelector('[data-list="' + key + '"]');
   el.innerHTML = set.rows.map(r => `<article class="card"><h4>${esc(r[0])}</h4>
-    <div class="meta"><span class="style">${esc(r[1])}</span><span>${esc(r[2])} ABV</span><span class="price">$${esc(r[3])}</span></div>
+    <div class="meta"><span class="style">${esc(r[1])}</span>${r[2] ? `<span>${esc(r[2])} ABV</span>` : ''}<span class="price">$${esc(r[3])}</span></div>
     <dl class="notes"><dt>Nose</dt><dd>${esc(r[4])}</dd><dt>Palate</dt><dd>${esc(r[5])}</dd><dt>Finish</dt><dd>${esc(r[6])}</dd></dl>
     <div class="scale"><span class="k">Body</span>${dots(r[7])}<span class="k" style="text-align:right">${set.k}</span>${dots(r[8])}</div>
     <div class="say">&ldquo;${esc(r[9])}&rdquo;</div></article>`).join('');
@@ -309,6 +396,14 @@ document.querySelector('[data-list="tequila"]').innerHTML = T.map(t => `<article
   <div class="meta"><span class="style">${esc(t[1])}</span></div>
   <dl class="expr">${t[3].map(e => `<div><dt>${esc(e[0])}</dt><dd>${esc(e[1])}</dd><span class="p">$${esc(e[2])}</span></div>`).join('')}</dl>
   <div class="say">&ldquo;${esc(t[2])}&rdquo;</div></article>`).join('');
+{
+  let last = '';
+  document.getElementById('beer-other').innerHTML = B.map(b => {
+    const head = b[0] !== last ? `<tr class="grouprow"><td colspan="3">${esc(b[0])}</td></tr>` : '';
+    last = b[0];
+    return head + `<tr><td><b>${esc(b[1])}</b> <span class="fmt">${esc(b[2])}</span></td><td>${esc(b[3])}</td><td class="num">$${esc(b[4])}</td></tr>`;
+  }).join('');
+}
 document.querySelectorAll('[data-wine]').forEach(el => {
   el.innerHTML = W.filter(w => w[0] === el.dataset.wine).map(w => `<article class="card"><h4>${esc(w[1])}${w[7] ? ' <span class="newtag">New</span>' : ''}</h4>
     <div class="meta"><span class="style">${esc(w[2])}</span>${w[3] ? `<span class="flag">${esc(w[3])}</span>` : ''}<span class="price">$${esc(w[4])}</span></div>
